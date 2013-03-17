@@ -5,6 +5,8 @@
  */
 package net.finmath.tests.convexityadjustment;
 
+import static org.junit.Assert.*;
+
 import java.text.DecimalFormat;
 
 import org.junit.Test;
@@ -38,7 +40,7 @@ public class CMSOptionTest {
 	private	double	correlationDecay	= 0.1;
 
 	// Process discretization properties
-	private int		numberOfPaths		= 500000;
+	private int		numberOfPaths		= 10000;
 	private int		numberOfTimeSteps	= 15;
 	private double	deltaT				= 0.5;
 
@@ -158,6 +160,8 @@ public class CMSOptionTest {
 		System.out.println("Forward Swaprate............................................:\t" + formatterPercent.format(rate));
 		System.out.println("Convexity Adjusted Forward Swaprate (Hunt-Kennedy)..........:\t" + formatterPercent.format(adjustedCMSRate));
 		
+		// Test condition
+		assertTrue(Math.abs(valueCMSOptionLMM - valueCMSOptionHK) < 1E-3);
 		/*
 		 * Value a caplet with same fixing date
 		 */
@@ -176,5 +180,5 @@ public class CMSOptionTest {
 
 		double valueSwaptionAnalytic = swaption.getValue(forwardCurve, swaprateVolatility);
 		System.out.println("Swaption with Black-Scholes.................................:\t" + formatterPercent.format(valueSwaptionAnalytic * swaptionNotional));
-	}	
+	}
 }

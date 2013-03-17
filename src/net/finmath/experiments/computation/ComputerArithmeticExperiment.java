@@ -10,12 +10,12 @@ package net.finmath.experiments.computation;
  * 
  * @author Christian Fries
  */
-public class ComputerArithmeticTest {
+public class ComputerArithmeticExperiment {
 
 	/**
 	 * Construct the test class.
 	 */
-	public ComputerArithmeticTest() {
+	public ComputerArithmeticExperiment() {
 		// TODO Auto-generated constructor stub
 	}
 

@@ -47,7 +47,7 @@ public class BlackScholesMonteCarloValuationTest {
 	private double	volatility     = 0.30;
 
 	// Process discretization properties
-	private int		numberOfPaths		= 100000;
+	private int		numberOfPaths		= 10000;
 	private int		numberOfTimeSteps	= 10;
 	private double	deltaT				= 0.5;
 

@@ -8,7 +8,9 @@
     <property name="srcDir"         value="./src"/>
     <property name="classDir"       value="./bin"/>
     <property name="jar"            value="${project_name}.jar"/>
-    <mkdir dir="${classDir}" />
+    <property name="reports.tests"  value="./reports/tests"/>
+	<mkdir dir="${classDir}" />
+	<mkdir dir="${reports.tests}" />
 </target>
 
 <!-- compile -->
@@ -37,14 +39,18 @@
 </target>
 
 <target name="junit" depends="jar">
-	<junit>
+	<junit printsummary="true" failureproperty="junit.failure">
 	    <classpath> 
 		    <fileset dir="lib">
 		      <include name="**/*.jar" />
 		    </fileset>
 		    <pathelement path="${jar}"/>	    	
 	    </classpath>
-	    <test name="net.finmath.tests.montecarlo.assetderivativevaluation.BlackScholesMonteCarloValuationTest"/>
+		<batchtest fork="yes" todir="${reports.tests}">
+			<fileset dir="${srcDir}">
+				<include name="**/*Test.java"/>
+			</fileset>
+		</batchtest>
 	</junit>
 </target>
 	

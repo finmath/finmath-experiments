@@ -1,0 +1,14 @@
+
+The spreadsheets in this folder rely on the availability of a java compiler in the JVM.
+Hence, the spreadsheets require that "Obba Server" is launched from a JDK (1.6 or better).
+A JRE is not sufficient.
+
+One way to active this is:
+
+- Download and install a Java Development Kit (JDK) if it is not already installed.
+
+- Launch Obba Server from the JDK, i.e. via command line like
+  (OS X, Unix):
+	path-to-jdk/bin/java -jar Obba.jar
+  (Windows)
+	path-to-jdk\bin\java.exe -jar Obba.jar

@@ -40,7 +40,7 @@
 	</jar>
 </target>
 
-<target name="junittest" depends="jar">
+<target name="junit" depends="jar">
 	<junit printsummary="true" failureproperty="junit.failure">
 	    <classpath> 
 		    <fileset dir="lib">
@@ -57,7 +57,7 @@
 	</junit>
 </target>
 
-<target name="junit" depends="junittest">
+<target name="junitreport" depends="junit">
 	<junitreport todir="${reports.tests}">
 		<fileset dir="${reports.tests}">
 			<include name="TEST-*.xml"/>

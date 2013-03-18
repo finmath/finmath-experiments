@@ -221,7 +221,7 @@ public class LIBORMarketModelValuationTest {
 			System.out.println(formatterDeviation.format(deviation));
 			
 			
-			if(isUnitTests) assertTrue(Math.abs(deviation) < 1E-03);
+			if(isUnitTests) assertTrue(Math.abs(deviation) < 2E-03);
 		}
 		System.out.println("__________________________________________________________________________________________\n");
 	}
@@ -273,7 +273,7 @@ public class LIBORMarketModelValuationTest {
 			System.out.print(formatterPrice.format(value) + "\n");
 
 			// The swap should be at par (close to zero)
-			if(isUnitTests) assertTrue(Math.abs(value) < 1E-3);
+			if(isUnitTests) assertTrue(Math.abs(value) < 2E-3);
 		}
 		System.out.println("__________________________________________________________________________________________\n");
 	}

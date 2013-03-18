@@ -46,7 +46,7 @@ public class LIBORMarketModelValuationTest {
 
 	private boolean isUnitTests = true;
 	
-	private final int numberOfPaths		= 10000;
+	private final int numberOfPaths		= 5000;
 	private final int numberOfFactors	= 5;
 	
 	private LIBORModelMonteCarloSimulationInterface liborMarketModel; 

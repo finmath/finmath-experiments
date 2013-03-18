@@ -9,8 +9,10 @@
     <property name="classDir"       value="./bin"/>
     <property name="jar"            value="${project_name}.jar"/>
     <property name="reports.tests"  value="./reports/tests"/>
+    <property name="reports.html"  value="./reports/html"/>
 	<mkdir dir="${classDir}" />
 	<mkdir dir="${reports.tests}" />
+	<mkdir dir="${reports.html}" />
 </target>
 
 <!-- compile -->
@@ -38,7 +40,7 @@
 	</jar>
 </target>
 
-<target name="junit" depends="jar">
+<target name="junittest" depends="jar">
 	<junit printsummary="true" failureproperty="junit.failure">
 	    <classpath> 
 		    <fileset dir="lib">
@@ -51,7 +53,17 @@
 				<include name="**/*Test.java"/>
 			</fileset>
 		</batchtest>
+		<formatter type="xml"/>
 	</junit>
+</target>
+
+<target name="junit" depends="junittest">
+	<junitreport todir="${reports.tests}">
+		<fileset dir="${reports.tests}">
+			<include name="TEST-*.xml"/>
+		</fileset>
+		<report format="frames" todir="${reports.html}"/>
+	</junitreport>
 </target>
 	
 <!-- removes all that has been built -->

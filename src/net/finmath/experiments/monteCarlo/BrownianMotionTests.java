@@ -57,10 +57,19 @@ public class BrownianMotionTests {
 			double mean		= brownianMotionRealization.getAverage();
 			double variance	= brownianMotionRealization.getVariance();
 
+			// Calculate x = \int dW(t) * dW(t)
+			RandomVariableInterface squaredIncrements = brownianIncement.getMutableCopy().squared();
+			sumOfSquaredIncrements.add(squaredIncrements);
+
+			double meanOfSumOfSquaredIncrements		= sumOfSquaredIncrements.getAverage();
+			double varianceOfSumOfSquaredIncrements	= sumOfSquaredIncrements.getVariance();
+
 			System.out.println(
 					fromatterReal2.format(time) + "\t" +
 					fromatterSci4.format(mean) + "\t" +
 					fromatterSci4.format(variance) + "\t" +
+					fromatterSci4.format(meanOfSumOfSquaredIncrements) + "\t" +
+					fromatterSci4.format(varianceOfSumOfSquaredIncrements) + "\t" +
 					""
 			);
 		}

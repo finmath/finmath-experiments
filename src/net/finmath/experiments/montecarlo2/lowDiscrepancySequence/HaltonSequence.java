@@ -3,7 +3,7 @@
  *
  * Created on 18.10.2012
  */
-package net.finmath.experiments.monteCarlo.lowDiscrepancySequence;
+package net.finmath.experiments.montecarlo2.lowDiscrepancySequence;
 
 /**
  * This class represents a Halton sequence (low discrepancy sequence), or equivalently a vector of

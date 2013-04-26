@@ -1,26 +1,26 @@
 /*
  * (c) Copyright Christian P. Fries, Germany. All rights reserved. Contact: email@christian-fries.de.
  *
- * Created on 21.01.2004
+ * Created on 12.02.2013
  */
-package net.finmath.experiments.monteCarlo.assetDerivativeValuation.products;
+package net.finmath.experiments.montecarlo2.assetDerivativeValuation.products;
 
 import net.finmath.exception.CalculationException;
 import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationInterface;
+import net.finmath.montecarlo.assetderivativevaluation.MonteCarloBlackScholesModel;
 import net.finmath.montecarlo.assetderivativevaluation.products.AbstractAssetMonteCarloProduct;
 import net.finmath.stochastic.RandomVariableInterface;
 
 /**
- * Implements valuation of a European stock option.
- * The code is equivalent to the code in <code>net.finmath.montecarlo.assetderivativevaluation.products.EuropeanOption</code>.
+ * Implements calculation of the delta of a European option using the pathwise method.
  * 
  * @author Christian Fries
  * @version 1.0
  */
-public class EuropeanOption2 extends AbstractAssetMonteCarloProduct {
+public class EuropeanOptionVegaPathwise extends AbstractAssetMonteCarloProduct {
 
-	private double maturity;
-	private double strike;
+	private double	maturity;
+	private double	strike;
 	
 	/**
 	 * Construct a product representing an European option on an asset S (where S the asset with index 0 from the model - single asset case).
@@ -28,7 +28,7 @@ public class EuropeanOption2 extends AbstractAssetMonteCarloProduct {
 	 * @param strike The strike K in the option payoff max(S(T)-K,0).
 	 * @param maturity The maturity T in the option payoff max(S(T)-K,0)
 	 */
-	public EuropeanOption2(double maturity, double strike) {
+	public EuropeanOptionVegaPathwise(double maturity, double strike) {
 		super();
 		this.maturity = maturity;
 		this.strike = strike;
@@ -43,11 +43,20 @@ public class EuropeanOption2 extends AbstractAssetMonteCarloProduct {
 	 */
 	public double getValue(AssetModelMonteCarloSimulationInterface model) throws CalculationException
 	{
+		MonteCarloBlackScholesModel blackScholesModel = null;
+		try {
+			blackScholesModel = (MonteCarloBlackScholesModel)model;
+		}
+		catch(Exception e) {
+			throw new ClassCastException("This method requires a Black-Scholes type model (MonteCarloBlackScholesModel).");
+		}
+
 		// Get underlying and numeraire
 		RandomVariableInterface underlyingAtMaturity	= model.getAssetValue(maturity,0);
 		RandomVariableInterface numeraireAtMaturity		= model.getNumeraire(maturity);
-		RandomVariableInterface monteCarloWeights		= model.getMonteCarloWeights(maturity);
+		RandomVariableInterface underlyingAtToday		= model.getAssetValue(0.0,0);
 		RandomVariableInterface numeraireAtToday		= model.getNumeraire(0);
+		RandomVariableInterface monteCarloWeights		= model.getMonteCarloWeights(maturity);
 		
 		/*
 		 *  The following way of calculating the expected value (average) is discouraged since it makes too strong
@@ -57,11 +66,21 @@ public class EuropeanOption2 extends AbstractAssetMonteCarloProduct {
 		double average = 0.0;
 		for(int path=0; path<model.getNumberOfPaths(); path++)
 		{
-			// Expectation of N(0) * ( max(S(T)-K,0) / N(T) )
 			if(underlyingAtMaturity.get(path) > strike)
-			{	
-				average += (underlyingAtMaturity.get(path) - strike) / numeraireAtMaturity.get(path) * monteCarloWeights.get(path)
-						* numeraireAtToday.get(path);
+			{
+				// Get some model parameters
+				double T		= maturity;
+				double S0		= underlyingAtToday.get(path);
+				double r		= blackScholesModel.getRiskFreeRate();
+				double sigma	= blackScholesModel.getVolatility();
+
+				double ST		= underlyingAtMaturity.get(path);
+				double WT		= (Math.log(ST/S0) - r * T + 0.5 * sigma * sigma * T)/sigma;
+
+				double payOff			= 1;
+				double modifiedPayoff	= payOff * ST * (-sigma * T + WT);
+
+				average += modifiedPayoff / numeraireAtMaturity.get(path) * monteCarloWeights.get(path) * numeraireAtToday.get(path);
 			}
 		}
 
@@ -69,7 +88,7 @@ public class EuropeanOption2 extends AbstractAssetMonteCarloProduct {
 	}
 
 	@Override
-	public RandomVariableInterface getValues(double evaluationTime, AssetModelMonteCarloSimulationInterface model) {
+	public RandomVariableInterface getValue(double evaluationTime, AssetModelMonteCarloSimulationInterface model) {
 		throw new RuntimeException("Method not supported.");
 	}
 }

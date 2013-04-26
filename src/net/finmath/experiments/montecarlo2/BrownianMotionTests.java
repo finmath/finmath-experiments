@@ -1,7 +1,7 @@
 /*
  * Created on 10.02.2004
  */
-package net.finmath.experiments.monteCarlo;
+package net.finmath.experiments.montecarlo2;
 
 import java.text.DecimalFormat;
 

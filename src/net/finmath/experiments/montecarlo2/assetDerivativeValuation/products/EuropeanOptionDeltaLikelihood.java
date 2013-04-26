@@ -3,7 +3,7 @@
  *
  * Created on 12.02.2013
  */
-package net.finmath.experiments.monteCarlo.assetDerivativeValuation.products;
+package net.finmath.experiments.montecarlo2.assetDerivativeValuation.products;
 
 import net.finmath.exception.CalculationException;
 import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationInterface;
@@ -17,7 +17,7 @@ import net.finmath.stochastic.RandomVariableInterface;
  * @author Christian Fries
  * @version 1.0
  */
-public class EuropeanOptionVegaLikelihood extends AbstractAssetMonteCarloProduct {
+public class EuropeanOptionDeltaLikelihood extends AbstractAssetMonteCarloProduct {
 
 	private double	maturity;
 	private double	strike;
@@ -30,7 +30,7 @@ public class EuropeanOptionVegaLikelihood extends AbstractAssetMonteCarloProduct
 	 * @param strike The strike K in the option payoff max(S(T)-K,0).
 	 * @param maturity The maturity T in the option payoff max(S(T)-K,0)
 	 */
-	public EuropeanOptionVegaLikelihood(double maturity, double strike) {
+	public EuropeanOptionDeltaLikelihood(double maturity, double strike) {
 		super();
 		this.maturity = maturity;
 		this.strike = strike;
@@ -87,17 +87,15 @@ public class EuropeanOptionVegaLikelihood extends AbstractAssetMonteCarloProduct
 					double x1		= 1.0 / (sigma * Math.sqrt(T)) * (Math.log(ST) - (r * T - 0.5 * sigma*sigma * T + Math.log(S0)));
 					double logPhi1	= Math.log(1.0/Math.sqrt(2 * Math.PI) * Math.exp(-x1*x1/2.0) / (ST * (sigma) * Math.sqrt(T)) );
 	
-					double x2		= 1.0 / ((sigma+h) * Math.sqrt(T)) * (Math.log(ST) - (r * T - 0.5 * (sigma+h)*(sigma+h) * T + Math.log(S0)));
-					double logPhi2	= Math.log(1.0/Math.sqrt(2 * Math.PI) * Math.exp(-x2*x2/2.0) / (ST * (sigma+h) * Math.sqrt(T)) );
-
+					double x2		= 1.0 / (sigma * Math.sqrt(T)) * (Math.log(ST) - (r * T - 0.5 * sigma*sigma * T + Math.log(S0+h)));
+					double logPhi2	= Math.log(1.0/Math.sqrt(2 * Math.PI) * Math.exp(-x2*x2/2.0) / (ST * (sigma) * Math.sqrt(T)) );
+					
 					lr		= (logPhi2 - logPhi1) / h;
 				}
 				else {
-					double dxdsigma = -x / sigma + Math.sqrt(T);
-					
-					lr		= - x * dxdsigma - 1/sigma;
+					lr		= -1.0 * x / (sigma * Math.sqrt(T)) * -1.0 / S0;
 				}
-				
+
 				double payOff			= (underlyingAtMaturity.get(path) - strike);
 				double modifiedPayoff	= payOff * lr;
 
@@ -109,7 +107,7 @@ public class EuropeanOptionVegaLikelihood extends AbstractAssetMonteCarloProduct
 	}
 
 	@Override
-	public RandomVariableInterface getValues(double evaluationTime, AssetModelMonteCarloSimulationInterface model) {
+	public RandomVariableInterface getValue(double evaluationTime, AssetModelMonteCarloSimulationInterface model) {
 		throw new RuntimeException("Method not supported.");
 	}
 }

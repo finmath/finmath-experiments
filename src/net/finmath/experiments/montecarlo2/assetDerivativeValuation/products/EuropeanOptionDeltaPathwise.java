@@ -3,7 +3,7 @@
  *
  * Created on 12.02.2013
  */
-package net.finmath.experiments.monteCarlo.assetDerivativeValuation.products;
+package net.finmath.experiments.montecarlo2.assetDerivativeValuation.products;
 
 import net.finmath.exception.CalculationException;
 import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationInterface;
@@ -84,7 +84,7 @@ public class EuropeanOptionDeltaPathwise extends AbstractAssetMonteCarloProduct 
 	}
 
 	@Override
-	public RandomVariableInterface getValues(double evaluationTime, AssetModelMonteCarloSimulationInterface model) {
+	public RandomVariableInterface getValue(double evaluationTime, AssetModelMonteCarloSimulationInterface model) {
 		throw new RuntimeException("Method not supported.");
 	}
 }

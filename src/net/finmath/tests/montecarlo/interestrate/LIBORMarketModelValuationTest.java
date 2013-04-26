@@ -38,7 +38,7 @@ import net.finmath.time.TimeDiscretizationInterface;
 import org.junit.Test;
 
 /**
- * This class tests the libor market model and products.
+ * This class tests the LIBOR market model and products.
  * 
  * @author Christian Fries
  */

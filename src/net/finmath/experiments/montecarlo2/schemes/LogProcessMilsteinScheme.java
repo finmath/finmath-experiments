@@ -3,7 +3,7 @@
  *
  * Created on 16.01.2004
  */
-package net.finmath.experiments.monteCarlo.schemes;
+package net.finmath.experiments.montecarlo2.schemes;
 
 import net.finmath.montecarlo.RandomVariable;
 import net.finmath.stochastic.ImmutableRandomVariableInterface;

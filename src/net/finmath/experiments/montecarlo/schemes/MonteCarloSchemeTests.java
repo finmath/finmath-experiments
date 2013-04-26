@@ -4,7 +4,7 @@
  * Created on 15.01.2004
  */
 
-package net.finmath.experiments.montecarlo2.schemes;
+package net.finmath.experiments.montecarlo.schemes;
 
 import java.text.DecimalFormat;
 

@@ -3,7 +3,7 @@
  *
  * Created on 25.10.2012
  */
-package net.finmath.experiments.montecarlo2;
+package net.finmath.experiments.montecarlo;
 
 import java.util.Random;
 

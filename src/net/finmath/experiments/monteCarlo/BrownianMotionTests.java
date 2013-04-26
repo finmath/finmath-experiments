@@ -8,6 +8,7 @@ import java.text.DecimalFormat;
 import net.finmath.montecarlo.BrownianMotion;
 import net.finmath.montecarlo.RandomVariable;
 import net.finmath.stochastic.ImmutableRandomVariableInterface;
+import net.finmath.stochastic.RandomVariableInterface;
 import net.finmath.time.TimeDiscretization;
 import net.finmath.time.TimeDiscretizationInterface;
 
@@ -40,32 +41,27 @@ public class BrownianMotionTests {
 				seed
 		);
 		
-		System.out.println("Average and variance of the increments of a BrownianMotion.\nTime step size: " + dt + "  Number of path: " + numberOfPaths);
+		System.out.println("Average, variance and other properties of a BrownianMotion.\nTime step size: " + dt + "  Number of path: " + numberOfPaths + "\n");
 
-		RandomVariable brownianMotionRealization = new RandomVariable(0.0, 0.0);
+		System.out.println("time  " + "\t" + "   mean  " + "\t" + "    var  ");
+
+		RandomVariable brownianMotionRealization		= new RandomVariable(0.0, 0.0);
+		RandomVariable sumOfSquaredIncrements 	= new RandomVariable(0.0, 0.0);
 		for(int timeIndex=0; timeIndex<timeDiscretization.getNumberOfTimeSteps(); timeIndex++) {
 			ImmutableRandomVariableInterface brownianIncement = brownian.getBrownianIncrement(timeIndex,0);
+
+			// Calculate W(t+dt) from dW
 			brownianMotionRealization.add(brownianIncement);
-
-			double average = 0.0;
-			double secondMoment = 0.0;
-			for(int path=0; path<numberOfPaths; path++)
-			{	
-				double brownianIncementOnPath = brownianIncement.get(path);
-
-				average			+= brownianIncementOnPath;
-				secondMoment	+= brownianIncementOnPath * brownianIncementOnPath;
-			}
-			average			/= numberOfPaths;
-			secondMoment	/= numberOfPaths;
+			
+			double time		= timeDiscretization.getTime(timeIndex);
+			double mean		= brownianMotionRealization.getAverage();
+			double variance	= brownianMotionRealization.getVariance();
 
 			System.out.println(
-					"Increment from " + fromatterReal2.format(timeDiscretization.getTime(timeIndex)) + " to " + fromatterReal2.format(timeDiscretization.getTime(timeIndex+1)) + ":  " +
-					"avg: " + fromatterSci4.format(average) + "  " +
-					"var: " + fromatterSci4.format(secondMoment - average*average) + "    " +
-					"Brownian motion at " + fromatterReal2.format(timeDiscretization.getTime(timeIndex+1)) + ":  " +
-					"avg: " + fromatterSci4.format(brownianMotionRealization.getAverage()) + "  " +
-					"var: " + fromatterSci4.format(brownianMotionRealization.getVariance())
+					fromatterReal2.format(time) + "\t" +
+					fromatterSci4.format(mean) + "\t" +
+					fromatterSci4.format(variance) + "\t" +
+					""
 			);
 		}
 	}	

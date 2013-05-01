@@ -19,6 +19,7 @@ import net.finmath.marketdata.model.curves.ForwardCurve;
 import net.finmath.marketdata.model.curves.ForwardCurveInterface;
 import net.finmath.montecarlo.interestrate.LIBORMarketModel;
 import net.finmath.montecarlo.interestrate.LIBORMarketModel.CalibrationItem;
+import net.finmath.montecarlo.interestrate.LIBORMarketModelInterface;
 import net.finmath.montecarlo.interestrate.LIBORModelMonteCarloSimulation;
 import net.finmath.montecarlo.interestrate.LIBORModelMonteCarloSimulationInterface;
 import net.finmath.montecarlo.interestrate.modelplugins.AbstractLIBORCovarianceModelParametric;
@@ -395,7 +396,7 @@ public class LIBORMarketModelValuationTest {
 		 */
 		TimeDiscretizationInterface timeDiscretization = liborMarketModel.getTimeDiscretization();
 
-		ForwardCurveInterface forwardCurve = ((LIBORMarketModel)liborMarketModel.getModel()).getForwardRateCurve();
+		ForwardCurveInterface forwardCurve = ((LIBORMarketModelInterface)liborMarketModel.getModel()).getForwardRateCurve();
 
 		/*
 		 * Create a LIBOR Market Model

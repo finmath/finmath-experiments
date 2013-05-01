@@ -3,7 +3,7 @@
  *
  * Created on 12.02.2013
  */
-package net.finmath.experiments.montecarlo.assetDerivativeValuation.products;
+package net.finmath.experiments.montecarlo.assetderivativevaluation.products;
 
 import net.finmath.exception.CalculationException;
 import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationInterface;
@@ -17,7 +17,7 @@ import net.finmath.stochastic.RandomVariableInterface;
  * @author Christian Fries
  * @version 1.0
  */
-public class EuropeanOptionDeltaPathwise extends AbstractAssetMonteCarloProduct {
+public class EuropeanOptionVegaPathwise extends AbstractAssetMonteCarloProduct {
 
 	private double	maturity;
 	private double	strike;
@@ -28,7 +28,7 @@ public class EuropeanOptionDeltaPathwise extends AbstractAssetMonteCarloProduct 
 	 * @param strike The strike K in the option payoff max(S(T)-K,0).
 	 * @param maturity The maturity T in the option payoff max(S(T)-K,0)
 	 */
-	public EuropeanOptionDeltaPathwise(double maturity, double strike) {
+	public EuropeanOptionVegaPathwise(double maturity, double strike) {
 		super();
 		this.maturity = maturity;
 		this.strike = strike;
@@ -43,7 +43,6 @@ public class EuropeanOptionDeltaPathwise extends AbstractAssetMonteCarloProduct 
 	 */
 	public double getValue(AssetModelMonteCarloSimulationInterface model) throws CalculationException
 	{
-		@SuppressWarnings("unused")
 		MonteCarloBlackScholesModel blackScholesModel = null;
 		try {
 			blackScholesModel = (MonteCarloBlackScholesModel)model;
@@ -70,11 +69,16 @@ public class EuropeanOptionDeltaPathwise extends AbstractAssetMonteCarloProduct 
 			if(underlyingAtMaturity.get(path) > strike)
 			{
 				// Get some model parameters
+				double T		= maturity;
 				double S0		= underlyingAtToday.get(path);
+				double r		= blackScholesModel.getRiskFreeRate();
+				double sigma	= blackScholesModel.getVolatility();
+
 				double ST		= underlyingAtMaturity.get(path);
+				double WT		= (Math.log(ST/S0) - r * T + 0.5 * sigma * sigma * T)/sigma;
 
 				double payOff			= 1;
-				double modifiedPayoff	= payOff * ST/S0;
+				double modifiedPayoff	= payOff * ST * (-sigma * T + WT);
 
 				average += modifiedPayoff / numeraireAtMaturity.get(path) * monteCarloWeights.get(path) * numeraireAtToday.get(path);
 			}

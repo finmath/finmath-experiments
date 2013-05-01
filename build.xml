@@ -2,74 +2,70 @@
 
 <project name="project" default="jar" basedir=".">
 
-<!-- edit the following lines to your needs            -->
-<target name="init">
-    <property name="project_name"   value="finmath-experiments"/>
-    <property name="srcDir"         value="./src"/>
-    <property name="classDir"       value="./bin"/>
-    <property name="jar"            value="${project_name}.jar"/>
-    <property name="reports.tests"  value="./reports/tests"/>
-    <property name="reports.html"  value="./reports/html"/>
-	<mkdir dir="${classDir}" />
-	<mkdir dir="${reports.tests}" />
-	<mkdir dir="${reports.html}" />
-</target>
+	<!-- edit the following lines to your needs            -->
+	<target name="init">
+		<property name="project_name" value="finmath-experiments" />
+		<property name="srcDir" value="./src" />
+		<property name="classDir" value="./bin" />
+		<property name="jar" value="${project_name}.jar" />
+		<property name="reports.tests" value="./reports/tests" />
+		<property name="reports.html" value="./reports/html" />
+		<mkdir dir="${classDir}" />
+		<mkdir dir="${reports.tests}" />
+		<mkdir dir="${reports.html}" />
+	</target>
 
-<!-- compile -->
-<target name="compile" depends="init">
-	<javac srcdir="${srcDir}"
-		includes="net/finmath/**/**/*.java" 
-        destdir="${classDir}" includeantruntime="false">
-		<classpath>
-		    <fileset dir="lib">
-		      <include name="**/*.jar" />
-		    </fileset>
-		</classpath>
-	</javac>
-</target>
+	<!-- compile -->
+	<target name="compile" depends="init">
+		<javac srcdir="${srcDir}" includes="net/finmath/**/**/*.java" destdir="${classDir}" includeantruntime="false">
+			<classpath>
+				<fileset dir="lib">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
 
-<!-- create .jar -->
-<target name="jar" depends="compile">
-	<jar jarfile="${jar}"
-		basedir="${classDir}"
-		includes="net/finmath/**"
-	>
-		<fileset dir="${srcDir}">
-			<include name="com/mycompany/resources/*.properties"/>
-		 </fileset>
-	</jar>
-</target>
-
-<target name="junit" depends="jar">
-	<junit printsummary="true" failureproperty="junit.failure">
-	    <classpath> 
-		    <fileset dir="lib">
-		      <include name="**/*.jar" />
-		    </fileset>
-		    <pathelement path="${jar}"/>	    	
-	    </classpath>
-		<batchtest fork="yes" todir="${reports.tests}">
+	<!-- create .jar -->
+	<target name="jar" depends="compile">
+		<jar jarfile="${jar}" basedir="${classDir}" includes="net/finmath/**">
 			<fileset dir="${srcDir}">
-				<include name="**/*Test.java"/>
+				<include name="com/mycompany/resources/*.properties" />
 			</fileset>
-		</batchtest>
-		<formatter type="xml"/>
-	</junit>
-</target>
+		</jar>
+	</target>
 
-<target name="junitreport" depends="junit">
-	<junitreport todir="${reports.tests}">
-		<fileset dir="${reports.tests}">
-			<include name="TEST-*.xml"/>
-		</fileset>
-		<report format="frames" todir="${reports.html}"/>
-	</junitreport>
-</target>
-	
-<!-- removes all that has been built -->
-<target name="clean" depends="init">
-        <delete dir="${classDir}" includeEmptyDirs="true" />
-</target>
+	<target name="junit" depends="jar">
+		<junit printsummary="true" failureproperty="junit.failure">
+			<classpath>
+				<fileset dir="lib">
+					<include name="**/*.jar" />
+				</fileset>
+				<pathelement path="${jar}" />
+			</classpath>
+			<batchtest fork="yes" todir="${reports.tests}">
+				<fileset dir="${srcDir}">
+					<include name="**/*Test.java" />
+				</fileset>
+			</batchtest>
+			<formatter type="xml" />
+		</junit>
+	</target>
+
+	<target name="junitreport" depends="junit">
+		<junitreport todir="${reports.tests}">
+			<fileset dir="${reports.tests}">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="noframes" todir="${reports.html}" />
+		</junitreport>
+	</target>
+
+	<!-- removes all that has been built -->
+	<target name="clean" depends="init">
+		<delete dir="${classDir}" includeEmptyDirs="true" />
+	</target>
+
 </project>
 
 <!-- end file build.xml -->

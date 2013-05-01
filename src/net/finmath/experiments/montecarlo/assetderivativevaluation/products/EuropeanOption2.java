@@ -3,7 +3,7 @@
  *
  * Created on 21.01.2004
  */
-package net.finmath.experiments.montecarlo.assetDerivativeValuation.products;
+package net.finmath.experiments.montecarlo.assetderivativevaluation.products;
 
 import net.finmath.exception.CalculationException;
 import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationInterface;

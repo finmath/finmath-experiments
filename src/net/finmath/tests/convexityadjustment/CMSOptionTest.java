@@ -5,11 +5,9 @@
  */
 package net.finmath.tests.convexityadjustment;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.text.DecimalFormat;
-
-import org.junit.Test;
 
 import net.finmath.exception.CalculationException;
 import net.finmath.functions.AnalyticFormulas;
@@ -19,7 +17,6 @@ import net.finmath.marketdata.products.Swap;
 import net.finmath.marketdata.products.SwapAnnuity;
 import net.finmath.montecarlo.BrownianMotion;
 import net.finmath.montecarlo.interestrate.LIBORMarketModel;
-import net.finmath.montecarlo.interestrate.LIBORMarketModelInterface;
 import net.finmath.montecarlo.interestrate.LIBORModelMonteCarloSimulation;
 import net.finmath.montecarlo.interestrate.modelplugins.LIBORCorrelationModelExponentialDecay;
 import net.finmath.montecarlo.interestrate.modelplugins.LIBORCovarianceModelFromVolatilityAndCorrelation;
@@ -31,6 +28,8 @@ import net.finmath.montecarlo.interestrate.products.SwaptionAnalyticApproximatio
 import net.finmath.montecarlo.process.ProcessEulerScheme;
 import net.finmath.time.TimeDiscretization;
 import net.finmath.time.TimeDiscretizationInterface;
+
+import org.junit.Test;
 
 public class CMSOptionTest {
 

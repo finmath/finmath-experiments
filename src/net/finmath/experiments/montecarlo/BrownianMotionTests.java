@@ -50,17 +50,17 @@ public class BrownianMotionTests {
 		RandomVariable brownianMotionRealization		= new RandomVariable(0.0, 0.0);
 		RandomVariable sumOfSquaredIncrements 	= new RandomVariable(0.0, 0.0);
 		for(int timeIndex=0; timeIndex<timeDiscretization.getNumberOfTimeSteps(); timeIndex++) {
-			ImmutableRandomVariableInterface brownianIncement = brownian.getBrownianIncrement(timeIndex,0);
-
-			// Calculate W(t+dt) from dW
-			brownianMotionRealization.add(brownianIncement);
+			ImmutableRandomVariableInterface brownianIncrement = brownian.getBrownianIncrement(timeIndex,0);
 			
+			// Calculate W(t+dt) from dW
+			brownianMotionRealization.add(brownianIncrement);
+
 			double time		= timeDiscretization.getTime(timeIndex);
 			double mean		= brownianMotionRealization.getAverage();
 			double variance	= brownianMotionRealization.getVariance();
 
 			// Calculate x = \int dW(t) * dW(t)
-			RandomVariableInterface squaredIncrements = brownianIncement.getMutableCopy().squared();
+			RandomVariableInterface squaredIncrements = brownianIncrement.getMutableCopy().squared();
 			sumOfSquaredIncrements.add(squaredIncrements);
 
 			double meanOfSumOfSquaredIncrements		= sumOfSquaredIncrements.getAverage();

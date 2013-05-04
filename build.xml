@@ -18,7 +18,7 @@
 	<!-- compile -->
 	<target name="compile" depends="init">
 		<javac srcdir="${srcDir}" includes="net/finmath/**/**/*.java" destdir="${classDir}"
-			includeantruntime="false" source="1.7" target="1.7">
+			includeantruntime="false">
 			<classpath>
 				<fileset dir="lib">
 					<include name="**/*.jar" />
@@ -38,11 +38,12 @@
 
 	<target name="junit" depends="jar">
 		<junit printsummary="true" failureproperty="junit.failure">
+			<jvmarg value="-XX:-UseSplitVerifier"/>
 			<classpath>
 				<fileset dir="lib">
 					<include name="**/*.jar" />
 				</fileset>
-				<pathelement path="${jar}" />
+				<pathelement path="${classDir}" />
 			</classpath>
 			<batchtest fork="yes" todir="${reports.tests}">
 				<fileset dir="${srcDir}">

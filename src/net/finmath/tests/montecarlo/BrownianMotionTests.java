@@ -24,7 +24,7 @@ import net.finmath.time.TimeDiscretizationInterface;
  */
 public class BrownianMotionTests {
 
-	static final DecimalFormat fromatterReal2	= new DecimalFormat("0.00");
+	static final DecimalFormat fromatterReal2	= new DecimalFormat(" 0.00");
 	static final DecimalFormat fromatterSci4	= new DecimalFormat(" 0.0000E00;-0.0000E00");
 	
 	@Test
@@ -42,36 +42,44 @@ public class BrownianMotionTests {
 		// Test the quality of the Brownian motion
 		BrownianMotion brownian = new BrownianMotion(
 				timeDiscretization,
-				1,
+				2,
 				numberOfPaths,
 				seed
 		);
 		
 		System.out.println("Average and variance of the integral of (Delta W)^2.\nTime step size: " + dt + "  Number of path: " + numberOfPaths + "\n");
 
-		System.out.println("time  " + "\t" + "   mean  " + "\t" + "    var  ");
-
 		RandomVariable sumOfSquaredIncrements 		= new RandomVariable(0.0, 0.0);
+		RandomVariable sumOfCrossIncrements	= new RandomVariable(0.0, 0.0);
 		for(int timeIndex=0; timeIndex<timeDiscretization.getNumberOfTimeSteps(); timeIndex++) {
-			ImmutableRandomVariableInterface brownianIncrement = brownian.getBrownianIncrement(timeIndex,0);
-			
-			// Calculate x = \int dW(t) * dW(t)
-			RandomVariableInterface squaredIncrements = brownianIncrement.getMutableCopy().squared();
+			ImmutableRandomVariableInterface brownianIncrement1 = brownian.getBrownianIncrement(timeIndex,0);
+			ImmutableRandomVariableInterface brownianIncrement2 = brownian.getBrownianIncrement(timeIndex,1);
+
+			// Calculate x = \int dW1(t) * dW1(t)
+			RandomVariableInterface squaredIncrements = brownianIncrement1.getMutableCopy().squared();
 			sumOfSquaredIncrements.add(squaredIncrements);
+
+			// Calculate x = \int dW1(t) * dW2(t)
+			RandomVariableInterface covarianceIncrements = brownianIncrement1.getMutableCopy().mult(brownianIncrement2);
+			sumOfCrossIncrements.add(covarianceIncrements);
 		}
 
 		double time								= timeDiscretization.getTime(timeDiscretization.getNumberOfTimeSteps());
 		double meanOfSumOfSquaredIncrements		= sumOfSquaredIncrements.getAverage();
 		double varianceOfSumOfSquaredIncrements	= sumOfSquaredIncrements.getVariance();
+		double meanOfSumOfCrossIncrements		= sumOfCrossIncrements.getAverage();
+		double varianceOfSumOfCrossIncrements	= sumOfCrossIncrements.getVariance();
 
 		assertTrue(Math.abs(meanOfSumOfSquaredIncrements-time) < 1.0E-3);
 		assertTrue(Math.abs(varianceOfSumOfSquaredIncrements) < 1.0E-2);
+		assertTrue(Math.abs(meanOfSumOfCrossIncrements) < 1.0E-3);
+		assertTrue(Math.abs(varianceOfSumOfCrossIncrements) < 1.0E-2);
 
-		System.out.println(
-				fromatterReal2.format(time) + "\t" +
-				fromatterSci4.format(meanOfSumOfSquaredIncrements) + "\t" +
-				fromatterSci4.format(varianceOfSumOfSquaredIncrements) + "\t" +
-				""
-		);
+		
+		System.out.println("              t = " + fromatterReal2.format(time));
+		System.out.println("int_0^t dW1 dW1 = " + fromatterSci4.format(meanOfSumOfSquaredIncrements)
+				+ "\t (Monte-Carlo variance: " + fromatterSci4.format(varianceOfSumOfSquaredIncrements) + ")");
+		System.out.println("int_0^t dW1 dW2 = " + fromatterSci4.format(meanOfSumOfCrossIncrements)
+				+ "\t (Monte-Carlo variance: " + fromatterSci4.format(varianceOfSumOfCrossIncrements) + ")");
 	}
 }

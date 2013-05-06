@@ -5,11 +5,9 @@
  */
 package net.finmath.tests.montecarlo;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.text.DecimalFormat;
-
-import org.junit.Test;
 
 import net.finmath.montecarlo.BrownianMotion;
 import net.finmath.montecarlo.RandomVariable;
@@ -17,6 +15,8 @@ import net.finmath.stochastic.ImmutableRandomVariableInterface;
 import net.finmath.stochastic.RandomVariableInterface;
 import net.finmath.time.TimeDiscretization;
 import net.finmath.time.TimeDiscretizationInterface;
+
+import org.junit.Test;
 
 /**
  * @author Christian Fries

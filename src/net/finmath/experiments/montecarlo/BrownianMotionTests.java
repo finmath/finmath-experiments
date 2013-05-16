@@ -47,8 +47,8 @@ public class BrownianMotionTests {
 
 		System.out.println("time  " + "\t" + "   mean  " + "\t" + "    var  ");
 
-		RandomVariable brownianMotionRealization		= new RandomVariable(0.0, 0.0);
-		RandomVariable sumOfSquaredIncrements 	= new RandomVariable(0.0, 0.0);
+		RandomVariable brownianMotionRealization	= new RandomVariable(0.0);
+		RandomVariable sumOfSquaredIncrements 		= new RandomVariable(0.0);
 		for(int timeIndex=0; timeIndex<timeDiscretization.getNumberOfTimeSteps(); timeIndex++) {
 			ImmutableRandomVariableInterface brownianIncrement = brownian.getBrownianIncrement(timeIndex,0);
 			

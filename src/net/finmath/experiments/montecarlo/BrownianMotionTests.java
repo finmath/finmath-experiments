@@ -28,7 +28,7 @@ public class BrownianMotionTests {
 		// The parameters
 		int numberOfPaths	= 10000;
 		int seed			= 53252;
-		
+
 		double lastTime = 4.0;
 		double dt = 0.1;
 
@@ -43,9 +43,10 @@ public class BrownianMotionTests {
 				seed
 		);
 		
-		System.out.println("Average, variance and other properties of a BrownianMotion.\nTime step size: " + dt + "  Number of path: " + numberOfPaths + "\n");
+		System.out.println("Average, variance and other properties of a BrownianMotion.\nTime step size (dt): " + dt + "  Number of path: " + numberOfPaths + "\n");
 
-		System.out.println("time  " + "\t" + "   mean  " + "\t" + "    var  ");
+		System.out.println("      " + "\t" + "  int dW " + "\t" + "         " + "\t" + "int dW dW" + "\t" + "        ");
+		System.out.println("time  " + "\t" + "   mean  " + "\t" + "    var  " + "\t" + "   mean  " + "\t" + "    var  ");
 
 		RandomVariable brownianMotionRealization	= new RandomVariable(0.0);
 		RandomVariable sumOfSquaredIncrements 		= new RandomVariable(0.0);

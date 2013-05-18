@@ -407,7 +407,7 @@ public class LIBORMarketModelValuationTest {
 
 		LIBORMarketModel liborMarketModelCalibrated = new LIBORMarketModel(
 				this.liborMarketModel.getLiborPeriodDiscretization(),
-				forwardCurve, covarianceModelParametric, calibrationItems.toArray(new CalibrationItem[0]));	
+				forwardCurve, null, covarianceModelParametric, calibrationItems.toArray(new CalibrationItem[0]));	
 
 		
 		/*

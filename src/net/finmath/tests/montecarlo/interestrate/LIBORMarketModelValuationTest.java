@@ -330,9 +330,12 @@ public class LIBORMarketModelValuationTest {
 			double valueAnalytic = swaptionAnalyitc.getValue(liborMarketModel);
 			System.out.print(formatterPrice.format(valueAnalytic) + "          ");
 
-			// Relative deviation
+			// Absolute deviation
 			double deviation1 = (valueSimulation - valueAnalytic);
 			System.out.println(formatterDeviation.format(deviation1) + "          ");
+
+			// The swap should be at par (close to zero)
+			if(isUnitTests) assertTrue(Math.abs(deviation1) < 2E-4);
 		}
 		System.out.println("__________________________________________________________________________________________\n");
 	}

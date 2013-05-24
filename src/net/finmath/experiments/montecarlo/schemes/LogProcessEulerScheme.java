@@ -21,14 +21,14 @@ import net.finmath.time.TimeDiscretization;
  */
 public class LogProcessEulerScheme
 {
-	private ImmutableRandomVariableInterface[]	discreteProcess = null;
-
 	private int		numberOfTimeIndices;
 	private double	deltaT;
 	private int		numberOfPaths;
 	private double	initialValue;
 	private double	sigma;
 		
+	private ImmutableRandomVariableInterface[]	discreteProcess = null;
+
 	/**
 	 * @param numberOfTimeIndices
 	 * @param deltaT
@@ -95,9 +95,9 @@ public class LogProcessEulerScheme
 		
 		BrownianMotionInterface	brownianMotion	= new BrownianMotion(
 				new TimeDiscretization(0.0, getNumberOfTimeIndices(), getDeltaT()),
-				1,	// numberOfFactors
+				1,						// numberOfFactors
 				getNumberOfPaths(),
-				31415		// seed
+				31415					// seed
 				);
 		
 		// Allocate Memory

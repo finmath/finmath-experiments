@@ -5,8 +5,11 @@
  */
 package net.finmath.experiments.montecarlo.schemes;
 
+import net.finmath.montecarlo.BrownianMotion;
+import net.finmath.montecarlo.BrownianMotionInterface;
 import net.finmath.montecarlo.RandomVariable;
 import net.finmath.stochastic.ImmutableRandomVariableInterface;
+import net.finmath.time.TimeDiscretization;
 import cern.jet.random.AbstractDistribution;
 import cern.jet.random.Normal;
 import cern.jet.random.engine.MersenneTwister64;
@@ -16,15 +19,14 @@ import cern.jet.random.engine.MersenneTwister64;
  */
 public class LogProcessExpEulerScheme
 {
-	private AbstractDistribution		normalDistribution	= new Normal( 0,1, new MersenneTwister64() );
+	private int		numberOfTimeIndices;
+	private double	deltaT;
+	private int		numberOfPaths;
+	private double	initialValue;
+	private double	sigma;
+		
 	private ImmutableRandomVariableInterface[]	discreteProcess = null;
 
-	int		numberOfTimeIndices;
-	double	deltaT;
-	int		numberOfPaths;
-	double	initialValue;
-	double	sigma;
-		
 	/**
 	 * @param numberOfTimeIndices
 	 * @param deltaT
@@ -88,6 +90,14 @@ public class LogProcessExpEulerScheme
 	 * Calculates the whole (discrete) process.
 	 */
 	private void doPrecalculateProcess() {
+		
+		BrownianMotionInterface	brownianMotion	= new BrownianMotion(
+				new TimeDiscretization(0.0, getNumberOfTimeIndices(), getDeltaT()),
+				1,						// numberOfFactors
+				getNumberOfPaths(),
+				31415					// seed
+				);
+		
 		// Allocate Memory
 		discreteProcess = new ImmutableRandomVariableInterface[getNumberOfTimeIndices()];
 
@@ -108,6 +118,7 @@ public class LogProcessExpEulerScheme
 			{	
 				// Euler Scheme
 				ImmutableRandomVariableInterface previouseRealization	= discreteProcess[timeIndex-1];
+				ImmutableRandomVariableInterface deltaW					= brownianMotion.getBrownianIncrement(timeIndex, 0);
 
 				// Generate values 
 				for (int iPath = 0; iPath < numberOfPaths; iPath++ )
@@ -116,8 +127,7 @@ public class LogProcessExpEulerScheme
 					double drift = 0;
 					
 					// Diffusion
-					double randomNumber = normalDistribution.nextDouble();
-					double diffusion = sigma * randomNumber * Math.sqrt(deltaT);
+					double diffusion = sigma * deltaW.get(iPath);
 					
 					double previousValue = previouseRealization.get(iPath);
 					

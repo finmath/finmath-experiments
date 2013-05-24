@@ -5,8 +5,11 @@
  */
 package net.finmath.experiments.montecarlo.schemes;
 
+import net.finmath.montecarlo.BrownianMotion;
+import net.finmath.montecarlo.BrownianMotionInterface;
 import net.finmath.montecarlo.RandomVariable;
 import net.finmath.stochastic.ImmutableRandomVariableInterface;
+import net.finmath.time.TimeDiscretization;
 import cern.jet.random.AbstractDistribution;
 import cern.jet.random.Normal;
 import cern.jet.random.engine.MersenneTwister64;
@@ -14,16 +17,16 @@ import cern.jet.random.engine.MersenneTwister64;
 /**
  * @author Christian Fries
  */
-public class LogProcessMilsteinScheme {
-	private AbstractDistribution		normalDistribution	= new Normal( 0,1, new MersenneTwister64() );
+public class LogProcessMilsteinScheme
+{
+	private int		numberOfTimeIndices;
+	private double	deltaT;
+	private int		numberOfPaths;
+	private double	initialValue;
+	private double	sigma;
+		
 	private ImmutableRandomVariableInterface[]	discreteProcess = null;
 
-	int		numberOfTimeIndices;
-	double	deltaT;
-	int		numberOfPaths;
-	double	initialValue;
-	double	sigma;
-		
 	public static void main(String[] args)
 	{
 		// Create an instance of this class
@@ -119,6 +122,14 @@ public class LogProcessMilsteinScheme {
 	 * Calculates the whole (discrete) process.
 	 */
 	private void doPrecalculateProcess() {
+
+		BrownianMotionInterface	brownianMotion	= new BrownianMotion(
+				new TimeDiscretization(0.0, getNumberOfTimeIndices(), getDeltaT()),
+				1,						// numberOfFactors
+				getNumberOfPaths(),
+				31415					// seed
+				);
+
 		// Allocate Memory
 		discreteProcess = new ImmutableRandomVariableInterface[getNumberOfTimeIndices()];
 
@@ -139,6 +150,7 @@ public class LogProcessMilsteinScheme {
 			{	
 				// Milstein Scheme
 				ImmutableRandomVariableInterface previouseRealization	= discreteProcess[timeIndex-1];
+				ImmutableRandomVariableInterface deltaW					= brownianMotion.getBrownianIncrement(timeIndex, 0);
 
 				// Generate values 
 				for (int iPath = 0; iPath < numberOfPaths; iPath++ )
@@ -147,14 +159,12 @@ public class LogProcessMilsteinScheme {
 					double drift = 0;
 
 					// Diffusion
-					double randomNumber	= normalDistribution.nextDouble();
-					double deltaW		= randomNumber * Math.sqrt(deltaT);
-					double diffusion	= sigma * deltaW;
+					double diffusion = sigma * deltaW.get(iPath);
 					
 					double previousValue = previouseRealization.get(iPath);
 					
 					double newValue = previousValue + drift * previousValue * deltaT + previousValue * diffusion
-										+ 1.0/2.0 * previousValue * sigma * sigma * (deltaW * deltaW - deltaT);  // Milstein-Zusatz
+										+ 1.0/2.0 * previousValue * sigma * sigma * (deltaW.get(iPath) * deltaW.get(iPath) - deltaT);  // Milstein-Zusatz
 
 					newRealization.set(iPath,newValue); 
 				};
@@ -183,7 +193,7 @@ public class LogProcessMilsteinScheme {
 	/**
 	 * @return Returns the nPaths.
 	 */
-	public int getNPaths() {
+	public int getNumberOfPaths() {
 		return numberOfPaths;
 	}
 
@@ -200,4 +210,5 @@ public class LogProcessMilsteinScheme {
 	public double getSigma() {
 		return sigma;
 	}
+
 }

@@ -154,7 +154,6 @@ public class BlackScholesMonteCarloValuationTest {
 			riskFreeRate,
 			volatility);
 		
-        model = (AssetModelMonteCarloSimulationInterface) model.getCloneWithModifiedSeed(1);
         return model;
     }
 

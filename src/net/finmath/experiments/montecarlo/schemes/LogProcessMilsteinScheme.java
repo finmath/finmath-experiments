@@ -10,9 +10,6 @@ import net.finmath.montecarlo.BrownianMotionInterface;
 import net.finmath.montecarlo.RandomVariable;
 import net.finmath.stochastic.ImmutableRandomVariableInterface;
 import net.finmath.time.TimeDiscretization;
-import cern.jet.random.AbstractDistribution;
-import cern.jet.random.Normal;
-import cern.jet.random.engine.MersenneTwister64;
 
 /**
  * @author Christian Fries

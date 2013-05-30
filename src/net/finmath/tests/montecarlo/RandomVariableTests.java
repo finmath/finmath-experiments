@@ -39,10 +39,11 @@ public class RandomVariableTests {
 		
 		// Create a stochstic random variable with two paths.
 		RandomVariableInterface randomVariable2 = new RandomVariable(0.0,
-				new double[] {-2.0, -1.0, 0.0, 1.0, 2.0} );
+				new double[] {-4.0, -2.0, 0.0, 2.0, 4.0} );
 
 		// Perform some calculations
-		randomVariable2.add(2.0);
+		randomVariable2.add(4.0);
+		randomVariable2.div(2.0);
 		
 		// The random variable has average value 2.0
 		assertTrue(randomVariable2.getAverage() == 2.0);

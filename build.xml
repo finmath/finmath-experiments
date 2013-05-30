@@ -39,7 +39,7 @@
 	<target name="junit" depends="jar">
 		<junit printsummary="true" failureproperty="junit.failure">
 			<jvmarg value="-XX:-UseSplitVerifier"/>
-			<jvmarg value="-Xmx1024M"/>
+			<jvmarg value="-Xmx512M"/>
 			<classpath>
 				<fileset dir="lib">
 					<include name="**/*.jar" />

@@ -47,8 +47,8 @@ public class LIBORMarketModelValuationTest {
 
 	private boolean isUnitTests = true;
 	
-	private final int numberOfPaths		= 50000;
-	private final int numberOfFactors	= 5;
+	private final int numberOfPaths		= 10000;
+	private final int numberOfFactors	= 4;
 	
 	private LIBORModelMonteCarloSimulationInterface liborMarketModel; 
 	
@@ -119,7 +119,7 @@ public class LIBORMarketModelValuationTest {
 		 * Create a simulation time discretization
 		 */
 		double lastTime = 20.0;
-		double dt = 0.125;
+		double dt = 0.5;
 
 		TimeDiscretization timeDiscretization = new TimeDiscretization(0.0, (int) (lastTime / dt), dt);
 
@@ -226,7 +226,7 @@ public class LIBORMarketModelValuationTest {
 		}
 		
 		System.out.println("Maximum abs deviation: " + formatterDeviation.format(maxAbsDeviation));
-		if(isUnitTests) assertTrue(maxAbsDeviation < 1E-03);
+		if(isUnitTests) assertTrue(maxAbsDeviation < 2E-03);
 
 		System.out.println("__________________________________________________________________________________________\n");
 	}
@@ -281,8 +281,10 @@ public class LIBORMarketModelValuationTest {
 			maxAbsDeviation = Math.max(maxAbsDeviation, Math.abs(value));
 		}
 
+		System.out.println("Maximum abs deviation: " + formatterDeviation.format(maxAbsDeviation));
+
 		// The swap should be at par (close to zero)
-		if(isUnitTests) assertTrue(maxAbsDeviation < 1E-3);
+		if(isUnitTests) assertTrue(maxAbsDeviation < 5E-3);
 
 		System.out.println("__________________________________________________________________________________________\n");
 	}
@@ -326,16 +328,13 @@ public class LIBORMarketModelValuationTest {
 				swaprates[periodStartIndex] = swaprate;
 			}
 
-			Swaption						swaptionMonteCarlo = new Swaption(exerciseDate, fixingDates, paymentDates, swaprates);
-			SwaptionAnalyticApproximation	swaptionAnalyitc = new SwaptionAnalyticApproximation(
-			        swaprate, swapTenor,
-			        SwaptionAnalyticApproximation.ValueUnit.VALUE);
-
 			// Value with Monte Carlo
+			Swaption swaptionMonteCarlo	= new Swaption(exerciseDate, fixingDates, paymentDates, swaprates);
 			double valueSimulation = swaptionMonteCarlo.getValue(liborMarketModel);
 			System.out.print(formatterValue.format(valueSimulation) + "          ");
 
 			// Value analytic
+			SwaptionAnalyticApproximation swaptionAnalyitc = new SwaptionAnalyticApproximation(swaprate, swapTenor, SwaptionAnalyticApproximation.ValueUnit.VALUE);
 			double valueAnalytic = swaptionAnalyitc.getValue(liborMarketModel);
 			System.out.print(formatterValue.format(valueAnalytic) + "          ");
 
@@ -346,7 +345,7 @@ public class LIBORMarketModelValuationTest {
 			maxAbsDeviation = Math.max(maxAbsDeviation, Math.abs(deviation));
 		}
 
-		if(isUnitTests) assertTrue(Math.abs(maxAbsDeviation) < 1E-3);
+		if(isUnitTests) assertTrue(Math.abs(maxAbsDeviation) < 2E-3);
 
 		System.out.println("__________________________________________________________________________________________\n");
 	}

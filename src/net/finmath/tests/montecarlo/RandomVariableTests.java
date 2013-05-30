@@ -50,7 +50,7 @@ public class RandomVariableTests {
 		// The random variable has variance value 2.0 = (4 + 1 + 0 + 1 + 4) / 5
 		assertTrue(randomVariable2.getVariance() == 2.0);
 		
-		// Multiply two random variables, this will expand the receive to a stochastic one
+		// Multiply two random variables, this will expand the receiver to a stochastic one
 		randomVariable.mult(randomVariable2);
 		
 		// The random variable has average value 6.0

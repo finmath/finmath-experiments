@@ -48,7 +48,7 @@ public class LIBORMarketModelValuationTest {
 	private boolean isUnitTests = true;
 	
 	private final int numberOfPaths		= 10000;
-	private final int numberOfFactors	= 4;
+	private final int numberOfFactors	= 5;
 	
 	private LIBORModelMonteCarloSimulationInterface liborMarketModel; 
 	
@@ -226,7 +226,7 @@ public class LIBORMarketModelValuationTest {
 		}
 		
 		System.out.println("Maximum abs deviation: " + formatterDeviation.format(maxAbsDeviation));
-		if(isUnitTests) assertTrue(maxAbsDeviation < 2E-03);
+		if(isUnitTests) assertTrue(maxAbsDeviation < 5E-03);
 
 		System.out.println("__________________________________________________________________________________________\n");
 	}

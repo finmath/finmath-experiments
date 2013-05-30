@@ -17,7 +17,11 @@
 
 	<!-- compile -->
 	<target name="compile" depends="init">
-		<javac srcdir="${srcDir}" includes="net/finmath/**/**/*.java" destdir="${classDir}"
+		<javac srcdir="${srcDir}"
+			includes="net/finmath/**/**/*.java"
+			source="1.7"
+			target="1.7"
+			destdir="${classDir}"
 			includeantruntime="false">
 			<classpath>
 				<fileset dir="lib">

@@ -6,7 +6,7 @@
 	<target name="init">
 		<property name="project_name" value="finmath-experiments" />
 		<property name="srcDir" value="./src" />
-		<property name="classDir" value="./bin" />
+		<property name="classDir" value="./classes" />
 		<property name="jar" value="${project_name}.jar" />
 		<property name="reports.tests" value="./reports/tests" />
 		<property name="reports.html" value="./reports/html" />
@@ -19,8 +19,8 @@
 	<target name="compile" depends="init">
 		<javac srcdir="${srcDir}"
 			includes="net/finmath/**/**/*.java"
-			source="1.7"
-			target="1.7"
+			source="1.6"
+			target="1.6"
 			destdir="${classDir}"
 			includeantruntime="false">
 			<classpath>

@@ -29,6 +29,7 @@ import net.finmath.montecarlo.interestrate.modelplugins.LIBORCovarianceModelFrom
 import net.finmath.montecarlo.interestrate.modelplugins.LIBORVolatilityModelFromGivenMatrix;
 import net.finmath.montecarlo.interestrate.products.AbstractLIBORMonteCarloProduct;
 import net.finmath.montecarlo.interestrate.products.Bond;
+import net.finmath.montecarlo.interestrate.products.DigitalCaplet;
 import net.finmath.montecarlo.interestrate.products.Swap;
 import net.finmath.montecarlo.interestrate.products.Swaption;
 import net.finmath.montecarlo.interestrate.products.SwaptionAnalyticApproximation;
@@ -285,12 +286,60 @@ public class LIBORMarketModelValuationTest {
 	}
 
 	@Test
+	public void testDigitalCaplet() throws CalculationException {
+		/*
+		 * Value a swaption
+		 */
+		System.out.println("Digital caplet prices:\n");
+		System.out.println("Maturity      Simulation       Analytic        Deviation");
+	
+		double maxAbsDeviation = 0.0;
+		for (int maturityIndex = 1; maturityIndex <= liborMarketModel.getNumberOfLibors() - 10; maturityIndex++) {
+	
+			double optionMaturity = liborMarketModel.getLiborPeriod(maturityIndex);
+			System.out.print(formatterMaturity.format(optionMaturity) + "          ");
+	
+			double periodStart	= liborMarketModel.getLiborPeriod(maturityIndex);
+			double periodEnd	= liborMarketModel.getLiborPeriod(maturityIndex+1);
+	
+			double strike = 0.02;
+	
+			// Create a digital caplet
+			DigitalCaplet digitalCaplet = new DigitalCaplet(optionMaturity, periodStart, periodEnd, strike);
+			
+			// Value with Monte Carlo
+			double valueSimulation = digitalCaplet.getValue(liborMarketModel);
+			System.out.print(formatterValue.format(valueSimulation) + "          ");
+	
+			// Value analytic
+			double forward			= getParSwaprate(liborMarketModel, new double[] { periodStart , periodEnd});
+			double periodLength		= periodEnd-periodStart;
+			double discountFactor	= getSwapAnnuity(liborMarketModel, new double[] { periodStart , periodEnd}) / periodLength;
+			int optionMaturityIndex = liborMarketModel.getTimeIndex(optionMaturity);
+			int liborIndex = liborMarketModel.getLiborPeriodIndex(periodStart);
+			double volatility = Math.sqrt(liborMarketModel.getModel().getIntegratedLIBORCovariance()[optionMaturityIndex][liborIndex][liborIndex]/optionMaturity);
+			double valueAnalytic = net.finmath.functions.AnalyticFormulas.blackModelDgitialCapletValue(forward, volatility, periodLength, discountFactor, optionMaturity, strike);
+			System.out.print(formatterValue.format(valueAnalytic) + "          ");
+	
+			// Absolute deviation
+			double deviation = (valueSimulation - valueAnalytic);
+			System.out.println(formatterDeviation.format(deviation) + "          ");
+	
+			maxAbsDeviation = Math.max(maxAbsDeviation, Math.abs(deviation));
+		}
+	
+		if(isUnitTests) assertTrue(Math.abs(maxAbsDeviation) < 5E-3);
+	
+		System.out.println("__________________________________________________________________________________________\n");
+	}
+
+	@Test
 	public void testSwaption() throws CalculationException {
 		/*
 		 * Value a swaption
 		 */
 		System.out.println("Swaption prices:\n");
-		System.out.println("Maturity      Simulation 1     Analytic        Deviation");
+		System.out.println("Maturity      Simulation       Analytic        Deviation");
 
 		double maxAbsDeviation = 0.0;
 		for (int maturityIndex = 1; maturityIndex <= liborMarketModel.getNumberOfLibors() - 10; maturityIndex++) {
@@ -351,7 +400,7 @@ public class LIBORMarketModelValuationTest {
 		 * Value a swaption
 		 */
 		System.out.println("Swaption prices:\n");
-		System.out.println("Moneyness      Simulation 1     Analytic        Deviation");
+		System.out.println("Moneyness      Simulation       Analytic        Deviation");
 
 		double maturity = 5.0;
 		int numberOfPeriods = 10;
@@ -586,4 +635,5 @@ public class LIBORMarketModelValuationTest {
 
 		return swapAnnuity;
 	}
+	
 }

@@ -6,7 +6,6 @@
 package net.finmath.tests.montecarlo;
 
 import static org.junit.Assert.assertTrue;
-
 import net.finmath.montecarlo.RandomVariable;
 import net.finmath.stochastic.RandomVariableInterface;
 

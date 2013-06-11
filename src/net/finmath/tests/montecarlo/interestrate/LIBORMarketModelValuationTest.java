@@ -605,11 +605,11 @@ public class LIBORMarketModelValuationTest {
 	}
 
 	private static double getSwapAnnuity(LIBORModelMonteCarloSimulationInterface liborMarketModel, double[] swapTenor) throws CalculationException {
-		double swapStart = swapTenor[0];
-		double swapEnd = swapTenor[swapTenor.length - 1];
+		double swapStart	= swapTenor[0];
+		double swapEnd		= swapTenor[swapTenor.length - 1];
 
-		int swapStartIndex = liborMarketModel.getLiborPeriodIndex(swapStart);
-		int swapEndIndex = liborMarketModel.getLiborPeriodIndex(swapEnd);
+		int swapStartIndex	= liborMarketModel.getLiborPeriodIndex(swapStart);
+		int swapEndIndex	= liborMarketModel.getLiborPeriodIndex(swapEnd);
 
 		// Calculate discount factors from model
 		double[] discountFactors = new double[swapEndIndex + 1];

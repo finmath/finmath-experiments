@@ -504,19 +504,26 @@ public class LIBORMarketModelValuationTest {
 				double[] swaprates = new double[numberOfPeriods];
 				Arrays.fill(swaprates, swaprate);
 
-				SwaptionAnalyticApproximation swaptionAnalytic = new SwaptionAnalyticApproximation(swaprate, swapTenor, SwaptionAnalyticApproximation.ValueUnit.VOLATILITY);
-
 				// This is just some swaption volatility used for testing, true market data shouold go here.
 				double targetValueVolatilty = 0.20 + 0.20 * Math.exp(-exerciseDate / 10.0) + 0.20 * Math.exp(-(exerciseDate+numberOfPeriods) / 10.0);
 
-				// You may also use full Monte-Carlo calibration
-				Swaption swaptionMonteCarlo = new Swaption(exerciseDate, fixingDates, paymentDates, swaprates);
-				double targetValuePrice = AnalyticFormulas.blackModelSwaptionValue(swaprate, targetValueVolatilty, fixingDates[0], swaprate, getSwapAnnuity(liborMarketModel,swapTenor));
 
+				// Buid our calibration product
 
 				// XXX1: Change the calibration product here
-				calibrationItems.add(new CalibrationItem(swaptionAnalytic, targetValueVolatilty, 1.0));
-				//				calibrationItems.add(new CalibrationItem(swaptionMonteCarlo, targetValuePrice, 1.0));
+				boolean isUseAnalyticCalibration = true;
+				if(isUseAnalyticCalibration) {
+					// Use an anylitc approximation to the swaption - much faster
+					SwaptionAnalyticApproximation swaptionAnalytic = new SwaptionAnalyticApproximation(swaprate, swapTenor, SwaptionAnalyticApproximation.ValueUnit.VOLATILITY);
+
+					calibrationItems.add(new CalibrationItem(swaptionAnalytic, targetValueVolatilty, 1.0));
+				}
+				else {
+					// You may also use full Monte-Carlo calibration - more accurate. Also possible for displaced diffusion.
+					Swaption swaptionMonteCarlo = new Swaption(exerciseDate, fixingDates, paymentDates, swaprates);
+					double targetValuePrice = AnalyticFormulas.blackModelSwaptionValue(swaprate, targetValueVolatilty, fixingDates[0], swaprate, getSwapAnnuity(liborMarketModel,swapTenor));
+					calibrationItems.add(new CalibrationItem(swaptionMonteCarlo, targetValuePrice, 1.0));
+				}
 			}
 		}
 		System.out.println("");
@@ -543,9 +550,6 @@ public class LIBORMarketModelValuationTest {
 		/*
 		 * Test our calibration
 		 */
-		final int numberOfPaths = 10000;
-		final int numberOfFactors = liborMarketModel.getNumberOfFactors();
-
 		ProcessEulerScheme process = new ProcessEulerScheme(
 				new net.finmath.montecarlo.BrownianMotion(timeDiscretization,
 						numberOfFactors, numberOfPaths, 3141 /* seed */));

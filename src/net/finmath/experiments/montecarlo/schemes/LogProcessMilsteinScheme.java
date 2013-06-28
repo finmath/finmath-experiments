@@ -21,40 +21,9 @@ public class LogProcessMilsteinScheme
 	private int		numberOfPaths;
 	private double	initialValue;
 	private double	sigma;
-		
+
 	private ImmutableRandomVariableInterface[]	discreteProcess = null;
 
-	public static void main(String[] args)
-	{
-		// Create an instance of this class
-		LogProcessMilsteinScheme milsteinScheme = new LogProcessMilsteinScheme(
-				101,	// numberOfTimeIndices
-				0.1,	// deltaT
-				100000,	// numberOfPaths
-				1.0,	// initialValue
-				0.2);	// sigma
-
-		// Get start time of calculation
-		double startMillis = System.currentTimeMillis();
-
-		int		lastTimeIndex	= milsteinScheme.getNumberOfTimeIndices()-1;
-		double	sigma			= milsteinScheme.getSigma();
-		double	deltaT			= milsteinScheme.getDeltaT();
-		
-		double	average			= milsteinScheme.getAverageOfLog( lastTimeIndex );
-		double	averageAnalytic	= -(0.5 * sigma * sigma * (lastTimeIndex * deltaT) );
-
-		// Get end time of calculation
-		double endMillis = System.currentTimeMillis();
-
-		double calculationTimeInSeconds = ((float)( endMillis - startMillis )) / 1000.0;
-
-		// Print result
-		System.out.println( "Average (numeric) : " + average + "." );
-		System.out.println( "Average (analytic): " + averageAnalytic + "." );
-		System.out.println( "Calculation Time: " + calculationTimeInSeconds + " seconds." );
-	}
-	
 	/**
 	 * @param numberOfTimeIndices
 	 * @param deltaT
@@ -76,14 +45,14 @@ public class LogProcessMilsteinScheme
 		this.initialValue = initialValue;
 		this.sigma = sigma;
 	}
-	
+
 	public ImmutableRandomVariableInterface getProcessValue(int timeIndex)
 	{
 		if(discreteProcess == null)
 		{
 			doPrecalculateProcess();
 		}
-		
+
 		// Return value of process
 		return discreteProcess[timeIndex];
 	}
@@ -96,25 +65,25 @@ public class LogProcessMilsteinScheme
 	 */
 	public double getAverage(int timeIndex)
 	{
-		// Get the random variable from the process repesented by this object
+		// Get the random variable from the process represented by this object
 		ImmutableRandomVariableInterface randomVariable = getProcessValue(timeIndex);
 		return randomVariable.getAverage();
 	}
-	
+
 	public double getAverageOfLog(int timeIndex)
 	{
-		// Get the random variable from the process repesented by this object
+		// Get the random variable from the process represented by this object
 		ImmutableRandomVariableInterface randomVariable = getProcessValue(timeIndex);
 		return randomVariable.getMutableCopy().log().getAverage();
 	}
 
 	public double getVarianceOfLog(int timeIndex)
 	{
-		// Get the random variable from the process repesented by this object
+		// Get the random variable from the process represented by this object
 		ImmutableRandomVariableInterface randomVariable = getProcessValue(timeIndex);
 		return randomVariable.getMutableCopy().log().getVariance();
 	}
-	
+
 	/**
 	 * Calculates the whole (discrete) process.
 	 */
@@ -132,15 +101,15 @@ public class LogProcessMilsteinScheme
 
 		for(int timeIndex = 0; timeIndex < getNumberOfTimeIndices(); timeIndex++)
 		{
-			RandomVariable newRealization = new RandomVariable((double)timeIndex, numberOfPaths, 0.0);
-			
+			double[] newRealization = new double[numberOfPaths];
+
 			// Generate process at timeIndex
 			if(timeIndex == 0)
 			{
 				// Set initial value
-				for (int iPath = 0; iPath < newRealization.size(); iPath++ )
+				for (int iPath = 0; iPath < numberOfPaths; iPath++ )
 				{
-					newRealization.set(iPath, initialValue);
+					newRealization[iPath] = initialValue;
 				}
 			}
 			else
@@ -157,18 +126,18 @@ public class LogProcessMilsteinScheme
 
 					// Diffusion
 					double diffusion = sigma * deltaW.get(iPath);
-					
-					double previousValue = previouseRealization.get(iPath);
-					
-					double newValue = previousValue + drift * previousValue * deltaT + previousValue * diffusion
-										+ 1.0/2.0 * previousValue * sigma * sigma * (deltaW.get(iPath) * deltaW.get(iPath) - deltaT);  // Milstein-Zusatz
 
-					newRealization.set(iPath,newValue); 
+					double previousValue = previouseRealization.get(iPath);
+
+					double newValue = previousValue + drift * previousValue * deltaT + previousValue * diffusion
+							+ 1.0/2.0 * previousValue * sigma * sigma * (deltaW.get(iPath) * deltaW.get(iPath) - deltaT);  // Milstein-Zusatz
+
+					newRealization[iPath] = newValue; 
 				};
 			}
-			
+
 			// Store values
-			discreteProcess[timeIndex] = newRealization;
+			discreteProcess[timeIndex] = new RandomVariable((double)timeIndex, newRealization);
 		}
 	}
 

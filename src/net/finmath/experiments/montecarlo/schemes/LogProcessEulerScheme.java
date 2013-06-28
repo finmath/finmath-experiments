@@ -69,21 +69,21 @@ public class LogProcessEulerScheme
 	 */
 	public double getAverage(int timeIndex)
 	{
-		// Get the random variable from the process repesented by this object
+		// Get the random variable from the process represented by this object
 		ImmutableRandomVariableInterface randomVariable = getProcessValue(timeIndex);
 		return randomVariable.getAverage();
 	}
 	
 	public double getAverageOfLog(int timeIndex)
 	{
-		// Get the random variable from the process repesented by this object
+		// Get the random variable from the process represented by this object
 		ImmutableRandomVariableInterface randomVariable = getProcessValue(timeIndex);
 		return randomVariable.getMutableCopy().log().getAverage();
 	}
 
 	public double getVarianceOfLog(int timeIndex)
 	{
-		// Get the random variable from the process repesented by this object
+		// Get the random variable from the process represented by this object
 		ImmutableRandomVariableInterface randomVariable = getProcessValue(timeIndex);
 		return randomVariable.getMutableCopy().log().getVariance();
 	}
@@ -105,15 +105,15 @@ public class LogProcessEulerScheme
 
 		for(int timeIndex = 0; timeIndex < getNumberOfTimeIndices(); timeIndex++)
 		{
-			RandomVariable newRealization = new RandomVariable((double)timeIndex, numberOfPaths, 0.0);
+			double[] newRealization = new double[numberOfPaths];
 			
 			// Generate process at timeIndex
 			if(timeIndex == 0)
 			{
 				// Set initial value
-				for (int iPath = 0; iPath < newRealization.size(); iPath++ )
+				for (int iPath = 0; iPath < numberOfPaths; iPath++ )
 				{
-					newRealization.set(iPath, initialValue);
+					newRealization[iPath] = initialValue;
 				}
 			}
 			else
@@ -136,14 +136,14 @@ public class LogProcessEulerScheme
 					
 					// Numerical scheme
 					double newValue = previousValue + previousValue * drift * deltaT + previousValue * diffusion;
-					
+
 					// Store new value
-					newRealization.set(iPath, newValue);
+					newRealization[iPath] = newValue;
 				};
 			}
 			
 			// Store values
-			discreteProcess[timeIndex] = newRealization;
+			discreteProcess[timeIndex] = new RandomVariable((double)timeIndex, newRealization);
 		}
 	}
 

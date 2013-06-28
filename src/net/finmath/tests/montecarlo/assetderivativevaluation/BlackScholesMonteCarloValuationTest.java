@@ -15,11 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.finmath.exception.CalculationException;
-import net.finmath.experiments.montecarlo.assetderivativevaluation.products.EuropeanOption2;
-import net.finmath.experiments.montecarlo.assetderivativevaluation.products.EuropeanOptionDeltaLikelihood;
-import net.finmath.experiments.montecarlo.assetderivativevaluation.products.EuropeanOptionDeltaPathwise;
-import net.finmath.experiments.montecarlo.assetderivativevaluation.products.EuropeanOptionVegaLikelihood;
-import net.finmath.experiments.montecarlo.assetderivativevaluation.products.EuropeanOptionVegaPathwise;
 import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationInterface;
 import net.finmath.montecarlo.assetderivativevaluation.MonteCarloBlackScholesModel;
 import net.finmath.montecarlo.assetderivativevaluation.products.AsianOption;
@@ -169,7 +164,7 @@ public class BlackScholesMonteCarloValuationTest {
 
 		// Test options with different strike
 		System.out.println("Valuation of European Options");
-		System.out.println(" Strike \t Monte-Carlo \t Analytic \t Deviation \t Monte-Carlo (alternative implementation)");
+		System.out.println(" Strike \t Monte-Carlo \t Analytic \t Deviation");
 
 		double initialValue	= blackScholesModel.getAssetValue(0.0, 0).get(0);
 		double riskFreeRate	= blackScholesModel.getRiskFreeRate();
@@ -182,12 +177,7 @@ public class BlackScholesMonteCarloValuationTest {
 			EuropeanOption		callOption	= new EuropeanOption(optionMaturity, optionStrike);
 			// Value the product with Monte Carlo
 			double valueMonteCarlo	= callOption.getValue(blackScholesModel);
-			
-			// Create a product
-			EuropeanOption2	callOption2	= new EuropeanOption2(optionMaturity, optionStrike);
-			// Value the product with Monte Carlo
-			double valueMonteCarlo2	= callOption2.getValue(blackScholesModel);
-			
+
 			// Calculate the analytic value
 			double valueAnalytic	= net.finmath.functions.AnalyticFormulas.blackScholesOptionValue(initialValue, riskFreeRate, volatility, optionMaturity, optionStrike);
 
@@ -195,8 +185,7 @@ public class BlackScholesMonteCarloValuationTest {
 			System.out.println(numberFormatStrike.format(optionStrike) + 
 					"\t" + numberFormatValue.format(valueMonteCarlo) +
 					"\t" + numberFormatValue.format(valueAnalytic) +
-					"\t" + numberFormatDeviation.format(valueMonteCarlo-valueAnalytic) +
-					"\t" + numberFormatValue.format(valueMonteCarlo2));
+					"\t" + numberFormatDeviation.format(valueMonteCarlo-valueAnalytic));
 			
 			if(numberOfPaths > numberOfPaths) assertTrue(Math.abs(valueMonteCarlo-valueAnalytic) < 1E-03);
 		}
@@ -204,8 +193,6 @@ public class BlackScholesMonteCarloValuationTest {
 
 	/**
 	 * Test some properties of the model
-	 * 
-	 * @param model The model to be used for the valuations.
 	 */
 	@Test
     public void testModelProperties() throws CalculationException {
@@ -274,8 +261,7 @@ public class BlackScholesMonteCarloValuationTest {
 	/**
 	 * Evaluates 100000 Asian options in 10 parallel threads (each valuing 10000 options)
 	 * 
-	 * @param model The model to be used for the valuations.
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	public void testMultiThreaddedValuation() throws InterruptedException {
 		final double[] averagingPoints = { 0.5, 1.0, 1.5, 2.0, 2.5, 2.5, 3.0, 3.0 , 3.0, 3.5, 4.5, 5.0 };
@@ -366,27 +352,14 @@ public class BlackScholesMonteCarloValuationTest {
 			// Calculate the analytic value
 			double deltaAnalytic	= net.finmath.functions.AnalyticFormulas.blackScholesOptionDelta(initialValue, riskFreeRate, volatility, optionMaturity, optionStrike);
 
-			// Calculate the value using pathwise differentiation
-			EuropeanOptionDeltaPathwise		callOptionDeltaPathwise	= new EuropeanOptionDeltaPathwise(optionMaturity, optionStrike);
-			double							deltaPathwise				= callOptionDeltaPathwise.getValue(blackScholesModel);
-
-			// Calculate the value using likelihood differentiation
-			EuropeanOptionDeltaLikelihood	callOptionDeltaLikelihood	= new EuropeanOptionDeltaLikelihood(optionMaturity, optionStrike);
-			double							deltaLikelihood				= callOptionDeltaLikelihood.getValue(blackScholesModel);
 
 			// Print result
 			System.out.println(numberFormatStrike.format(optionStrike) + 
 					"\t" + numberFormatValue.format(delta) +
-					"\t" + numberFormatValue.format(deltaPathwise) +
-					"\t" + numberFormatValue.format(deltaLikelihood) +
 					"\t" + numberFormatValue.format(deltaAnalytic) +
-					"\t" + numberFormatDeviation.format(delta-deltaAnalytic) +
-					"\t" + numberFormatDeviation.format(deltaPathwise-deltaAnalytic) +
-					"\t" + numberFormatDeviation.format(deltaLikelihood-deltaAnalytic));
-			
+					"\t" + numberFormatDeviation.format(delta-deltaAnalytic));
+
 			if(numberOfPaths > numberOfPaths) assertTrue(Math.abs(delta-deltaAnalytic) < 1E-02);
-			if(numberOfPaths > numberOfPaths) assertTrue(Math.abs(deltaPathwise-deltaAnalytic) < 1E-02);
-			if(numberOfPaths > numberOfPaths) assertTrue(Math.abs(deltaLikelihood-deltaAnalytic) < 1E-02);
 		}
 		System.out.println("__________________________________________________________________________________________\n");
 	}
@@ -440,23 +413,11 @@ public class BlackScholesMonteCarloValuationTest {
 			// Calculate the analytic value
 			double vegaAnalytic	= net.finmath.functions.AnalyticFormulas.blackScholesOptionVega(initialValue, riskFreeRate, volatility, optionMaturity, optionStrike);
 
-			// Calculate the value using pathwise differentiation
-			EuropeanOptionVegaPathwise		callOptionVegaPathwise	= new EuropeanOptionVegaPathwise(optionMaturity, optionStrike);
-			double							vegaPathwise				= callOptionVegaPathwise.getValue(blackScholesModel);
-
-			// Calculate the value using likelihood differentiation
-			EuropeanOptionVegaLikelihood	callOptionVegaLikelihood	= new EuropeanOptionVegaLikelihood(optionMaturity, optionStrike);
-			double							vegaLikelihood				= callOptionVegaLikelihood.getValue(blackScholesModel);
-
 			// Print result
 			System.out.println(numberFormatStrike.format(optionStrike) + 
 					"\t" + numberFormatValue.format(vega) +
-					"\t" + numberFormatValue.format(vegaPathwise) +
-					"\t" + numberFormatValue.format(vegaLikelihood) +
 					"\t" + numberFormatValue.format(vegaAnalytic) +
-					"\t" + numberFormatDeviation.format(vega-vegaAnalytic) +
-					"\t" + numberFormatDeviation.format(vegaPathwise-vegaAnalytic) +
-					"\t" + numberFormatDeviation.format(vegaLikelihood-vegaAnalytic));
+					"\t" + numberFormatDeviation.format(vega-vegaAnalytic));
 
 			if(numberOfPaths > numberOfPaths) assertTrue(Math.abs(vega-vegaAnalytic) < 1E-02);
 		}

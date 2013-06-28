@@ -51,7 +51,7 @@ public class LogProcessExpEulerScheme
 		{
 			doPrecalculateProcess();
 		}
-		
+				
 		// Return value of process
 		return discreteProcess[timeIndex];
 	}
@@ -64,21 +64,21 @@ public class LogProcessExpEulerScheme
 	 */
 	public double getAverage(int timeIndex)
 	{
-		// Get the random variable from the process repesented by this object
+		// Get the random variable from the process represented by this object
 		ImmutableRandomVariableInterface randomVariable = getProcessValue(timeIndex);
 		return randomVariable.getAverage();
 	}
 	
 	public double getAverageOfLog(int timeIndex)
 	{
-		// Get the random variable from the process repesented by this object
+		// Get the random variable from the process represented by this object
 		ImmutableRandomVariableInterface randomVariable = getProcessValue(timeIndex);
 		return randomVariable.getMutableCopy().log().getAverage();
 	}
 
 	public double getVarianceOfLog(int timeIndex)
 	{
-		// Get the random variable from the process repesented by this object
+		// Get the random variable from the process represented by this object
 		ImmutableRandomVariableInterface randomVariable = getProcessValue(timeIndex);
 		return randomVariable.getMutableCopy().log().getVariance();
 	}
@@ -100,15 +100,15 @@ public class LogProcessExpEulerScheme
 
 		for(int timeIndex = 0; timeIndex < getNumberOfTimeIndices(); timeIndex++)
 		{
-			RandomVariable newRealization = new RandomVariable((double)timeIndex, numberOfPaths, 0.0);
+			double[] newRealization = new double[numberOfPaths];
 			
 			// Generate process at timeIndex
 			if(timeIndex == 0)
 			{
 				// Set initial value
-				for (int iPath = 0; iPath < newRealization.size(); iPath++ )
+				for (int iPath = 0; iPath < numberOfPaths; iPath++ )
 				{
-					newRealization.set(iPath, initialValue);
+					newRealization[iPath] = initialValue;
 				}
 			}
 			else
@@ -126,15 +126,19 @@ public class LogProcessExpEulerScheme
 					// Diffusion
 					double diffusion = sigma * deltaW.get(iPath);
 					
+					// Previous value
 					double previousValue = previouseRealization.get(iPath);
 					
+					// Numerical scheme
 					double newValue = previousValue * Math.exp(drift -0.5 * sigma * sigma * deltaT + diffusion);
-					newRealization.set(iPath,newValue); 
+
+					// Store new value
+					newRealization[iPath] = newValue;
 				};
 			}
 			
 			// Store values
-			discreteProcess[timeIndex] = newRealization;
+			discreteProcess[timeIndex] = new RandomVariable((double)timeIndex, newRealization);
 		}
 	}
 

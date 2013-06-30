@@ -2,8 +2,8 @@
 import net.finmath.exception.CalculationException;
 import net.finmath.montecarlo.assetderivativevaluation.products.AbstractAssetMonteCarloProduct;
 import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationInterface;
-import net.finmath.stochastic.ImmutableRandomVariableInterface;
 import net.finmath.stochastic.RandomVariableInterface;
+import net.finmath.stochastic.RandomVariableAccumulatorInterface;
 
 /**
  * Implements pricing of a European stock option.

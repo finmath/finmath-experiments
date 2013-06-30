@@ -10,6 +10,7 @@ import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimul
 import net.finmath.montecarlo.assetderivativevaluation.MonteCarloBlackScholesModel;
 import net.finmath.montecarlo.assetderivativevaluation.products.AbstractAssetMonteCarloProduct;
 import net.finmath.stochastic.RandomVariableInterface;
+import net.finmath.stochastic.RandomVariableAccumulatorInterface;
 
 /**
  * Implements calculation of the delta of a European option using the pathwise method.
@@ -53,14 +54,14 @@ public class EuropeanOptionVegaPathwise extends AbstractAssetMonteCarloProduct {
 
 		// Get underlying and numeraire
 		RandomVariableInterface underlyingAtMaturity	= model.getAssetValue(maturity,0);
-		RandomVariableInterface numeraireAtMaturity		= model.getNumeraire(maturity);
+		RandomVariableInterface numeraireAtMaturity	= model.getNumeraire(maturity);
 		RandomVariableInterface underlyingAtToday		= model.getAssetValue(0.0,0);
 		RandomVariableInterface numeraireAtToday		= model.getNumeraire(0);
 		RandomVariableInterface monteCarloWeights		= model.getMonteCarloWeights(maturity);
 		
 		/*
 		 *  The following way of calculating the expected value (average) is discouraged since it makes too strong
-		 *  assumptions on the internals of the <code>RandomVariableInterface</code>. Instead you should use
+		 *  assumptions on the internals of the <code>RandomVariableAccumulatorInterface</code>. Instead you should use
 		 *  the mutators sub, div, mult and the getter getAverage. This code is provided for illustrative purposes.
 		 */
 		double average = 0.0;
@@ -88,7 +89,7 @@ public class EuropeanOptionVegaPathwise extends AbstractAssetMonteCarloProduct {
 	}
 
 	@Override
-	public RandomVariableInterface getValue(double evaluationTime, AssetModelMonteCarloSimulationInterface model) {
+	public RandomVariableAccumulatorInterface getValue(double evaluationTime, AssetModelMonteCarloSimulationInterface model) {
 		throw new RuntimeException("Method not supported.");
 	}
 }

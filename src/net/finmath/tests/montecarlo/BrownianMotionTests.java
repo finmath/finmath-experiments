@@ -11,7 +11,6 @@ import java.text.DecimalFormat;
 
 import net.finmath.montecarlo.BrownianMotion;
 import net.finmath.montecarlo.RandomVariable;
-import net.finmath.stochastic.ImmutableRandomVariableInterface;
 import net.finmath.stochastic.RandomVariableInterface;
 import net.finmath.time.TimeDiscretization;
 import net.finmath.time.TimeDiscretizationInterface;
@@ -49,19 +48,19 @@ public class BrownianMotionTests {
 		
 		System.out.println("Average and variance of the integral of (Delta W)^2.\nTime step size: " + dt + "  Number of path: " + numberOfPaths + "\n");
 
-		RandomVariable sumOfSquaredIncrements 		= new RandomVariable(0.0, 0.0);
-		RandomVariable sumOfCrossIncrements	= new RandomVariable(0.0, 0.0);
+		RandomVariableInterface sumOfSquaredIncrements 	= new RandomVariable(0.0);
+		RandomVariableInterface sumOfCrossIncrements		= new RandomVariable(0.0);
 		for(int timeIndex=0; timeIndex<timeDiscretization.getNumberOfTimeSteps(); timeIndex++) {
-			ImmutableRandomVariableInterface brownianIncrement1 = brownian.getBrownianIncrement(timeIndex,0);
-			ImmutableRandomVariableInterface brownianIncrement2 = brownian.getBrownianIncrement(timeIndex,1);
+			RandomVariableInterface brownianIncrement1 = brownian.getBrownianIncrement(timeIndex,0);
+			RandomVariableInterface brownianIncrement2 = brownian.getBrownianIncrement(timeIndex,1);
 
 			// Calculate x = \int dW1(t) * dW1(t)
 			RandomVariableInterface squaredIncrements = brownianIncrement1.getMutableCopy().squared();
-			sumOfSquaredIncrements.add(squaredIncrements);
+			sumOfSquaredIncrements = sumOfSquaredIncrements.add(squaredIncrements);
 
 			// Calculate x = \int dW1(t) * dW2(t)
 			RandomVariableInterface covarianceIncrements = brownianIncrement1.getMutableCopy().mult(brownianIncrement2);
-			sumOfCrossIncrements.add(covarianceIncrements);
+			sumOfCrossIncrements = sumOfCrossIncrements.add(covarianceIncrements);
 		}
 
 		double time								= timeDiscretization.getTime(timeDiscretization.getNumberOfTimeSteps());

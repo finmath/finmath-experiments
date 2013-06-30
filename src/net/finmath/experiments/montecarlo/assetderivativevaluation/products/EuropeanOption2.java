@@ -9,6 +9,7 @@ import net.finmath.exception.CalculationException;
 import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationInterface;
 import net.finmath.montecarlo.assetderivativevaluation.products.AbstractAssetMonteCarloProduct;
 import net.finmath.stochastic.RandomVariableInterface;
+import net.finmath.stochastic.RandomVariableAccumulatorInterface;
 
 /**
  * Implements valuation of a European stock option.
@@ -45,13 +46,13 @@ public class EuropeanOption2 extends AbstractAssetMonteCarloProduct {
 	{
 		// Get underlying and numeraire
 		RandomVariableInterface underlyingAtMaturity	= model.getAssetValue(maturity,0);
-		RandomVariableInterface numeraireAtMaturity		= model.getNumeraire(maturity);
+		RandomVariableInterface numeraireAtMaturity	= model.getNumeraire(maturity);
 		RandomVariableInterface monteCarloWeights		= model.getMonteCarloWeights(maturity);
 		RandomVariableInterface numeraireAtToday		= model.getNumeraire(0);
 		
 		/*
 		 *  The following way of calculating the expected value (average) is discouraged since it makes too strong
-		 *  assumptions on the internals of the <code>RandomVariableInterface</code>. Instead you should use
+		 *  assumptions on the internals of the <code>RandomVariableAccumulatorInterface</code>. Instead you should use
 		 *  the mutators sub, div, mult and the getter getAverage. This code is provided for illustrative purposes.
 		 */
 		double average = 0.0;
@@ -69,7 +70,7 @@ public class EuropeanOption2 extends AbstractAssetMonteCarloProduct {
 	}
 
 	@Override
-	public RandomVariableInterface getValue(double evaluationTime, AssetModelMonteCarloSimulationInterface model) {
+	public RandomVariableAccumulatorInterface getValue(double evaluationTime, AssetModelMonteCarloSimulationInterface model) {
 		throw new RuntimeException("Method not supported.");
 	}
 }

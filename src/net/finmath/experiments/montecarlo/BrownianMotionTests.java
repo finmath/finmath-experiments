@@ -9,7 +9,6 @@ import java.text.DecimalFormat;
 
 import net.finmath.montecarlo.BrownianMotion;
 import net.finmath.montecarlo.RandomVariable;
-import net.finmath.stochastic.ImmutableRandomVariableInterface;
 import net.finmath.stochastic.RandomVariableInterface;
 import net.finmath.time.TimeDiscretization;
 import net.finmath.time.TimeDiscretizationInterface;
@@ -48,10 +47,10 @@ public class BrownianMotionTests {
 		System.out.println("      " + "\t" + "  int dW " + "\t" + "         " + "\t" + "int dW dW" + "\t" + "        ");
 		System.out.println("time  " + "\t" + "   mean  " + "\t" + "    var  " + "\t" + "   mean  " + "\t" + "    var  ");
 
-		RandomVariable brownianMotionRealization	= new RandomVariable(0.0);
-		RandomVariable sumOfSquaredIncrements 		= new RandomVariable(0.0);
+		RandomVariableInterface brownianMotionRealization	= new RandomVariable(0.0);
+		RandomVariableInterface sumOfSquaredIncrements 		= new RandomVariable(0.0);
 		for(int timeIndex=0; timeIndex<timeDiscretization.getNumberOfTimeSteps(); timeIndex++) {
-			ImmutableRandomVariableInterface brownianIncrement = brownian.getBrownianIncrement(timeIndex,0);
+			RandomVariableInterface brownianIncrement = brownian.getBrownianIncrement(timeIndex,0);
 			
 			// Calculate W(t+dt) from dW
 			brownianMotionRealization.add(brownianIncrement);
@@ -62,7 +61,7 @@ public class BrownianMotionTests {
 
 			// Calculate x = \int dW(t) * dW(t)
 			RandomVariableInterface squaredIncrements = brownianIncrement.getMutableCopy().squared();
-			sumOfSquaredIncrements.add(squaredIncrements);
+			sumOfSquaredIncrements = sumOfSquaredIncrements.add(squaredIncrements);
 
 			double meanOfSumOfSquaredIncrements		= sumOfSquaredIncrements.getAverage();
 			double varianceOfSumOfSquaredIncrements	= sumOfSquaredIncrements.getVariance();

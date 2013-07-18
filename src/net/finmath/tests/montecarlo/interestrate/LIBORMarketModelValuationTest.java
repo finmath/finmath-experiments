@@ -19,10 +19,13 @@ import net.finmath.marketdata.model.curves.ForwardCurve;
 import net.finmath.marketdata.model.curves.ForwardCurveInterface;
 import net.finmath.montecarlo.interestrate.LIBORMarketModel;
 import net.finmath.montecarlo.interestrate.LIBORMarketModel.CalibrationItem;
+import net.finmath.montecarlo.interestrate.LIBORMarketModelGeneralized;
 import net.finmath.montecarlo.interestrate.LIBORMarketModelInterface;
 import net.finmath.montecarlo.interestrate.LIBORModelMonteCarloSimulation;
 import net.finmath.montecarlo.interestrate.LIBORModelMonteCarloSimulationInterface;
+import net.finmath.montecarlo.interestrate.modelplugins.AbstractLIBORCovarianceModel;
 import net.finmath.montecarlo.interestrate.modelplugins.AbstractLIBORCovarianceModelParametric;
+import net.finmath.montecarlo.interestrate.modelplugins.DisplacedDiffusionModel;
 import net.finmath.montecarlo.interestrate.modelplugins.LIBORCorrelationModelExponentialDecay;
 import net.finmath.montecarlo.interestrate.modelplugins.LIBORCovarianceModelExponentialForm7Param;
 import net.finmath.montecarlo.interestrate.modelplugins.LIBORCovarianceModelFromVolatilityAndCorrelation;
@@ -56,36 +59,6 @@ public class LIBORMarketModelValuationTest {
 	private static DecimalFormat formatterMaturity	= new DecimalFormat("00.00", new DecimalFormatSymbols(Locale.ENGLISH));
 	private static DecimalFormat formatterValue		= new DecimalFormat(" ##0.000%;-##0.000%", new DecimalFormatSymbols(Locale.ENGLISH));
 	private static DecimalFormat formatterDeviation	= new DecimalFormat(" 0.00000E00;-0.00000E00", new DecimalFormatSymbols(Locale.ENGLISH));
-
-	public static void main(String[] args) {
-
-		long start = System.currentTimeMillis();
-
-		LIBORMarketModelValuationTest liborMarketModelValuationTest = new LIBORMarketModelValuationTest();
-
-		// Disable assertions of unit testing
-		liborMarketModelValuationTest.setUnitTests(false);
-
-		try {
-			// Run bond valuation testing on this model
-			liborMarketModelValuationTest.testBond();
-
-			// Run swap valuation testing on this model
-			liborMarketModelValuationTest.testSwap();
-
-			// Run swaption valuation testing on this model
-			liborMarketModelValuationTest.testSwaption();
-
-			// Run swaption calibration on this model
-			liborMarketModelValuationTest.testSwaptionCalibration();
-		} catch (CalculationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		long end = System.currentTimeMillis();
-		System.out.println("Calculation Time: " + (double) (end - start) / 1000.0 + "sec.");
-	}
 
 	public LIBORMarketModelValuationTest() {
 
@@ -162,16 +135,16 @@ public class LIBORMarketModelValuationTest {
 						liborPeriodDiscretization, volatilityModel, correlationModel);
 
 		// DisplacedDiffusionModel (future extension)
-		//		AbstractLIBORCovarianceModel covarianceModel2 = new DisplacedDiffusionModel(covarianceModel, 0.00, false);
+		AbstractLIBORCovarianceModel covarianceModel2 = new DisplacedDiffusionModel(covarianceModel, 0.00, false);
 
 		/*
 		 * Create corresponding LIBOR Market Model
 		 */
-		LIBORMarketModel liborMarketModel = new LIBORMarketModel(
-				liborPeriodDiscretization, forwardCurve, covarianceModel);
+		LIBORMarketModelGeneralized liborMarketModel = new LIBORMarketModelGeneralized(
+				liborPeriodDiscretization, forwardCurve, covarianceModel2);
 
 		// Choose the simulation measure
-		liborMarketModel.setMeasure(LIBORMarketModel.Measure.SPOT);
+		liborMarketModel.setMeasure(LIBORMarketModelGeneralized.Measure.SPOT);
 		// liborMarketModel.setDriftAproximationMethod(LIBORMarketModel.DRIFTAPROXIMATION_PREDICTOR_CORRECTOR);
 
 		ProcessEulerScheme process = new ProcessEulerScheme(
@@ -222,15 +195,15 @@ public class LIBORMarketModelValuationTest {
 		}
 
 		System.out.println("Maximum abs deviation: " + formatterDeviation.format(maxAbsDeviation));
-		if(isUnitTests) assertTrue(maxAbsDeviation < 5E-03);
-
 		System.out.println("__________________________________________________________________________________________\n");
+
+		if(isUnitTests) assertTrue(maxAbsDeviation < 5E-03);
 	}
 
 	@Test
 	public void testSwap() throws CalculationException {
 		/*
-		 * Price a bond
+		 * Price a swap
 		 */
 		System.out.println("Par-Swap prices:\n");
 		System.out.println("Swap \t\t\t Value");
@@ -278,11 +251,10 @@ public class LIBORMarketModelValuationTest {
 		}
 
 		System.out.println("Maximum abs deviation: " + formatterDeviation.format(maxAbsDeviation));
+		System.out.println("__________________________________________________________________________________________\n");
 
 		// The swap should be at par (close to zero)
 		if(isUnitTests) assertTrue(maxAbsDeviation < 5E-3);
-
-		System.out.println("__________________________________________________________________________________________\n");
 	}
 
 	@Test
@@ -327,10 +299,10 @@ public class LIBORMarketModelValuationTest {
 	
 			maxAbsDeviation = Math.max(maxAbsDeviation, Math.abs(deviation));
 		}
+
+		System.out.println("__________________________________________________________________________________________\n");
 	
 		if(isUnitTests) assertTrue(Math.abs(maxAbsDeviation) < 5E-3);
-	
-		System.out.println("__________________________________________________________________________________________\n");
 	}
 
 	@Test
@@ -389,9 +361,9 @@ public class LIBORMarketModelValuationTest {
 			maxAbsDeviation = Math.max(maxAbsDeviation, Math.abs(deviation));
 		}
 
-		if(isUnitTests) assertTrue(Math.abs(maxAbsDeviation) < 2E-3);
-
 		System.out.println("__________________________________________________________________________________________\n");
+
+		if(isUnitTests) assertTrue(Math.abs(maxAbsDeviation) < 5E-3);
 	}
 
 	@Test
@@ -459,11 +431,10 @@ public class LIBORMarketModelValuationTest {
 		}
 
 		System.out.println("Maximum abs deviation: " + formatterDeviation.format(maxAbsDeviation));
+		System.out.println("__________________________________________________________________________________________\n");
 
 		// The swap should be at par (close to zero)
 		if(isUnitTests) assertTrue(Math.abs(maxAbsDeviation) < 1E-1);
-
-		System.out.println("__________________________________________________________________________________________\n");
 	}
 
 	@Test
@@ -570,6 +541,7 @@ public class LIBORMarketModelValuationTest {
 			System.out.println("Model: " + formatterValue.format(valueModel) + "\t Target: " + formatterValue.format(valueTarget) + "\t Deviation: " + formatterDeviation.format(valueModel-valueTarget));
 		}
 		System.out.println("Mean Deviation:" + deviationSum/calibrationItems.size());
+		System.out.println("__________________________________________________________________________________________\n");
 	}
 
 	private static double getParSwaprate(LIBORModelMonteCarloSimulationInterface liborMarketModel, double[] swapTenor) throws CalculationException {

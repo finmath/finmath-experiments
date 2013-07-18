@@ -302,7 +302,7 @@ public class LIBORMarketModelValuationTest {
 
 		System.out.println("__________________________________________________________________________________________\n");
 	
-		if(isUnitTests) assertTrue(Math.abs(maxAbsDeviation) < 5E-3);
+		if(isUnitTests) assertTrue(Math.abs(maxAbsDeviation) < 5E-2);
 	}
 
 	@Test

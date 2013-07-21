@@ -34,22 +34,22 @@ import org.junit.Test;
 public class CMSOptionTest {
 
 	// Model properties
-	private double	initialValue		= 0.10;
-	private double	volatility			= 0.10;
-	private	int		numberOfFactors		= 5;
-	private	double	correlationDecay	= 0.1;
+	private final double	initialValue		= 0.10;
+	private final double	volatility			= 0.10;
+	private final int		numberOfFactors		= 5;
+	private final double	correlationDecay	= 0.1;
 
 	// Process discretization properties
-	private int		numberOfPaths		= 10000;
-	private int		numberOfTimeSteps	= 15;
-	private double	deltaT				= 0.5;
+	private final int		numberOfPaths		= 10000;
+	private final int		numberOfTimeSteps	= 15;
+	private final double	deltaT				= 0.5;
 
 	// LIBOR tenor discretization
-	private int		numberOfPeriods		= 30;
-	private double	periodLength		= 0.5;
+	private final int		numberOfPeriods		= 30;
+	private final double	periodLength		= 0.5;
 	
 	// Random number generator seed
-	private int		seed				= 3141;
+	private final int		seed				= 3141;
 	
 	// Java DecimalFormat for our output format
 	static final	DecimalFormat	formatterPercent	= new DecimalFormat("0.0000%");
@@ -75,7 +75,7 @@ public class CMSOptionTest {
 		System.out.println("Calculation time: " + (endMillis - startMillis)/1000.0 + " sec");
 	}
 
-	public LIBORModelMonteCarloSimulation getLIBORModelMonteCarloSimulation(ForwardCurveInterface forwardCurve) {
+	public LIBORModelMonteCarloSimulation getLIBORModelMonteCarloSimulation(ForwardCurveInterface forwardCurve) throws CalculationException {
 		// Create the time discretization
         TimeDiscretizationInterface timeDiscretization = new TimeDiscretization(0.0, numberOfTimeSteps, deltaT);
 
@@ -93,7 +93,6 @@ public class CMSOptionTest {
 						new LIBORVolatilityModelTwoParameterExponentialForm(timeDiscretization, tenorDiscretization, volatility, 0.0),
 						new LIBORCorrelationModelExponentialDecay(timeDiscretization, tenorDiscretization, numberOfFactors, correlationDecay, false))
 		);
-		liborMarketModel.setMeasure(LIBORMarketModel.Measure.SPOT);
 
 		BrownianMotion brownianMotion = new BrownianMotion(timeDiscretization, numberOfFactors, numberOfPaths, seed);
 

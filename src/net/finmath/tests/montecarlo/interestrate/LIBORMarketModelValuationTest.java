@@ -11,7 +11,9 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import net.finmath.exception.CalculationException;
 import net.finmath.functions.AnalyticFormulas;
@@ -19,13 +21,10 @@ import net.finmath.marketdata.model.curves.ForwardCurve;
 import net.finmath.marketdata.model.curves.ForwardCurveInterface;
 import net.finmath.montecarlo.interestrate.LIBORMarketModel;
 import net.finmath.montecarlo.interestrate.LIBORMarketModel.CalibrationItem;
-import net.finmath.montecarlo.interestrate.LIBORMarketModelGeneralized;
 import net.finmath.montecarlo.interestrate.LIBORMarketModelInterface;
 import net.finmath.montecarlo.interestrate.LIBORModelMonteCarloSimulation;
 import net.finmath.montecarlo.interestrate.LIBORModelMonteCarloSimulationInterface;
-import net.finmath.montecarlo.interestrate.modelplugins.AbstractLIBORCovarianceModel;
 import net.finmath.montecarlo.interestrate.modelplugins.AbstractLIBORCovarianceModelParametric;
-import net.finmath.montecarlo.interestrate.modelplugins.DisplacedDiffusionModel;
 import net.finmath.montecarlo.interestrate.modelplugins.LIBORCorrelationModelExponentialDecay;
 import net.finmath.montecarlo.interestrate.modelplugins.LIBORCovarianceModelExponentialForm7Param;
 import net.finmath.montecarlo.interestrate.modelplugins.LIBORCovarianceModelFromVolatilityAndCorrelation;
@@ -134,18 +133,34 @@ public class LIBORMarketModelValuationTest {
 				new LIBORCovarianceModelFromVolatilityAndCorrelation(timeDiscretization,
 						liborPeriodDiscretization, volatilityModel, correlationModel);
 
-		// DisplacedDiffusionModel (future extension)
-		AbstractLIBORCovarianceModel covarianceModel2 = new DisplacedDiffusionModel(covarianceModel, 0.00, false);
+		// BlendedLocalVolatlityModel (future extension)
+		//		AbstractLIBORCovarianceModel covarianceModel2 = new BlendedLocalVolatlityModel(covarianceModel, 0.00, false);
+
+		// Set model properties
+		Map<String, String> properties = new HashMap<String, String>();
+
+		// Choose the simulation measure
+		properties.put("measure", LIBORMarketModel.Measure.SPOT.name());
+		
+		// Choose log normal model
+		properties.put("stateSpace", LIBORMarketModel.StateSpace.LOGNORMAL.name());
+
+		// Empty array of calibration items - hence, model will use given covariance
+		LIBORMarketModel.CalibrationItem[] calibrationItems = new LIBORMarketModel.CalibrationItem[0];
 
 		/*
 		 * Create corresponding LIBOR Market Model
 		 */
-		LIBORMarketModelGeneralized liborMarketModel = new LIBORMarketModelGeneralized(
-				liborPeriodDiscretization, forwardCurve, covarianceModel2);
+		LIBORMarketModelInterface liborMarketModel;
+		try {
+			liborMarketModel = new LIBORMarketModel(
+					liborPeriodDiscretization, forwardCurve, null, covarianceModel, calibrationItems, properties);
+		} catch (CalculationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 
-		// Choose the simulation measure
-		liborMarketModel.setMeasure(LIBORMarketModelGeneralized.Measure.SPOT);
-		// liborMarketModel.setDriftAproximationMethod(LIBORMarketModel.DRIFTAPROXIMATION_PREDICTOR_CORRECTOR);
+			return null;
+		}
 
 		ProcessEulerScheme process = new ProcessEulerScheme(
 				new net.finmath.montecarlo.BrownianMotion(timeDiscretization,
@@ -203,7 +218,7 @@ public class LIBORMarketModelValuationTest {
 	@Test
 	public void testSwap() throws CalculationException {
 		/*
-		 * Price a swap
+		 * Value a swap
 		 */
 		System.out.println("Par-Swap prices:\n");
 		System.out.println("Swap \t\t\t Value");
@@ -515,7 +530,7 @@ public class LIBORMarketModelValuationTest {
 
 		LIBORMarketModel liborMarketModelCalibrated = new LIBORMarketModel(
 				this.liborMarketModel.getLiborPeriodDiscretization(),
-				forwardCurve, null, covarianceModelParametric, calibrationItems.toArray(new CalibrationItem[0]));	
+				forwardCurve, null, covarianceModelParametric, calibrationItems.toArray(new CalibrationItem[0]), null);	
 
 
 		/*
@@ -581,10 +596,8 @@ public class LIBORMarketModelValuationTest {
 	}
 
 	private static double getSwapAnnuity(LIBORModelMonteCarloSimulationInterface liborMarketModel, double[] swapTenor) throws CalculationException {
-		double swapStart	= swapTenor[0];
 		double swapEnd		= swapTenor[swapTenor.length - 1];
 
-		int swapStartIndex	= liborMarketModel.getLiborPeriodIndex(swapStart);
 		int swapEndIndex	= liborMarketModel.getLiborPeriodIndex(swapEnd);
 
 		// Calculate discount factors from model

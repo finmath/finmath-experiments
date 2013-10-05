@@ -62,10 +62,10 @@ public class CalibrationTest {
 				);
 
 		// Create a forward curve from that discount curve for semi-annual forward rates
-		double periodLength = 0.5;
 		ForwardCurveInterface	forwardCurveFromDiscountCurve	= new ForwardCurveFromDiscountCurve(
 				discountCurve.getName()						/* name of the discount curve to use */,
-				periodLength								/* period length */
+				null										/* reference date: not specified since single curve setup */,
+				null										/* period length: not specified since single curve setup */
 				);
 
 		// A model is a collection of curves (curves and products find other curves by looking up their name in the model)
@@ -76,7 +76,8 @@ public class CalibrationTest {
 
 		// We may ask the forward curve for a forward.
 		double fixingTime	= 1.0;
-		double forwardRate	= forwardCurveFromDiscountCurve.getForward(model1, fixingTime);
+		double periodLength = 0.5;
+		double forwardRate	= forwardCurveFromDiscountCurve.getForward(model1, fixingTime, periodLength);
 		System.out.println("Semi-annual forward with fixing in " + fixingTime + " calculated from that discount curve is " + forwardRate);
 
 		// Check if we have the right value
@@ -102,11 +103,11 @@ public class CalibrationTest {
 				new double[] {1.0, 0.95, 0.90, 0.85, 0.80}	/* discount factors */
 				);
 
-		// Create a forward curve from that discount curve for semi-annual forward rates
-		double periodLength = 0.5;
+		// Create a forward curve from that discount curve for forward rates
 		ForwardCurveInterface	forwardCurveFromDiscountCurve	= new ForwardCurveFromDiscountCurve(
 				discountCurve.getName()						/* name of the discount curve to use */,
-				periodLength								/* period length */
+				null										/* reference date: not specified since single curve setup */,
+				null										/* period length: not specified since single curve setup */
 				);
 
 		// Create a collection of objective functions (calibration products)
@@ -168,8 +169,8 @@ public class CalibrationTest {
 		Vector<AnalyticProductInterface> calibrationProducts2 = new Vector<AnalyticProductInterface>();
 			
 		// It is possible to mix tenors (although it may not be meaningful in a forward curve calibration)
-		calibrationProducts2.add(new Swap(new RegularSchedule(new TimeDiscretization(0.0, 1, 1.0)), null, 0.06, "discountCurve", new RegularSchedule(new TimeDiscretization(0.0, 1, 1.0)), "forwardCurve", 0.0, "discountCurve"));
-		calibrationProducts2.add(new Swap(new RegularSchedule(new TimeDiscretization(0.0, 2, 1.0)), null, 0.05, "discountCurve", new RegularSchedule(new TimeDiscretization(0.0, 2, 1.0)), "forwardCurve", 0.0, "discountCurve"));
+		calibrationProducts2.add(new Swap(new RegularSchedule(new TimeDiscretization(0.0, 1, 1.0)), null, 0.06, "discountCurve", new RegularSchedule(new TimeDiscretization(0.0, 1, 0.5)), "forwardCurve", 0.0, "discountCurve"));
+		calibrationProducts2.add(new Swap(new RegularSchedule(new TimeDiscretization(0.0, 2, 1.0)), null, 0.05, "discountCurve", new RegularSchedule(new TimeDiscretization(0.0, 2, 0.5)), "forwardCurve", 0.0, "discountCurve"));
 		calibrationProducts2.add(new Swap(new RegularSchedule(new TimeDiscretization(0.0, 6, 0.5)), null, 0.04, "discountCurve", new RegularSchedule(new TimeDiscretization(0.0, 6, 0.5)), "forwardCurve", 0.0, "discountCurve"));
 		calibrationProducts2.add(new Swap(new RegularSchedule(new TimeDiscretization(0.0, 8, 0.5)), null, 0.04, "discountCurve", new RegularSchedule(new TimeDiscretization(0.0, 8, 0.5)), "forwardCurve", 0.0, "discountCurve"));
 		calibrationProducts2.add(new Swap(new RegularSchedule(new TimeDiscretization(0.0, 10, 0.5)), null, 0.04, "discountCurve", new RegularSchedule(new TimeDiscretization(0.0, 10, 0.5)), "forwardCurve", 0.0, "discountCurve"));

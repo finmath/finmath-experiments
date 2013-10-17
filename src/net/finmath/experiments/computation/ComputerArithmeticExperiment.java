@@ -66,7 +66,7 @@ public class ComputerArithmeticExperiment {
 		/*
 		 * Test calculations close to the maximum value
 		 */
-		double value			= 1.0/3.0;
+		double value			= 1.0/10.0;
 		int numberOfSummations	= 1000000;
 		System.out.println("\n\nTest 4: Summation: Calculating the average of " + numberOfSummations + " numbers of value " + value + ".");
 

@@ -16,7 +16,6 @@ public class ComputerArithmeticExperiment {
 	 * Construct the test class.
 	 */
 	public ComputerArithmeticExperiment() {
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -63,7 +62,24 @@ public class ComputerArithmeticExperiment {
 		double x2 = getSmallestSolutionOfQuadraticEquation2(p,q);
 		System.out.println("Solution:           x = " + x2);
 		System.out.println("Result: x^2 - 2px + q = " + (x2 * x2 - 2 * p * x2 + q));
-		
+
+		/*
+		 * Test calculations close to the maximum value
+		 */
+		System.out.println("\n\nTest 4: Summation.");
+		int numberOfSummations = 10000000;
+
+		System.out.println("Method 1");
+		double sum = getSumOfNumberClassical(1.0/3.0, numberOfSummations);
+		double average = sum / numberOfSummations;
+		System.out.println("Sum:     " + sum);
+		System.out.println("Average: " + average);
+
+		System.out.println("Method 2");
+		double sum2 = getSumOfNumbersKahan(1.0/3.0, numberOfSummations);
+		double average2 = sum2 / numberOfSummations;		
+		System.out.println("Sum:     " + sum2);
+		System.out.println("Average: " + average2);
 	}
 	
 	
@@ -103,4 +119,38 @@ public class ComputerArithmeticExperiment {
 	static double getSmallestSolutionOfQuadraticEquation2(double p, double q) {
 		return q / (p + Math.sqrt(p * p - q));
 	}
+	
+	/**
+	 * Calculates a sum by summing up <code>numberOfSummations</code> times the (identical) value <code>value</code>.
+	 * 
+	 * @param valueToSum A value.
+	 * @param numberOfSummations The number of summations.
+	 * @return The result of summing up value numerToSum times.
+	 */
+	static double getSumOfNumberClassical(double valueToSum, int numberOfSummations) {
+		double sum = 0.0;
+		for(int i=0; i<numberOfSummations; i++) sum += valueToSum;
+		return sum;
+	}
+	
+	/**
+	 * Calculates the sum of summing up <code>numberOfSummations</code> times the (identical) value <code>value</code>
+	 * using the Kahan algorithm.
+	 * 
+	 * @param valueToSum A value.
+	 * @param numberOfSummations The number of summations.
+	 * @return The result of summing up value numerToSum times.
+	 */
+	static double getSumOfNumbersKahan(double valueToSum, int numberOfSummations) {
+	    double error = 0.0;				// Running error compensation
+	    double sum = 0.0;				// Running sum
+	    for(int i=0; i<numberOfSummations; i++)  {
+	    	double value	= valueToSum - error;			// Error corrected value
+	    	double newSum	= sum + value;				// New sum
+	    	error = (newSum - sum) - value;				// Numerical error
+	    	sum = newSum;
+	    }
+	    return sum;
+	}
+
 }

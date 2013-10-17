@@ -66,20 +66,19 @@ public class ComputerArithmeticExperiment {
 		/*
 		 * Test calculations close to the maximum value
 		 */
-		System.out.println("\n\nTest 4: Summation.");
-		int numberOfSummations = 10000000;
+		double value			= 1.0/3.0;
+		int numberOfSummations	= 1000000;
+		System.out.println("\n\nTest 4: Summation: Calculating the average of " + numberOfSummations + " numbers of value " + value + ".");
 
 		System.out.println("Method 1");
-		double sum = getSumOfNumberClassical(1.0/3.0, numberOfSummations);
-		double average = sum / numberOfSummations;
-		System.out.println("Sum:     " + sum);
-		System.out.println("Average: " + average);
+		double sumClassical		= getSumOfNumberClassical(value, numberOfSummations);
+		double averageClassical	= sumClassical / numberOfSummations;
+		System.out.println("Average: " + averageClassical);
 
 		System.out.println("Method 2");
-		double sum2 = getSumOfNumbersKahan(1.0/3.0, numberOfSummations);
-		double average2 = sum2 / numberOfSummations;		
-		System.out.println("Sum:     " + sum2);
-		System.out.println("Average: " + average2);
+		double sumKahan		= getSumOfNumbersKahan(value, numberOfSummations);
+		double averageKahan	= sumKahan / numberOfSummations;		
+		System.out.println("Average: " + averageKahan);
 	}
 	
 	

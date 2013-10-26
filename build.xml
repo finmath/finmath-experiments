@@ -35,7 +35,7 @@
 	<target name="jar" depends="compile">
 		<jar jarfile="${jar}" basedir="${classDir}" includes="net/finmath/**">
 			<fileset dir="${srcDir}">
-				<include name="com/mycompany/resources/*.properties" />
+				<include name="net/finmath/resources/*.properties" />
 			</fileset>
 		</jar>
 	</target>

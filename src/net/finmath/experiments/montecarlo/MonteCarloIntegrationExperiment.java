@@ -19,10 +19,10 @@ public class MonteCarloIntegrationExperiment {
 		long numberOfSimulations = 1000000;
 		
 		double pi = getMonteCarloApproximationOfPi(numberOfSimulations);
-		System.out.println("Simulation with n=" + numberOfSimulations + " resulted in approximation of pi = " + pi);
+		System.out.println("Simulation with n = " + numberOfSimulations + " resulted in approximation of pi = " + pi);
 
-		System.out.println("Approximation error is                       = " + (pi-Math.PI));
-		System.out.println("Theoretical order of th Monte-Carlo error is = "+1.0/Math.sqrt(numberOfSimulations));
+		System.out.println("Approximation error is                        = " + Math.abs(pi-Math.PI));
+		System.out.println("Theoretical order of the Monte-Carlo error is = " + 1.0/Math.sqrt(numberOfSimulations));
 	}
 
 	/**

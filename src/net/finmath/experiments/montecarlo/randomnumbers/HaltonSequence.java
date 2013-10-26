@@ -3,19 +3,23 @@
  *
  * Created on 18.10.2012
  */
-package net.finmath.experiments.montecarlo.lowdiscrepancysequence;
+package net.finmath.experiments.montecarlo.randomnumbers;
 
 /**
- * This class represents a Halton sequence (low discrepancy sequence), or equivalently a vector of
+ * This class represents a Halton sequence (a low discrepancy sequence), or equivalently a vector of
  * Van der Corput sequences.
+ * 
+ * 
+ * 
  * @author Christian Fries
  */
 public class HaltonSequence {
 
-	int[] baseVector;
+	private int[] baseVector;
 
 	/**
-	 * Construct a Halton sequence with d = base.length dimensions where the i-th component uses base[i] as base.
+	 * Construct a Halton sequence with d = base.length dimensions where the i-th component
+	 * uses base[i] as base of the corresponding van der Corput sequence.
 	 * 
 	 * @param base Vector of base integers for each component.
 	 */

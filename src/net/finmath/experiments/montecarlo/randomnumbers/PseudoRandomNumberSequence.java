@@ -3,7 +3,7 @@
  *
  * Created on 25.10.2012
  */
-package net.finmath.experiments.montecarlo;
+package net.finmath.experiments.montecarlo.randomnumbers;
 
 import java.util.Random;
 
@@ -12,7 +12,7 @@ import cern.jet.random.engine.MersenneTwister64;
 /**
  * @author Christian Fries
  */
-public class RandomNumberSequence {
+public class PseudoRandomNumberSequence {
 
 	enum RandomNumberGeneratorType {
 		LCG_JAVA,
@@ -33,8 +33,7 @@ public class RandomNumberSequence {
 	 * @param seed Seed of the generator.
 	 * @param length Length of the sequence.
 	 */
-    public RandomNumberSequence(RandomNumberGeneratorType type, long seed,
-            int length) {
+    public PseudoRandomNumberSequence(RandomNumberGeneratorType type, long seed, int length) {
 	    super();
 	    this.type = type;
 	    this.seed = seed;
@@ -49,7 +48,7 @@ public class RandomNumberSequence {
 	 * @param seed Seed of the generator.
 	 * @param length Length of the sequence.
 	 */
-    public RandomNumberSequence(long seed, int length) {
+    public PseudoRandomNumberSequence(long seed, int length) {
 	    super();
 	    this.type = RandomNumberGeneratorType.MERSENNE_TWISTER;
 	    this.seed = seed;

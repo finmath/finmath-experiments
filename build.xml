@@ -40,34 +40,6 @@
 		</jar>
 	</target>
 
-	<target name="junit" depends="jar">
-		<junit printsummary="true" failureproperty="junit.failure">
-			<jvmarg value="-XX:-UseSplitVerifier"/>
-			<jvmarg value="-Xmx512M"/>
-			<classpath>
-				<fileset dir="lib">
-					<include name="**/*.jar" />
-				</fileset>
-				<pathelement path="${classDir}" />
-			</classpath>
-			<batchtest fork="yes" todir="${reports.tests}">
-				<fileset dir="${srcDir}">
-					<include name="**/*Test.java" />
-				</fileset>
-			</batchtest>
-			<formatter type="xml" />
-		</junit>
-	</target>
-
-	<target name="junitreport" depends="junit">
-		<junitreport todir="${reports.tests}">
-			<fileset dir="${reports.tests}">
-				<include name="TEST-*.xml" />
-			</fileset>
-			<report format="noframes" todir="${reports.html}" />
-		</junitreport>
-	</target>
-
 	<!-- removes all that has been built -->
 	<target name="clean" depends="init">
 		<delete dir="${classDir}" includeEmptyDirs="true" />

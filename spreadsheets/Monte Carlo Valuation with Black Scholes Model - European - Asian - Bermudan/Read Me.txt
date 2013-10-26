@@ -1,4 +1,0 @@
-
-The spreadsheet requires that the "Obba" add-in is installed.
-
-See http://www.obba.info

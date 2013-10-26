@@ -1,7 +1,7 @@
-finmath-experiments
+finmath experiments
 ===================
 
-Experiments, demos and unit tests based on finmath lib.
+Experiments and demos based on finmath lib.
 
 Projects
 --------
@@ -14,12 +14,15 @@ You will find several project in the repository.
     Monte-Carlo simulation of SDEs and the estimation of conditional
     expectations in Monte-Carlo).
 
+**finmath spreadsheets**  
+    A collection of spreadsheets building upon *finmath lib* and
+    providing end user solutions (e.g, interest rate curve calibration
+    or calibration of a forward rate model, aka LIBOR market model).
+
 **finmath experiments**  
     Small experiments, illustrating some aspects of mathematical
-    finance. Also illustrates how to use the finmath lib. Also contains
-    a collection of spreadsheets building upon *finmath lib* and
-    providing end user solutions (e.g, interest rate curve calibration
-    or calibration of a forward rate model).
+    finance. Also illustrates how to use the finmath lib.
+    
 
 Documentation
 -------------

@@ -7,13 +7,17 @@
 package net.finmath.experiments.montecarlo;
 
 /**
+ * A simple class illustrating a Monte-Carlo integration.
+ * 
  * @author Christian Fries
  */
 public class MonteCarloIntegrationExperiment {
 
 
 	/**
-	 * @param args
+	 * Main program to run the experiment.
+	 * 
+	 * @param args Arguments, not used
 	 */
 	public static void main(String[] args) {
 		long numberOfSimulations = 1000000;

@@ -7,8 +7,17 @@ package net.finmath.experiments.montecarlo.randomnumbers;
 
 /**
  * This class represents a Halton sequence (a low discrepancy sequence), or equivalently a vector of
- * Van der Corput sequences.
- * 
+ * Van der Corput sequences. For a given base b the van der Corput sequence is given by
+ * <br>
+ * <i>
+ * 	x<sub>i</sub> = &Sigma;x<sub>1 &le; j &le; i</sub> a<sub>i,j</sub> b<sub>-j</sub>
+ * </i>
+ * <br>
+ * where a<sub>i,j</sub> is such that
+ * <br>
+ * <i>
+ * 	i = &Sigma;x<sub>1 &le; j &le; i</sub> a<sub>i,j</sub> b<sub>j-1</sub>
+ * </i>
  * 
  * 
  * @author Christian Fries
@@ -82,7 +91,7 @@ public class HaltonSequence {
 		if(base < 2) throw new RuntimeException("Cannot create Halton number with base less than two.");
 		if(index < 0) throw new RuntimeException("Cannot create Halton number with index less than zero.");
 
-		// Index shift: counting of the function start at 0, algorithm below start at 1.
+		// Index shift: counting of the function starts at 0, algorithm below starts at 1.
 		index++;
 
 		// Calculate Halton number x

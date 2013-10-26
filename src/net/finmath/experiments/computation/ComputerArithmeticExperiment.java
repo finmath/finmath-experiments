@@ -13,13 +13,9 @@ package net.finmath.experiments.computation;
 public class ComputerArithmeticExperiment {
 
 	/**
-	 * Construct the test class.
-	 */
-	public ComputerArithmeticExperiment() {
-	}
-
-	/**
-	 * @param args
+	 * Main program to run the experiment.
+	 * 
+	 * @param args Arguments, not used
 	 */
 	public static void main(String[] args) {
 

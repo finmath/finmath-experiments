@@ -78,7 +78,8 @@ public class MonteCarloIntegrationParallelizedExperiment {
 	/**
 	 * Calculates an approximation of pi via Monte-Carlo integration.
 	 * 
-	 * @param numberOfSimulations
+	 * @param indexStart The start index of the random number sequence.
+	 * @param numberOfSimulations The number of elements to use from the random number sequence.
 	 * @return An approximation of pi.
 	 */
 	public static double getMonteCarloApproximationOfPi(int indexStart, int numberOfSimulations) {

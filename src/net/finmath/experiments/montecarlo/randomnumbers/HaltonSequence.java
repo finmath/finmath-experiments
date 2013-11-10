@@ -86,7 +86,7 @@ public class HaltonSequence {
 	 * @param base Base of the Halton number.
 	 * @return Halton number.
 	 */
-	static double getHaltonNumber(int index, int base) {
+	public static double getHaltonNumber(int index, int base) {
 		// Check base
 		if(base < 2) throw new RuntimeException("Cannot create Halton number with base less than two.");
 		if(index < 0) throw new RuntimeException("Cannot create Halton number with index less than zero.");

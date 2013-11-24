@@ -23,16 +23,16 @@ public class MonteCarloSchemeTests {
 		
 		double initialValue = 1.0;
 		double sigma = 0.5;		// Note: Try different sigmas: 0.2, 0.5, 0.7, 0.9		
-		int numberOfPath = 10000;
+		int numberOfPath = 100000;
 		
-		for(int numberOfTimeSteps=2; numberOfTimeSteps<=202; numberOfTimeSteps+=20)
+		for(int numberOfTimeSteps=1; numberOfTimeSteps<=2002; numberOfTimeSteps+=20)
 		{
 			double lastTime = 10.0;
-			double deltaT = lastTime/(numberOfTimeSteps-1);
+			double deltaT = lastTime/numberOfTimeSteps;
 			
 			// Create an instance of the euler scheme class
 			LogProcessEulerScheme eulerScheme = new LogProcessEulerScheme(
-					numberOfTimeSteps,	// numberOfTimeIndices
+					numberOfTimeSteps,	// numberOfTimeSteps
 					deltaT,				// deltaT
 					numberOfPath,		// numberOfPaths
 					initialValue,		// initialValue
@@ -40,7 +40,7 @@ public class MonteCarloSchemeTests {
 
 			// Create an instance of the euler scheme class
 			LogProcessMilsteinScheme milsteinScheme = new LogProcessMilsteinScheme(
-					numberOfTimeSteps,	// numberOfTimeIndices
+					numberOfTimeSteps,	// numberOfTimeSteps
 					deltaT,				// deltaT
 					numberOfPath,		// numberOfPaths
 					initialValue,		// initialValue
@@ -48,7 +48,7 @@ public class MonteCarloSchemeTests {
 
 			// Create an instance of the euler scheme class
 			LogProcessExpEulerScheme expEulerScheme = new LogProcessExpEulerScheme(
-					numberOfTimeSteps,	// numberOfTimeIndices
+					numberOfTimeSteps,	// numberOfTimeSteps
 					deltaT,				// deltaT
 					numberOfPath,		// numberOfPaths
 					initialValue,		// initialValue
@@ -57,7 +57,7 @@ public class MonteCarloSchemeTests {
 			// Get start time of calculation
 			double startMillis = System.currentTimeMillis();
 
-			int		lastTimeIndex	= eulerScheme.getNumberOfTimeIndices()-1;
+			int		lastTimeIndex	= eulerScheme.getNumberOfTimeSteps();
 			
 			double	averageEuler	= eulerScheme.getAverageOfLog( lastTimeIndex );
 			double	averageMilstein	= milsteinScheme.getAverageOfLog( lastTimeIndex );

@@ -16,7 +16,7 @@ import net.finmath.time.TimeDiscretization;
  */
 public class LogProcessExpEulerScheme
 {
-	private int		numberOfTimeIndices;
+	private int		numberOfTimeSteps;
 	private double	deltaT;
 	private int		numberOfPaths;
 	private double	initialValue;
@@ -25,20 +25,20 @@ public class LogProcessExpEulerScheme
 	private RandomVariableInterface[]	discreteProcess = null;
 
 	/**
-	 * @param numberOfTimeIndices
+	 * @param numberOfTimeSteps
 	 * @param deltaT
 	 * @param paths
 	 * @param initialValue
 	 * @param sigma
 	 */
 	public LogProcessExpEulerScheme(
-			int numberOfTimeIndices,
+			int numberOfTimeSteps,
 			double deltaT,
 			int numberOfPaths,
 			double initialValue,
 			double sigma) {
 		super();
-		this.numberOfTimeIndices = numberOfTimeIndices;
+		this.numberOfTimeSteps = numberOfTimeSteps;
 		this.deltaT = deltaT;
 		this.numberOfPaths = numberOfPaths;
 		this.initialValue = initialValue;
@@ -73,14 +73,14 @@ public class LogProcessExpEulerScheme
 	{
 		// Get the random variable from the process represented by this object
 		RandomVariableInterface randomVariable = getProcessValue(timeIndex);
-		return randomVariable.getMutableCopy().log().getAverage();
+		return randomVariable.log().getAverage();
 	}
 
 	public double getVarianceOfLog(int timeIndex)
 	{
 		// Get the random variable from the process represented by this object
 		RandomVariableInterface randomVariable = getProcessValue(timeIndex);
-		return randomVariable.getMutableCopy().log().getVariance();
+		return randomVariable.log().getVariance();
 	}
 	
 	/**
@@ -89,16 +89,16 @@ public class LogProcessExpEulerScheme
 	private void doPrecalculateProcess() {
 		
 		BrownianMotionInterface	brownianMotion	= new BrownianMotion(
-				new TimeDiscretization(0.0, getNumberOfTimeIndices(), getDeltaT()),
+				new TimeDiscretization(0.0, getNumberOfTimeSteps(), getDeltaT()),
 				1,						// numberOfFactors
 				getNumberOfPaths(),
 				31415					// seed
 				);
 		
 		// Allocate Memory
-		discreteProcess = new RandomVariableInterface[getNumberOfTimeIndices()];
+		discreteProcess = new RandomVariableInterface[getNumberOfTimeSteps()+1];
 
-		for(int timeIndex = 0; timeIndex < getNumberOfTimeIndices(); timeIndex++)
+		for(int timeIndex = 0; timeIndex < getNumberOfTimeSteps()+1; timeIndex++)
 		{
 			double[] newRealization = new double[numberOfPaths];
 			
@@ -115,7 +115,7 @@ public class LogProcessExpEulerScheme
 			{	
 				// Euler Scheme
 				RandomVariableInterface previouseRealization	= discreteProcess[timeIndex-1];
-				RandomVariableInterface deltaW					= brownianMotion.getBrownianIncrement(timeIndex, 0);
+				RandomVariableInterface deltaW					= brownianMotion.getBrownianIncrement(timeIndex-1, 0);
 
 				// Generate values 
 				for (int iPath = 0; iPath < numberOfPaths; iPath++ )
@@ -130,7 +130,7 @@ public class LogProcessExpEulerScheme
 					double previousValue = previouseRealization.get(iPath);
 					
 					// Numerical scheme
-					double newValue = previousValue * Math.exp(drift -0.5 * sigma * sigma * deltaT + diffusion);
+					double newValue = previousValue * Math.exp(drift - 0.5 * sigma * sigma * deltaT + diffusion);
 
 					// Store new value
 					newRealization[iPath] = newValue;
@@ -165,10 +165,10 @@ public class LogProcessExpEulerScheme
 	}
 
 	/**
-	 * @return Returns the numberOfTimeIndices.
+	 * @return Returns the numberOfTimeSteps.
 	 */
-	public int getNumberOfTimeIndices() {
-		return numberOfTimeIndices;
+	public int getNumberOfTimeSteps() {
+		return numberOfTimeSteps;
 	}
 
 	/**

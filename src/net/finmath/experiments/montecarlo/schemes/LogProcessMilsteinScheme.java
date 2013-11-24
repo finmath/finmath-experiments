@@ -16,7 +16,7 @@ import net.finmath.time.TimeDiscretization;
  */
 public class LogProcessMilsteinScheme
 {
-	private int		numberOfTimeIndices;
+	private int		numberOfTimeSteps;
 	private double	deltaT;
 	private int		numberOfPaths;
 	private double	initialValue;
@@ -25,7 +25,7 @@ public class LogProcessMilsteinScheme
 	private RandomVariableInterface[]	discreteProcess = null;
 
 	/**
-	 * @param numberOfTimeIndices
+	 * @param numberOfTimeSteps
 	 * @param deltaT
 	 * @param paths
 	 * @param initialValue
@@ -33,13 +33,13 @@ public class LogProcessMilsteinScheme
 	 * gleicher Constructor wie im Euler-Schema. 
 	 */
 	public LogProcessMilsteinScheme(
-			int numberOfTimeIndices,
+			int numberOfTimeSteps,
 			double deltaT,
 			int numberOfPaths,
 			double initialValue,
 			double sigma) {
 		super();
-		this.numberOfTimeIndices = numberOfTimeIndices;
+		this.numberOfTimeSteps = numberOfTimeSteps;
 		this.deltaT = deltaT;
 		this.numberOfPaths = numberOfPaths;
 		this.initialValue = initialValue;
@@ -74,14 +74,14 @@ public class LogProcessMilsteinScheme
 	{
 		// Get the random variable from the process represented by this object
 		RandomVariableInterface randomVariable = getProcessValue(timeIndex);
-		return randomVariable.getMutableCopy().log().getAverage();
+		return randomVariable.log().getAverage();
 	}
 
 	public double getVarianceOfLog(int timeIndex)
 	{
 		// Get the random variable from the process represented by this object
 		RandomVariableInterface randomVariable = getProcessValue(timeIndex);
-		return randomVariable.getMutableCopy().log().getVariance();
+		return randomVariable.log().getVariance();
 	}
 
 	/**
@@ -90,16 +90,16 @@ public class LogProcessMilsteinScheme
 	private void doPrecalculateProcess() {
 
 		BrownianMotionInterface	brownianMotion	= new BrownianMotion(
-				new TimeDiscretization(0.0, getNumberOfTimeIndices(), getDeltaT()),
+				new TimeDiscretization(0.0, getNumberOfTimeSteps(), getDeltaT()),
 				1,						// numberOfFactors
 				getNumberOfPaths(),
 				31415					// seed
 				);
 
 		// Allocate Memory
-		discreteProcess = new RandomVariableInterface[getNumberOfTimeIndices()];
+		discreteProcess = new RandomVariableInterface[getNumberOfTimeSteps()+1];
 
-		for(int timeIndex = 0; timeIndex < getNumberOfTimeIndices(); timeIndex++)
+		for(int timeIndex = 0; timeIndex < getNumberOfTimeSteps()+1; timeIndex++)
 		{
 			double[] newRealization = new double[numberOfPaths];
 
@@ -116,7 +116,7 @@ public class LogProcessMilsteinScheme
 			{	
 				// Milstein Scheme
 				RandomVariableInterface previouseRealization	= discreteProcess[timeIndex-1];
-				RandomVariableInterface deltaW					= brownianMotion.getBrownianIncrement(timeIndex, 0);
+				RandomVariableInterface deltaW					= brownianMotion.getBrownianIncrement(timeIndex-1, 0);
 
 				// Generate values 
 				for (int iPath = 0; iPath < numberOfPaths; iPath++ )
@@ -164,10 +164,10 @@ public class LogProcessMilsteinScheme
 	}
 
 	/**
-	 * @return Returns the numberOfTimeIndices.
+	 * @return Returns the numberOfTimeSteps.
 	 */
-	public int getNumberOfTimeIndices() {
-		return numberOfTimeIndices;
+	public int getNumberOfTimeSteps() {
+		return numberOfTimeSteps;
 	}
 
 	/**

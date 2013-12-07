@@ -60,7 +60,7 @@ public class BrownianMotionTests {
 			double variance	= brownianMotionRealization.getVariance();
 
 			// Calculate x = \int dW(t) * dW(t)
-			RandomVariableInterface squaredIncrements = brownianIncrement.getMutableCopy().squared();
+			RandomVariableInterface squaredIncrements = brownianIncrement.squared();
 			sumOfSquaredIncrements = sumOfSquaredIncrements.add(squaredIncrements);
 
 			double meanOfSumOfSquaredIncrements		= sumOfSquaredIncrements.getAverage();

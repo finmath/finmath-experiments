@@ -5,6 +5,8 @@
  */
 package net.finmath.experiments.montecarlo.assetderivativevaluation;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -40,14 +42,14 @@ import org.junit.Test;
 public class BlackScholesMonteCarloValuationTest {
 
 	// Model properties
-	private double	initialValue   = 1.0;
-	private double	riskFreeRate   = 0.05;
-	private double	volatility     = 0.30;
+	private final double	initialValue   = 1.0;
+	private final double	riskFreeRate   = 0.05;
+	private final double	volatility     = 0.30;
 
 	// Process discretization properties
-	private int		numberOfPaths		= 10000;
-	private int		numberOfTimeSteps	= 10;
-	private double	deltaT				= 0.5;
+	private final int		numberOfPaths		= 20000;
+	private final int		numberOfTimeSteps	= 10;
+	private final double	deltaT				= 0.5;
 
 	
 	private AssetModelMonteCarloSimulationInterface model = null;
@@ -56,7 +58,7 @@ public class BlackScholesMonteCarloValuationTest {
 	 * This main method will test a Monte-Carlo simulation of a Black-Scholes model and some valuations
 	 * performed with this model.
 	 * 
-	 * @throws CalculationException 
+	 * @throws net.finmath.exception.CalculationException Thrown if the valuation fails, specific cause may be available via the <code>cause()</code> method. 
 	 * @throws InterruptedException 
 	 */
     public static void main(String[] args) throws IOException, CalculationException, InterruptedException
@@ -201,8 +203,6 @@ public class BlackScholesMonteCarloValuationTest {
 
 	/**
 	 * Test some properties of the model
-	 * 
-	 * @param model The model to be used for the valuations.
 	 */
 	@Test
     public void testModelProperties() throws CalculationException {
@@ -287,18 +287,21 @@ public class BlackScholesMonteCarloValuationTest {
 		System.out.println("Value of Asian Option is \t"	+ valueOfAsianOption);
 		System.out.println("Value of European Option is \t"	+ valueOfEuropeanOption);
 		System.out.println("Value of Bermudan Option is \t"	+ "(" + valueOfBermudanOptionLowerBound + "," + valueOfBermudanOptionUpperBound + ")");
+
+		assertTrue(valueOfAsianOption < valueOfEuropeanOption);
+		assertTrue(valueOfBermudanOptionLowerBound < valueOfBermudanOptionUpperBound);
+		assertTrue(valueOfEuropeanOption < valueOfBermudanOptionUpperBound);
 	}
 	
 	/**
 	 * Evaluates 100000 Asian options in 10 parallel threads (each valuing 10000 options)
 	 * 
-	 * @param model The model to be used for the valuations.
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	public void testMultiThreaddedValuation() throws InterruptedException {
 		final double[] averagingPoints = { 0.5, 1.0, 1.5, 2.0, 2.5, 2.5, 3.0, 3.0 , 3.0, 3.5, 4.5, 5.0 };
-		final double maturity = 5.0;
-		final double strike = 1.07;
+        final double maturity = 5.0;
+        final double strike = 1.07;
 
 		int			numberOfThreads	= 10;		
 		Thread[]	myThreads		= new Thread[numberOfThreads];
@@ -401,6 +404,7 @@ public class BlackScholesMonteCarloValuationTest {
 					"\t" + numberFormatDeviation.format(delta-deltaAnalytic) +
 					"\t" + numberFormatDeviation.format(deltaPathwise-deltaAnalytic) +
 					"\t" + numberFormatDeviation.format(deltaLikelihood-deltaAnalytic));
+			assertTrue(Math.abs(delta-deltaAnalytic) < 1E-02);
 		}
 		System.out.println("__________________________________________________________________________________________\n");
 	}

@@ -23,22 +23,25 @@ public class ComputerArithmeticExperiment {
 		 * Test the machine precision
 		 */
 		System.out.println("\n\nTest 1: Machine Precision");
+		System.out.println("__________________________________________________________________");
 
 		double eps = getCalculatedMachinePrecision();
 
 		System.out.println("Calculated Machine Precision: eps = " + eps);
 		System.out.println("                          1 + eps = " + (1+eps));
+		System.out.println("                            eps/2 = " + eps/2.0);
 		System.out.println("                        1 + eps/2 = " + (1+eps/2.0));
 
 		/*
 		 * Test calculations close to the maximum value
 		 */
-		System.out.println("\n\nTest 2: Infinity");
-		
+		System.out.println("\n\nTest 2: Infinity");		
+		System.out.println("__________________________________________________________________");
+
 		double maxDouble	= 	Double.MAX_VALUE;
 		
 		System.out.println("Largest possible number:              maxDouble = " + maxDouble);
-		System.out.println("                               maxDouble + eps  = " + (maxDouble + eps));		
+		System.out.println("                                maxDouble + eps = " + (maxDouble + eps));		
 		System.out.println("                    maxDouble + maxDouble * eps = " + (maxDouble + maxDouble * eps));
 		System.out.println("(maxDouble + maxDouble * eps) - maxDouble * eps = " + ((maxDouble + maxDouble * eps) - maxDouble * eps));
 
@@ -48,6 +51,7 @@ public class ComputerArithmeticExperiment {
 		double p = 1000000.0;
 		double q = 1;
 		System.out.println("\n\nTest 3: Solution of quadratic equation x^2 - 2px + q = 0 with p=" + p + " q="+q+"");
+		System.out.println("__________________________________________________________________");
 		
 		System.out.println("Method 1");
 		double x1 = getSmallestSolutionOfQuadraticEquation1(p,q);
@@ -65,6 +69,7 @@ public class ComputerArithmeticExperiment {
 		double value			= 1.0/10.0;
 		int numberOfSummations	= 1000000;
 		System.out.println("\n\nTest 4: Summation: Calculating the average of " + numberOfSummations + " numbers of value " + value + ".");
+		System.out.println("__________________________________________________________________");
 
 		System.out.println("Method 1");
 		double sumClassical		= getSumOfNumberClassical(value, numberOfSummations);
@@ -79,7 +84,7 @@ public class ComputerArithmeticExperiment {
 	
 	
 	/**
-	 * Returns epsilon such that 1 + epsilon > 1 = 1 + epsilon/2.
+	 * Returns the smallest epsilon such that 1 + epsilon > 1 = 1 + epsilon/2.
 	 * 
 	 * @return The machine precision.
 	 */

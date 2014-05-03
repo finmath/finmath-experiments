@@ -60,18 +60,16 @@ public class ForkJoinPoolTest {
 
 			try {
 				System.out.println(i + "\t" + concurrentExecutions.availablePermits() + "\t" + Thread.currentThread());
-				Thread.sleep(10);
 
 				if(isUseInnerStream) {
 					runCodeWhichUsesParallelStream(numberOfTasksInInnerLoop);
 				}
 				else {
-					Thread.sleep(10*numberOfTasksInInnerLoop);
+					try {
+						Thread.sleep(10*numberOfTasksInInnerLoop);
+					} catch (Exception e) {
+					}
 				}
-				
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 			finally {
 				if(isUseSemaphore) {

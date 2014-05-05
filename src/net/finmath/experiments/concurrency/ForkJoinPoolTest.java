@@ -77,7 +77,7 @@ public class ForkJoinPoolTest {
 						Thread.sleep(10*numberOfTasksInInnerLoop);
 					} catch (Exception e) {
 					}
-					runCodeWhichUsesParallelStream(i, Thread.currentThread().toString(), numberOfTasksInInnerLoop);
+					runCodeWhichUsesParallelStream(i, Thread.currentThread().toString());
 				}
 				else {
 					try {
@@ -101,7 +101,7 @@ public class ForkJoinPoolTest {
 	 * 
 	 * @param numberOfTasksInInnerLoop Number of tasks to execute.
 	 */
-	private void runCodeWhichUsesParallelStream(int i, String callingThread, int numberOfTasksInInnerLoop) {
+	private void runCodeWhichUsesParallelStream(int i, String callingThread) {
 
 		Runnable innerLoop = new Runnable() {
 			@Override

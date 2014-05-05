@@ -59,11 +59,10 @@ public class ForkJoinPoolTest {
 
 	public void testNestedLoops() {
 
-
-
 		System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism",Integer.toString(concurrentExecutionsLimitForStreams));
 		System.out.println("java.util.concurrent.ForkJoinPool.common.parallelism = " + System.getProperty("java.util.concurrent.ForkJoinPool.common.parallelism"));
 
+		// Outer loop
 		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
 
 			if(isUseSemaphore) {
@@ -107,6 +106,7 @@ public class ForkJoinPoolTest {
 		Runnable innerLoop = new Runnable() {
 			@Override
 			public void run() {
+				// Inner loop
 				IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
 					try {
 						System.out.println(i + "\t" + j + "\t" + concurrentExecutions.availablePermits() + "\t" + callingThread + "\t" + Thread.currentThread());

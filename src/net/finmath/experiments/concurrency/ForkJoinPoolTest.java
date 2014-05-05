@@ -36,22 +36,34 @@ import java.util.stream.IntStream;
  */
 public class ForkJoinPoolTest {
 
+	// Any combination of the booleans works, except (true,true,false)
+	final boolean isUseSemaphore			= true;
+	final boolean isUseInnerStream			= true;
+	final boolean isWrappedInnerLoopThread	= false;
+
+	final int		numberOfTasksInOuterLoop = 20;				// In real applications this can be a large number (e.g. > 1000).
+	final int		numberOfTasksInInnerLoop = 100;				// In real applications this can be a large number (e.g. > 1000).
+	final int		concurrentExecusionsLimitInOuterLoop = 5;
+	final int		concurrentExecutionsLimitForStreams = 10;
+
+	final Semaphore concurrentExecutions;
+
 	public static void main(String[] args) {
-		
-		// Any combination of the booleans works, except (true,true)
-		final boolean isUseSemaphore	= true;
-		final boolean isUseInnerStream	= true;
+		(new ForkJoinPoolTest()).testNestedLoops();
+	}
+	
+	public ForkJoinPoolTest() {
+		super();
+		this.concurrentExecutions = new Semaphore(concurrentExecusionsLimitInOuterLoop);
+	}
 
-		final int		numberOfTasksInOuterLoop = 20;				// In real applications this can be a large number (e.g. > 1000).
-		final int		numberOfTasksInInnerLoop = 100;				// In real applications this can be a large number (e.g. > 1000).
-		final int		concurrentExecusionsLimitInOuterLoop = 5;
-		final int		concurrentExecutionsLimitForStreams = 10;
+	public void testNestedLoops() {
 
-		final Semaphore concurrentExecutions = new Semaphore(concurrentExecusionsLimitInOuterLoop);
-				
+
+
 		System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism",Integer.toString(concurrentExecutionsLimitForStreams));
 		System.out.println("java.util.concurrent.ForkJoinPool.common.parallelism = " + System.getProperty("java.util.concurrent.ForkJoinPool.common.parallelism"));
-		
+
 		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
 
 			if(isUseSemaphore) {
@@ -59,10 +71,14 @@ public class ForkJoinPoolTest {
 			}
 
 			try {
-				System.out.println(i + "\t" + concurrentExecutions.availablePermits() + "\t" + Thread.currentThread());
+				System.out.println(i + "\t" + "-" + "\t" + concurrentExecutions.availablePermits() + "\t" + Thread.currentThread());
 
 				if(isUseInnerStream) {
-					runCodeWhichUsesParallelStream(numberOfTasksInInnerLoop);
+					try {
+						Thread.sleep(10*numberOfTasksInInnerLoop);
+					} catch (Exception e) {
+					}
+					runCodeWhichUsesParallelStream(i, Thread.currentThread().toString(), numberOfTasksInInnerLoop);
 				}
 				else {
 					try {
@@ -86,12 +102,31 @@ public class ForkJoinPoolTest {
 	 * 
 	 * @param numberOfTasksInInnerLoop Number of tasks to execute.
 	 */
-	private static void runCodeWhichUsesParallelStream(int numberOfTasksInInnerLoop) {
-		IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
-			try {
-				Thread.sleep(10);
-			} catch (Exception e) {
+	private void runCodeWhichUsesParallelStream(int i, String callingThread, int numberOfTasksInInnerLoop) {
+
+		Runnable innerLoop = new Runnable() {
+			@Override
+			public void run() {
+				IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
+					try {
+						System.out.println(i + "\t" + j + "\t" + concurrentExecutions.availablePermits() + "\t" + callingThread + "\t" + Thread.currentThread());
+						Thread.sleep(10);
+					} catch (Exception e) {
+					}
+				});
 			}
-		});
+		};
+
+		if(isWrappedInnerLoopThread) { 
+			Thread t = new Thread(innerLoop, "Wrapper Thread");
+			try {
+				t.start();
+				t.join();
+			} catch (InterruptedException e) {
+			}
+		}
+		else {
+			innerLoop.run();
+		}
 	}
 }

@@ -37,7 +37,11 @@ public class NestedParallelForEachTest {
 	final int		numberOfTasksInOuterLoop = 24;				// In real applications this can be a large number (e.g. > 1000).
 	final int		numberOfTasksInInnerLoop = 100;				// In real applications this can be a large number (e.g. > 1000).
 	final int		concurrentExecutionsLimitForStreams	= 8;	// java.util.concurrent.ForkJoinPool.common.parallelism
-	
+
+	// For those, who do not trust the use of Thread.sleep().
+	final boolean	isCPUTimeBurned = false;					// Set to true, if you like a true loop, and not Thread.sleep()
+	final long	 	cpuTimeBurningCountPerMillis = 800000;		// You might need to calibrate this for your machine
+
 	public static void main(String[] args) {
 		(new NestedParallelForEachTest()).testNestedLoops();
 	}
@@ -53,25 +57,25 @@ public class NestedParallelForEachTest {
 		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
 
 			try {
-				if(i < 10) Thread.sleep(10 * 1000);
+				if(i < 10) burnTime(10 * 1000);
 
 				System.out.println(i + "\t" + Thread.currentThread());
 
 				if(isInnerStreamParallel) {
 					// Inner loop as parallel: worst case (sequential) it takes 10 * numberOfTasksInInnerLoop millis
 					IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
-						try { Thread.sleep(10); } catch (Exception e) { e.printStackTrace(); }
+						burnTime(10);
 					});
 						
 				}
 				else {
 					// Inner loop as sequential
 					IntStream.range(0,numberOfTasksInInnerLoop).sequential().forEach(j -> {
-						try { Thread.sleep(10); } catch (Exception e) { e.printStackTrace(); }
+						burnTime(10);
 					});
 				}
 
-				if(i >= 10) Thread.sleep(10 * 1000);
+				if(i >= 10) burnTime(10 * 1000);
 			} catch (Exception e) { e.printStackTrace(); }
 
 		});
@@ -79,5 +83,24 @@ public class NestedParallelForEachTest {
 		long end = System.currentTimeMillis();
 
 		System.out.println("Done in " + (end-start)/1000 + " sec.");
+	}
+	
+	private double burnTime(long millis) {
+		if(isCPUTimeBurned) {
+			double x = 0;
+			for(long i=0; i<millis*cpuTimeBurningCountPerMillis; i++) {
+				x += Math.cos(0.0);
+			}
+			return x/cpuTimeBurningCountPerMillis;
+		}
+		else {
+			try {
+				Thread.sleep(millis);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return (double)millis;
+		}
 	}
 }

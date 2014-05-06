@@ -13,14 +13,14 @@ import java.util.stream.IntStream;
  * We are testing nested parallel forEach loops, which appear to
  * has unexpected performance in Java 1.8.0u5.
  * 
- * We have a nested parallel forEach.
- * The inner loop is independent (except of the use of a common pool) and consumes 1 second in total in the worst case,
- * namely if processed in non-parallel.
+ * We have a nested stream.parallel().forEach().
+ * The inner loop is independent (stateless, no interference, etc. - except of the use of a common pool)
+ * and consumes 1 second in total in the worst case, namely if processed sequential.
  * Half of the tasks of the outer loop consume 10 seconds prior that loop.
  * Half consume 10 seconds after that loop.
- * If we remove the inner loop I add another 1 second. 
- * Hence every thread consumes 11 seconds (with and without inner loop) in total.
- * Now: submitting 10 Threads to a pool of 20 we would expect 22 seconds at best. 
+ * We have a boolean which allows to switch the inner loop from parallel() to sequential().
+ * Hence every thread consumes 11 seconds (worst case) in total.
+ * Now: submitting 24 outer-loop-tasks to a pool of 8 we would expect 24/8 * 11 = 33 seconds at best (on an 8 core or better machine).
  * 
  * The result is:
  * - With inner sequential loop:	33 seconds.

@@ -11,9 +11,10 @@ import java.util.stream.IntStream;
  * This is a test of Java 8 parallel streams.
  * 
  * We are testing nested parallel forEach loops, which appear to
- * have unexpected performance in Java 1.8.0u5.
+ * have unexpected poor performance in Java 1.8.0u5.
  * 
- * We have a nested stream.parallel().forEach().
+ * We have a nested stream.parallel().forEach():
+ * 
  * The inner loop is independent (stateless, no interference, etc. - except of the use of a common pool)
  * and consumes 1 second in total in the worst case, namely if processed sequential.
  * Half of the tasks of the outer loop consume 10 seconds prior that loop.
@@ -25,6 +26,24 @@ import java.util.stream.IntStream;
  * The result is:
  * - With inner sequential loop:	33 seconds.
  * - With inner parallel loop:		>80 seconds (I had 92 seconds).
+ * 
+ * Now, there is a funny workaround. The method 
+ * wraps every operation in its own thread. Use this to wrap the inner loop in its
+ * own thread via
+ * <code>
+ * 					wrapInThread( () ->
+ * 						IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
+ * 							burnTime(10);
+ * 						}));
+ * </code>
+ * And the performance issue is gone. Note that this does not introduce any new
+ * parallelism and that the inner loop tasks are still submitted to the same
+ * common fork-join pool.
+ * 
+ * The reason, why this fix works, is because the inner loop is started form a Thread
+ * and not from possible ForkJoinWorkerThread of the outer loop. In the latter case
+ * the ForkJoinTask by mistake assumes that the starting thread is a worker of itself
+ * and issues a join, effectively joining inner loop tasks with outer loop tasks.
  * 
  * @author Christian Fries
  */
@@ -65,8 +84,7 @@ public class NestedParallelForEachTest {
 					// Inner loop as parallel: worst case (sequential) it takes 10 * numberOfTasksInInnerLoop millis
 					IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
 						burnTime(10);
-					});
-						
+					});						
 				}
 				else {
 					// Inner loop as sequential
@@ -102,5 +120,13 @@ public class NestedParallelForEachTest {
 			}
 			return (double)millis;
 		}
+	}
+	
+	private void wrapInThread(Runnable runnable) {
+		Thread t = new Thread(runnable, "Wrapper Thread");
+		try {
+			t.start();
+			t.join();
+		} catch (InterruptedException e) { }
 	}
 }

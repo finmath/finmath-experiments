@@ -11,7 +11,7 @@ import java.util.stream.IntStream;
  * This is a test of Java 8 parallel streams.
  * 
  * We are testing nested parallel forEach loops, which appear to
- * has unexpected performance in Java 1.8.0u5.
+ * have unexpected performance in Java 1.8.0u5.
  * 
  * We have a nested stream.parallel().forEach().
  * The inner loop is independent (stateless, no interference, etc. - except of the use of a common pool)

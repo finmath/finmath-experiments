@@ -120,28 +120,6 @@ public class NestedParallelForEachAndSynchronization {
 		});
 	}
 
-	public void runNestedLoopWithInnerParallel() {
-		// Outer loop
-		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
-			doWork(outerLoopOverheadFactor);
-			// Inner loop
-			IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
-				doWork(1);
-			});
-		});
-	}
-
-	public void runNestedLoopWithInnerSequential() {
-		// Outer loop
-		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
-			doWork(outerLoopOverheadFactor);
-			// Inner loop
-			IntStream.range(0,numberOfTasksInInnerLoop).sequential().forEach(j -> {
-				doWork(1);
-			});
-		});
-	}
-
 	public void runNestedLoopWithInnerSequentialSynchronized() {
 		Set<String> threadsUsedInThisTest = Collections.synchronizedSet(new HashSet<String>());
 

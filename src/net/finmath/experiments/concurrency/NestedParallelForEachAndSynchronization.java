@@ -7,6 +7,11 @@ package net.finmath.experiments.concurrency;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 /**
@@ -57,15 +62,16 @@ import java.util.stream.IntStream;
  */
 public class NestedParallelForEachAndSynchronization {
 
+	
 	final NumberFormat formatter2 = new DecimalFormat("0.00");
 	
 	final int		numberOfTasksInOuterLoop = 24;				// In real applications this can be a large number.
-	final int		numberOfTasksInInnerLoop = 240;				// In real applications this can be a large number.
+	final int		numberOfTasksInInnerLoop = 100;				// In real applications this can be a large number.
 	final int		concurrentExecutionsLimitForStreams	= 8;	// java.util.concurrent.ForkJoinPool.common.parallelism
 
 	final int		outerLoopOverheadFactor	= 10000;
 	final long	 	calculationTaskFactor	= 10;		// You might need to calibrate this for your machine
-
+	
 	public static void main(String[] args) {
 		(new NestedParallelForEachAndSynchronization()).testNestedLoops();
 	}
@@ -77,30 +83,38 @@ public class NestedParallelForEachAndSynchronization {
 	}
 
 	public void testNestedLoops() {
-		System.out.println("We perfrom four different tests of nested Java streams (parallel) forEach loops.");
+		System.out.println("");
+		System.out.println("We perfrom three different tests of nested Java streams (parallel) forEach loops.");
+		System.out.println("After each test you should see a DONE.");
+		System.out.println("For the last one you will likely not see that, because it has a deadlock.");
+		System.out.println("For each method we print the actual threads used - such that you can see that NO COMPENSATION THREADS are generated.");
 		System.out.println("");
 
-		System.out.print("Test 1 (inner loop sequential and synchronized) [works]___________________________________________:");
+		System.out.println("Test 1 (inner loop sequential and synchronized) [works]___________________________________________:");
 		runNestedLoopWithInnerSequentialSynchronized();
 		System.out.println("DONE.");
 
-		System.out.print("Test 2 (inner loop parallel and synchronized, but wrapped in a thread (a workaround) [works]______:");
+		System.out.println("Test 2 (inner loop parallel and synchronized, but wrapped in a thread (a workaround) [works]______:");
 		runNestedLoopWithInnerParallelSynchronizedButWrappedInThread();
 		System.out.println("DONE.");
 
-		System.out.print("Test 3 (inner loop parallel and synchronized [DEADLOCKS]__________________________________________:");
+		System.out.println("Test 3 (inner loop parallel and synchronized [DEADLOCKS]__________________________________________:");
 		runNestedLoopWithInnerParallelSynchronized();
 		System.out.println("DONE.");
 	}
 	
 	public void runNestedLoopWithInnerParallelSynchronized() {
+		Set<String> threadsUsedInThisTest = Collections.synchronizedSet(new HashSet<String>());
+
 		// Outer loop
 		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
 			doWork(outerLoopOverheadFactor);
+			if(threadsUsedInThisTest.add(Thread.currentThread().toString())) System.out.println("\t" + Thread.currentThread());
 			synchronized(this) {
 				// Inner loop
 				IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
 					doWork(1);
+					if(threadsUsedInThisTest.add(Thread.currentThread().toString())) System.out.println("\t" + Thread.currentThread());
 				});
 			}
 		});
@@ -129,27 +143,35 @@ public class NestedParallelForEachAndSynchronization {
 	}
 
 	public void runNestedLoopWithInnerSequentialSynchronized() {
+		Set<String> threadsUsedInThisTest = Collections.synchronizedSet(new HashSet<String>());
+
 		// Outer loop
 		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
 			doWork(outerLoopOverheadFactor);
+			if(threadsUsedInThisTest.add(Thread.currentThread().toString())) System.out.println("\t" + Thread.currentThread());
 			synchronized(this) {
 				// Inner loop
 				IntStream.range(0,numberOfTasksInInnerLoop).sequential().forEach(j -> {
 					doWork(1);
+					if(threadsUsedInThisTest.add(Thread.currentThread().toString())) System.out.println("\t" + Thread.currentThread());
 				});
 			}
 		});
 	}
 
 	public void runNestedLoopWithInnerParallelSynchronizedButWrappedInThread() {
+		Set<String> threadsUsedInThisTest = Collections.synchronizedSet(new HashSet<String>());
+
 		// Outer loop
 		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
 			doWork(outerLoopOverheadFactor);
+			if(threadsUsedInThisTest.add(Thread.currentThread().toString())) System.out.println("\t" + Thread.currentThread());
 			synchronized(this) {
 				wrapInThread(() ->
 					// Inner loop
 					IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
 						doWork(1);
+						if(threadsUsedInThisTest.add(Thread.currentThread().toString())) System.out.println("\t" + Thread.currentThread());
 					})
 				);
 			}
@@ -165,7 +187,7 @@ public class NestedParallelForEachAndSynchronization {
 	}
 	
 	private void wrapInThread(Runnable runnable) {
-		Thread t = new Thread(runnable, "Wrapper Thread");
+		Thread t = new Thread(runnable, "wrapper");
 		try {
 			t.start();
 			t.join();

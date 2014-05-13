@@ -19,16 +19,15 @@ import java.util.stream.IntStream;
  * We have a nested stream.parallel().forEach():
  * 
  * The inner loop is independent (stateless, no interference, etc. - except of the use of a common pool)
- * and consumes 1 second in total in the worst case, namely if processed sequential.
- * Half of the tasks of the outer loop consume 10 seconds prior that loop.
- * Half consume 10 seconds after that loop.
- * We have a boolean which allows to switch the inner loop from parallel() to sequential().
- * Hence every thread consumes 11 seconds (worst case) in total.
- * Now: submitting 24 outer-loop-tasks to a pool of 8 we would expect 24/8 * 11 = 33 seconds at best (on an 8 core or better machine).
+ * and consumes only a small amount of time.
  * 
- * The result is:
- * - With inner sequential loop:	33 seconds.
- * - With inner parallel loop:		>80 seconds (I had 92 seconds).
+ * Half of the tasks of the outer loop consume a larger portion of time prior that loop.
+ * Half consume a larger portion of time after that loop.
+ * 
+ * Now: submitting 24 outer-loop-tasks to a pool of 2 we observe:
+ * 
+ * - With inner sequential loop:					28 seconds.
+ * - With inner parallel loop:						38 seconds.
  * 
  * Now, there is a funny workaround. The method 
  * wraps every operation in its own thread. Use this to wrap the inner loop in its
@@ -39,14 +38,11 @@ import java.util.stream.IntStream;
  * 							burnTime(10);
  * 						}));
  * </code>
- * And the performance issue is gone. Note that this does not introduce any new
- * parallelism and that the inner loop tasks are still submitted to the same
- * common fork-join pool.
+ * And the performance issue is gone.
  * 
- * The reason, why this fix works, is because the inner loop is started form a Thread
- * and not from possible ForkJoinWorkerThread of the outer loop. In the latter case
- * the ForkJoinTask by mistake assumes that the starting thread is a worker of itself
- * and issues a join, effectively joining inner loop tasks with outer loop tasks.
+ * - With inner parallel loop, wrapped in thread:	23 seconds.
+ * 
+ * For details see: http://www.christian-fries.de/blog/files/2014-nested-java-8-parallel-foreach.html
  * 
  * @author Christian Fries
  */

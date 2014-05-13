@@ -7,6 +7,7 @@ package net.finmath.experiments.concurrency;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.stream.IntStream;
 
 /**
@@ -53,15 +54,15 @@ public class NestedParallelForEachBenchmark {
 
 	final NumberFormat formatter2 = new DecimalFormat("0.00");
 	
-	final int		numberOfWarmUpLoops = 0;
-	final int		numberOfBenchmarkLoops = 1;
+	final int		numberOfWarmUpLoops = 20;
+	final int		numberOfBenchmarkLoops = 20;
 	
-	final int		numberOfTasksInOuterLoop = 32;				// In real applications this can be a large number.
-	final int		numberOfTasksInInnerLoop = 10000;			// In real applications this can be a large number.
-	final int		concurrentExecutionsLimitForStreams	= 8;	// java.util.concurrent.ForkJoinPool.common.parallelism
+	final int		numberOfTasksInOuterLoop = 24;
+	final int		numberOfTasksInInnerLoop = 10;
+	final int		concurrentExecutionsLimitForStreams	= 2;	// java.util.concurrent.ForkJoinPool.common.parallelism
 
 	final int		outerLoopOverheadFactor	= 100000;
-	final long	 	calculationTaskFactor	= 1;		// You might need to calibrate this for your machine
+	final long	 	calculationTaskFactor	= 100;		// You might need to calibrate this for your machine
 
 	// Array where we store calculation results - this is just to prevent the JVM to optimize the task away
 	final double[]	results = new double[numberOfTasksInOuterLoop * numberOfTasksInInnerLoop];
@@ -78,7 +79,7 @@ public class NestedParallelForEachBenchmark {
 
 	public void testNestedLoops() {
 		System.out.println("We perfrom three different tests of Java streams (parallel) forEach loops.");
-		System.out.println("Each test takes between 1-2 minutes and is repeated " + (numberOfWarmUpLoops + numberOfBenchmarkLoops) + " times.");
+		System.out.println("Each test takes around 1 minute and is repeated " + (numberOfWarmUpLoops + numberOfBenchmarkLoops) + " times.");
 		System.out.println("Please be patient (we print a '.' after each run).");
 		System.out.println("Note: You may like to check cpu usage for each test.");
 		System.out.println("");
@@ -99,13 +100,18 @@ public class NestedParallelForEachBenchmark {
 		System.out.println("time for inner loop parallel________________________= " + timeForInnerParallel);
 	}
 	
-	public String timeAction(Runnable action) {
+	public void warmUp(Runnable action) {
 		// Some warm up
 		for(int i=0; i<numberOfWarmUpLoops; i++) {
+			Arrays.fill(results, 0);
 			System.out.print(".");
 			action.run();
 		}
-		
+	}
+
+	public String timeAction(Runnable action) {
+		warmUp(action);
+
 		// Test case
 		double sum			= 0.0;
 		double sumOfSquared	= 0.0;
@@ -113,6 +119,7 @@ public class NestedParallelForEachBenchmark {
 		double min			= Double.MAX_VALUE;
 		for(int i=0; i<numberOfBenchmarkLoops; i++) {
 			System.out.print(".");
+			Arrays.fill(results, 0);
 			long start = System.currentTimeMillis();
 			action.run();
 			long end = System.currentTimeMillis();
@@ -134,9 +141,6 @@ public class NestedParallelForEachBenchmark {
 
 			if(i < numberOfTasksInOuterLoop/2) results[i * numberOfTasksInInnerLoop] += burnTime(outerLoopOverheadFactor);
 
-			// Dummy creation of thread - to make timing comparable by including thread creation costs
-			wrapInThread(() -> {});
-			
 			// Inner loop as parallel: worst case (sequential) it takes 10 * numberOfTasksInInnerLoop millis
 			IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
 				results[i * numberOfTasksInInnerLoop + j] += burnTime(1);
@@ -152,9 +156,6 @@ public class NestedParallelForEachBenchmark {
 		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
 
 			if(i < numberOfTasksInOuterLoop/2) results[i * numberOfTasksInInnerLoop] += burnTime(outerLoopOverheadFactor);
-
-			// Dummy creation of thread - to make timing comparable by including thread creation costs
-			wrapInThread(() -> {});
 
 			// Inner loop as parallel: worst case (sequential) it takes 10 * numberOfTasksInInnerLoop millis
 			IntStream.range(0,numberOfTasksInInnerLoop).sequential().forEach(j -> {
@@ -186,7 +187,14 @@ public class NestedParallelForEachBenchmark {
 
 	private double burnTime(long millis) {
 		double x = 0;
-		for(long i=0; i<millis*calculationTaskFactor; i++) {
+/*		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+*/ 		for(long i=0; i<millis*calculationTaskFactor; i++) {
+			// We use a random number generator here, to prevent some optimization by the JVM
 			x += Math.cos(i*0.0023*Math.random());
 		}
 		return x/calculationTaskFactor;

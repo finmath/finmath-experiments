@@ -10,6 +10,7 @@ import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.IntUnaryOperator;
 import java.util.stream.IntStream;
 
 /**
@@ -55,6 +56,10 @@ import java.util.stream.IntStream;
  * and not from possible ForkJoinWorkerThread of the outer loop. In the latter case
  * the ForkJoinTask by mistake assumes that the starting thread is a worker of itself
  * and issues a join, effectively joining inner loop tasks with outer loop tasks (imho this is a bug).
+ * 
+ * Note: A minimal demo for the deadlock is the static method <code>nestedLoopDeadlockDemo</code>.
+ * 
+ * For details see: http://www.christian-fries.de/blog/files/2014-nested-java-8-parallel-foreach.html
  * 
  * @author Christian Fries
  */
@@ -168,5 +173,30 @@ public class NestedParallelForEachAndSynchronization {
 			t.start();
 			t.join();
 		} catch (InterruptedException e) { }
+	}
+	
+	public static void nestedLoopDeadlockDemo() {
+		System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism","8");
+		Object lock = new Object();
+
+		IntStream.range(0,24).parallel().forEach(i -> {
+			// do some work here
+			synchronized(lock) {
+				IntStream.range(0,100).parallel().forEach(j -> {
+					// do some work here
+				});
+			}
+		});
+		
+		System.out.println("Done.");
+	}
+	
+	
+	public static int twoDimenstionalIntegrationDemo() {
+		IntUnaryOperator func = (i) -> IntStream.range(0,100).parallel().map(j -> i*j).sum();
+		int m = IntStream.range(0,100).parallel().map(func).sum();
+		
+		System.out.println(m);
+		return m;
 	}
 }

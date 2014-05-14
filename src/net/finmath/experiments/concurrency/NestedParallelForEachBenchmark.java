@@ -5,9 +5,24 @@
  */
 package net.finmath.experiments.concurrency;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Formatter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.IntStream;
 
 /**
@@ -48,6 +63,8 @@ import java.util.stream.IntStream;
  */
 public class NestedParallelForEachBenchmark {
 
+	ExecutorService singleThreadExecutor = Executors.newFixedThreadPool(1);
+	
 	final NumberFormat formatter2 = new DecimalFormat("0.00");
 	
 	final int		numberOfWarmUpLoops = 20;
@@ -64,38 +81,130 @@ public class NestedParallelForEachBenchmark {
 	final double[]	results = new double[numberOfTasksInOuterLoop * numberOfTasksInInnerLoop];
 	
 	public static void main(String[] args) {
-		(new NestedParallelForEachBenchmark()).testNestedLoops();
+		int testCase = 3;		// Set to 1,2,3
+		System.out.println("Running test case " + testCase + " for Java parallel forEach loops.\nNote: you may switch between test case 1,2,3 in the main method.");
+		(new NestedParallelForEachBenchmark()).testNestedLoops(testCase);
 	}
 
 	public NestedParallelForEachBenchmark() {
 		super();
 		System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism",Integer.toString(concurrentExecutionsLimitForStreams));
 		System.out.println("java.util.concurrent.ForkJoinPool.common.parallelism = " + System.getProperty("java.util.concurrent.ForkJoinPool.common.parallelism"));
+		ThreadMXBean bean = ManagementFactory.getThreadMXBean( );
+		if(bean != null) bean.setThreadCpuTimeEnabled(true);
+
+		System.out.println("Each test takes around 30 seconds and is repeated " + (numberOfWarmUpLoops + numberOfBenchmarkLoops) + " times.");
+		System.out.println("Please be patient (we print a '.' after each run).");
+		System.out.println("");
 	}
 
-	public void testNestedLoops() {
-		System.out.println("We perfrom three different tests of Java streams (parallel) forEach loops.");
-		System.out.println("Each test takes around 1 minute and is repeated " + (numberOfWarmUpLoops + numberOfBenchmarkLoops) + " times.");
-		System.out.println("Please be patient (we print a '.' after each run).");
-		System.out.println("Note: You may like to check cpu usage for each test.");
-		System.out.println("");
+	public void testNestedLoops(int testCase) {
 
-		System.out.print("Test 1 (inner loop parallel but wrapped in thread)_:");
-		String timeWithInnerParallelButWrappedInThread	= timeAction(() -> timeNestedLoopWithInnerParallelButWrappedInThread());
-
-		System.out.print("Test 2 (inner loop sequential)_____________________:");
-		String timeForInnerSequential					= timeAction(() -> timeNestedLoopWithInnerSequential());
-
-		System.out.print("Test 3 (inner loop parallel)_______________________:");
-		String timeForInnerParallel						= timeAction(() -> timeNestedLoopWithInnerParallel());
+		String testCaseName = null;
+		String timings = null;
+		if(testCase == 1) {
+			System.out.print("Test 1 (inner loop parallel with bugfix):");
+			testCaseName = "inner loop parallel w/ bugfix...";
+			timings	= timeAction(() -> timeNestedLoopWithInnerParallelButWrappedInThread());
+		}
+		else if(testCase == 2) {
+			System.out.print("Test 2 (inner loop sequential):");
+			testCaseName = "inner loop sequential...........";
+			timings = timeAction(() -> timeNestedLoopWithInnerSequential());
+		}
+		else if(testCase == 3) {
+			System.out.print("Test 3 (inner loop parallel):");
+			testCaseName = "inner loop parallel.............";
+			timings = timeAction(() -> timeNestedLoopWithInnerParallel());
+		}
 
 		System.out.println("");
 		System.out.println("Results:");
-		System.out.println("time for inner loop parallel but wrapped in thread__= " + timeWithInnerParallelButWrappedInThread);
-		System.out.println("time for inner loop sequential______________________= " + timeForInnerSequential);
-		System.out.println("time for inner loop parallel________________________= " + timeForInnerParallel);
+
+		double totalCPUTime = printStats();
+		timings += "\t[CPU Time: " + formatter2.format(totalCPUTime) + "]";
+
+		System.out.println("time for " + testCaseName + " = " + timings);
 	}
 	
+	/*
+	 * Test case 3
+	 */
+	public void timeNestedLoopWithInnerParallel() {
+		// Outer loop
+		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
+
+			if(i < numberOfTasksInOuterLoop/2) results[i * numberOfTasksInInnerLoop] += burnTime(outerLoopOverheadFactor);
+
+			// Inner loop as parallel
+			IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
+				results[i * numberOfTasksInInnerLoop + j] += burnTime(1);
+			});
+
+			if(i >= numberOfTasksInOuterLoop/2) results[i * numberOfTasksInInnerLoop] += burnTime(outerLoopOverheadFactor);
+
+		});
+	}
+
+	/*
+	 * Test case 2
+	 */
+	public void timeNestedLoopWithInnerSequential() {
+		// Outer loop
+		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
+
+			if(i < numberOfTasksInOuterLoop/2) results[i * numberOfTasksInInnerLoop] += burnTime(outerLoopOverheadFactor);
+
+			// Inner loop as parallel
+			IntStream.range(0,numberOfTasksInInnerLoop).sequential().forEach(j -> {
+				results[i * numberOfTasksInInnerLoop + j] += burnTime(1);
+			});
+
+			if(i >= numberOfTasksInOuterLoop/2) results[i * numberOfTasksInInnerLoop] += burnTime(outerLoopOverheadFactor);
+
+		});
+	}
+
+	/* 
+	 * Test case 1
+	 */
+	public void timeNestedLoopWithInnerParallelButWrappedInThread() {
+		// Outer loop
+		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
+
+			if(i < numberOfTasksInOuterLoop/2) results[i * numberOfTasksInInnerLoop] += burnTime(outerLoopOverheadFactor);
+
+			// Inner loop as parallel
+			wrapInThread(() ->
+				IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
+					results[i * numberOfTasksInInnerLoop + j] += burnTime(1);
+				})
+			);
+
+			if(i >= numberOfTasksInOuterLoop/2) results[i * numberOfTasksInInnerLoop] += burnTime(outerLoopOverheadFactor);
+
+		});
+	}
+
+	private double burnTime(long millis) {
+		double x = 0;
+ 		for(long i=0; i<millis*calculationTaskFactor; i++) {
+			// We use a random number generator here, to prevent some optimization by the JVM
+			x += Math.cos(i*0.0023*Math.random());
+		}
+		return x/calculationTaskFactor;
+	}
+	
+	private void wrapInThread(Runnable runnable) {
+		Future<?> result = singleThreadExecutor.submit(runnable);
+		try {
+			result.get();
+		} catch (ExecutionException e) { } catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	public void warmUp(Runnable action) {
 		// Some warm up
 		for(int i=0; i<numberOfWarmUpLoops; i++) {
@@ -130,77 +239,32 @@ public class NestedParallelForEachBenchmark {
 
 		return "" + formatter2.format(sum / numberOfBenchmarkLoops) + " +/- " + formatter2.format(Math.sqrt(sumOfSquared/numberOfBenchmarkLoops - sum * sum / numberOfBenchmarkLoops / numberOfBenchmarkLoops)) + " (min: " + formatter2.format(min) + " , max: " + formatter2.format(max) + ")" ;
 	}
-	
-	public void timeNestedLoopWithInnerParallel() {
-		// Outer loop
-		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
 
-			if(i < numberOfTasksInOuterLoop/2) results[i * numberOfTasksInInnerLoop] += burnTime(outerLoopOverheadFactor);
-
-			// Inner loop as parallel: worst case (sequential) it takes 10 * numberOfTasksInInnerLoop millis
-			IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
-				results[i * numberOfTasksInInnerLoop + j] += burnTime(1);
-			});
-
-			if(i >= numberOfTasksInOuterLoop/2) results[i * numberOfTasksInInnerLoop] += burnTime(outerLoopOverheadFactor);
-
-		});
-	}
-
-	public void timeNestedLoopWithInnerSequential() {
-		// Outer loop
-		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
-
-			if(i < numberOfTasksInOuterLoop/2) results[i * numberOfTasksInInnerLoop] += burnTime(outerLoopOverheadFactor);
-
-			// Inner loop as parallel: worst case (sequential) it takes 10 * numberOfTasksInInnerLoop millis
-			IntStream.range(0,numberOfTasksInInnerLoop).sequential().forEach(j -> {
-				results[i * numberOfTasksInInnerLoop + j] += burnTime(1);
-			});
-
-			if(i >= numberOfTasksInOuterLoop/2) results[i * numberOfTasksInInnerLoop] += burnTime(outerLoopOverheadFactor);
-
-		});
-	}
-
-	public void timeNestedLoopWithInnerParallelButWrappedInThread() {
-		// Outer loop
-		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
-
-			if(i < numberOfTasksInOuterLoop/2) results[i * numberOfTasksInInnerLoop] += burnTime(outerLoopOverheadFactor);
-
-			// Inner loop as parallel: worst case (sequential) it takes 10 * numberOfTasksInInnerLoop millis
-			wrapInThread(() ->
-				IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
-					results[i * numberOfTasksInInnerLoop + j] += burnTime(1);
-				})
-			);
-
-			if(i >= numberOfTasksInOuterLoop/2) results[i * numberOfTasksInInnerLoop] += burnTime(outerLoopOverheadFactor);
-
-		});
-	}
-
-	private double burnTime(long millis) {
-		double x = 0;
-/*		try {
-			Thread.sleep(millis);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	private double printStats() {
+		Map<String, Double> cpuTimes = getCPUTime();
+		double totalCPUTime = 0;
+		for(String thread: new TreeSet<String>(cpuTimes.keySet())) {
+			double cpuTime = cpuTimes.get(thread);
+			totalCPUTime += cpuTimes.get(thread);
+			System.out.println("\t" + String.format("%35s",thread) + "\t" + formatter2.format(cpuTime));
 		}
-*/ 		for(long i=0; i<millis*calculationTaskFactor; i++) {
-			// We use a random number generator here, to prevent some optimization by the JVM
-			x += Math.cos(i*0.0023*Math.random());
-		}
-		return x/calculationTaskFactor;
+		return totalCPUTime;
 	}
-	
-	private void wrapInThread(Runnable runnable) {
-		Thread t = new Thread(runnable, "Wrapper Thread");
-		try {
-			t.start();
-			t.join();
-		} catch (InterruptedException e) { }
+
+	/** Get CPU time in nanoseconds. */
+	public Map<String, Double> getCPUTime() {
+
+		Map<String, Double> cpuTimes = new HashMap<String, Double>();
+
+		ThreadMXBean bean = ManagementFactory.getThreadMXBean( );
+	    if(!bean.isThreadCpuTimeSupported()) return null;
+
+		long[] threads = bean.getAllThreadIds();
+	    for (long threadId : threads) {
+	    	ThreadInfo thread = bean.getThreadInfo(threadId);
+	        long time = bean.getThreadCpuTime(threadId);
+	        cpuTimes.put(thread.getThreadName(), new Double((double)time/1000.0/1000.0/1000.0/(numberOfWarmUpLoops+numberOfBenchmarkLoops)));
+	    }
+	    return cpuTimes;
 	}
 }

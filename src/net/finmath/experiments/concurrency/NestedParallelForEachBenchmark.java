@@ -6,20 +6,15 @@
 package net.finmath.experiments.concurrency;
 
 import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -41,8 +36,8 @@ import java.util.stream.IntStream;
  * 
  * Now: submitting 24 outer-loop-tasks to a pool of 2 we observe:
  * 
- * - With inner sequential loop:					28 seconds.
- * - With inner parallel loop:						38 seconds.
+ * - With inner sequential loop:					26 seconds.
+ * - With inner parallel loop:						41 seconds.
  * 
  * Now, there is a funny workaround. The method 
  * wraps every operation in its own thread. Use this to wrap the inner loop in its
@@ -55,7 +50,7 @@ import java.util.stream.IntStream;
  * </code>
  * And the performance issue is gone.
  * 
- * - With inner parallel loop, wrapped in thread:	23 seconds.
+ * - With inner parallel loop, wrapped in thread:	25 seconds.
  * 
  * For details see: http://www.christian-fries.de/blog/files/2014-nested-java-8-parallel-foreach.html
  * 
@@ -79,11 +74,13 @@ public class NestedParallelForEachBenchmark {
 
 	// Array where we store calculation results - this is just to prevent the JVM to optimize the task away
 	final double[]	results = new double[numberOfTasksInOuterLoop * numberOfTasksInInnerLoop];
-	
+
 	public static void main(String[] args) {
 		int testCase = 3;		// Set to 1,2,3
 		System.out.println("Running test case " + testCase + " for Java parallel forEach loops.\nNote: you may switch between test case 1,2,3 in the main method.");
-		(new NestedParallelForEachBenchmark()).testNestedLoops(testCase);
+		NestedParallelForEachBenchmark benchmark = new NestedParallelForEachBenchmark();
+		benchmark.testNestedLoops(testCase);
+		benchmark.singleThreadExecutor.shutdown();
 	}
 
 	public NestedParallelForEachBenchmark() {

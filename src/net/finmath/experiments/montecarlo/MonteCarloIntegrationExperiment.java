@@ -20,7 +20,7 @@ public class MonteCarloIntegrationExperiment {
 	 * @param args Arguments, not used
 	 */
 	public static void main(String[] args) {
-		long numberOfSimulations = 1000000;
+		long numberOfSimulations = 10000000;
 		
 		double pi = getMonteCarloApproximationOfPi(numberOfSimulations);
 		System.out.println("Simulation with n = " + numberOfSimulations + " resulted in approximation of pi = " + pi);

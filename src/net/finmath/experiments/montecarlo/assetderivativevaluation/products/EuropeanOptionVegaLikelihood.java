@@ -56,7 +56,7 @@ public class EuropeanOptionVegaLikelihood extends AbstractAssetMonteCarloProduct
 
 		// Get underlying and numeraire
 		RandomVariableInterface underlyingAtMaturity	= model.getAssetValue(maturity,0);
-		RandomVariableInterface numeraireAtMaturity	= model.getNumeraire(maturity);
+		RandomVariableInterface numeraireAtMaturity		= model.getNumeraire(maturity);
 		RandomVariableInterface underlyingAtToday		= model.getAssetValue(0.0,0);
 		RandomVariableInterface numeraireAtToday		= model.getNumeraire(0);
 		RandomVariableInterface monteCarloWeights		= model.getMonteCarloWeights(maturity);

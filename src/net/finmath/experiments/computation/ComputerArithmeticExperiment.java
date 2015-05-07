@@ -43,7 +43,7 @@ public class ComputerArithmeticExperiment {
 		System.out.println("Largest possible number:              maxDouble = " + maxDouble);
 		System.out.println("                                maxDouble + eps = " + (maxDouble + eps));		
 		System.out.println("                    maxDouble + maxDouble * eps = " + (maxDouble + maxDouble * eps));
-		System.out.println("(maxDouble + maxDouble * eps) - maxDouble * eps = " + ((maxDouble + maxDouble * eps) - maxDouble * eps));
+		System.out.println("                maxDouble + maxDouble * eps / 4 = " + (maxDouble + maxDouble * eps/4));
 
 		/*
 		 * Test solution of quadratic equation

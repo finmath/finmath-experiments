@@ -94,7 +94,7 @@ public class EuropeanOptionDeltaLikelihood extends AbstractAssetMonteCarloProduc
 					lr		= (logPhi2 - logPhi1) / h;
 				}
 				else {
-					lr		= -1.0 * x / (sigma * Math.sqrt(T)) * -1.0 / S0;
+					lr		= x / (sigma * Math.sqrt(T)) / S0;
 				}
 
 				double payOff			= (underlyingAtMaturity.get(path) - strike);

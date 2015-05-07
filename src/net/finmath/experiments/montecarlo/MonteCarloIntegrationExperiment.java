@@ -32,7 +32,7 @@ public class MonteCarloIntegrationExperiment {
 	/**
 	 * Calculates an approximation of pi via Monte-Carlo integration.
 	 * 
-	 * @param numberOfSimulations
+	 * @param numberOfSimulations The number of Monte-Carlo simulations.
 	 * @return An approximation of pi.
 	 */
 	public static double getMonteCarloApproximationOfPi(long numberOfSimulations) {

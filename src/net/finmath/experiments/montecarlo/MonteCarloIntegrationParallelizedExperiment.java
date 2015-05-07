@@ -31,7 +31,7 @@ public class MonteCarloIntegrationParallelizedExperiment {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws InterruptedException, ExecutionException {
-		int numberOfSimulations = 10000000;
+		int numberOfSimulations = 500000000;
 		int numberOfThreads		= 10;
 		int numberOfTask		= 100;
 
@@ -41,6 +41,7 @@ public class MonteCarloIntegrationParallelizedExperiment {
 		/*
 		 * Start worker tasks (asynchronously)
 		 */
+		System.out.print("Distributing tasks...");
 		ExecutorService				executor	= Executors.newFixedThreadPool(numberOfThreads);
 		ArrayList<Future<Double>>	results		= new ArrayList<Future<Double>>();
 		for(int taskIndex=0; taskIndex<numberOfTask; taskIndex++) {
@@ -54,15 +55,19 @@ public class MonteCarloIntegrationParallelizedExperiment {
 			
 			results.add(value);
 		}
+		System.out.print("done.\n");
 		
 		/*
 		 * Collect results
 		 */
+		System.out.print("Collecting results...");
 		double sumOfResults = 0.0;
 		for(int taskIndex=0; taskIndex<numberOfTask; taskIndex++) {
 			sumOfResults += results.get(taskIndex).get().doubleValue();
 		}
+		System.out.print("done.\n");
 
+		
 		double pi = sumOfResults / numberOfTask;
 		System.out.println("Simulation with n = " + numberOfSimulationsEffective + " resulted in approximation of pi = " + pi);
 

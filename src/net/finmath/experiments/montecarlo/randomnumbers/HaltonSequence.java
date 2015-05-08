@@ -30,7 +30,7 @@ public class HaltonSequence {
 	 * Construct a Halton sequence with d = base.length dimensions where the i-th component
 	 * uses base[i] as base of the corresponding van der Corput sequence.
 	 * 
-	 * @param base Vector of base integers for each component.
+	 * @param baseVector Vector of base integers for each component.
 	 */
 	public HaltonSequence(int[] baseVector) {
 		// Check base

@@ -15,11 +15,10 @@ public class MonteCarloSchemeTests {
 
 	public static void main(String[] args)
 	{
-		// Just for demonstration: Print the command line parameters
-		for(int i=0; i<args.length; i++)
-		{
-			System.out.println( "Parameter " + i + ": " + args[i]);
-		}
+		System.out.println(
+				"Comparing the mean (m) and the variance (V) of the terminal distribution\n" 
+				+ "of log(S(T)), generated using a numerical scheme for S, to the analytic values.\n"
+				+ "Output shows the error \u0394m and \u0394V.\n");
 		
 		double initialValue = 1.0;
 		double sigma = 0.5;		// Note: Try different sigmas: 0.2, 0.5, 0.7, 0.9		
@@ -86,9 +85,9 @@ public class MonteCarloSchemeTests {
 			
 			System.out.print("Path =" + numberOfPath);
 			System.out.print("\tSteps=" + decimalFormatInteger.format(numberOfTimeSteps));
-			System.out.print("\tEuler...: m=" + decimalFormatPercent.format(errorAverageEuler)    + " V=" + decimalFormatPercent.format(errorVarianceEuler));
-			System.out.print("\tMilstein: m=" + decimalFormatPercent.format(errorAverageMilstein) + " V=" + decimalFormatPercent.format(errorVarianceMilstein));
-			System.out.print("\tExpEuler: m=" + decimalFormatPercent.format(errorAverageExpEuler) + " V=" + decimalFormatPercent.format(errorVarianceExpEuler));
+			System.out.print("\tEuler...: \u0394m=" + decimalFormatPercent.format(errorAverageEuler)    + " \u0394V=" + decimalFormatPercent.format(errorVarianceEuler));
+			System.out.print("\tMilstein: \u0394m=" + decimalFormatPercent.format(errorAverageMilstein) + " \u0394V=" + decimalFormatPercent.format(errorVarianceMilstein));
+			System.out.print("\tExpEuler: \u0394m=" + decimalFormatPercent.format(errorAverageExpEuler) + " \u0394V=" + decimalFormatPercent.format(errorVarianceExpEuler));
 			System.out.println("\t(Time=" + calculationTimeInSeconds + " sec)." );
 		}
 	}

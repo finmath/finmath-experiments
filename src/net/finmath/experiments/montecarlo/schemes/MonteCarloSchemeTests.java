@@ -9,6 +9,8 @@ package net.finmath.experiments.montecarlo.schemes;
 import java.text.DecimalFormat;
 
 /**
+ * Testing the behavior of some time discretization schemes w.r.t. time step size.
+ * 
  * @author Christian Fries
  */
 public class MonteCarloSchemeTests {

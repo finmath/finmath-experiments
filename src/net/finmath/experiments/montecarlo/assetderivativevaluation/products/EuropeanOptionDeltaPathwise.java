@@ -55,15 +55,15 @@ public class EuropeanOptionDeltaPathwise extends AbstractAssetMonteCarloProduct 
 
 		// Get underlying and numeraire
 		RandomVariableInterface underlyingAtMaturity	= model.getAssetValue(maturity,0);
-		RandomVariableInterface numeraireAtMaturity	= model.getNumeraire(maturity);
+		RandomVariableInterface numeraireAtMaturity		= model.getNumeraire(maturity);
 		RandomVariableInterface underlyingAtToday		= model.getAssetValue(0.0,0);
 		RandomVariableInterface numeraireAtToday		= model.getNumeraire(0);
 		RandomVariableInterface monteCarloWeights		= model.getMonteCarloWeights(maturity);
 		
 		/*
 		 *  The following way of calculating the expected value (average) is discouraged since it makes too strong
-		 *  assumptions on the internals of the <code>RandomVariableAccumulatorInterface</code>. Instead you should use
-		 *  the mutators sub, div, mult and the getter getAverage. This code is provided for illustrative purposes.
+		 *  assumptions on the internals of the <code>RandomVariableInterface</code>. Instead you should use
+		 *  the methods sub, div, mult and the getter getAverage. This code is provided for illustrative purposes.
 		 */
 		double average = 0.0;
 		for(int path=0; path<model.getNumberOfPaths(); path++)

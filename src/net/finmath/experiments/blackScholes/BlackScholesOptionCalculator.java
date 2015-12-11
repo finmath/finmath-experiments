@@ -22,6 +22,7 @@ import net.finmath.swing.JNumberField;
 
 /**
  * @author Christian Fries
+ * 
  */
 public class BlackScholesOptionCalculator extends JApplet implements ActionListener {
 

@@ -5,18 +5,21 @@
  */
 package net.finmath.experiments.montecarlo.assetderivativevaluation.products;
 
+import java.util.logging.Logger;
+
 import net.finmath.exception.CalculationException;
 import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationInterface;
 import net.finmath.montecarlo.assetderivativevaluation.MonteCarloBlackScholesModel;
 import net.finmath.montecarlo.assetderivativevaluation.products.AbstractAssetMonteCarloProduct;
-import net.finmath.stochastic.RandomVariableAccumulatorInterface;
 import net.finmath.stochastic.RandomVariableInterface;
 
 /**
- * Implements calculation of the delta of a European option using the pathwise method.
+ * Implements calculation of the delta of a European option using the path-wise method,
+ * assuming that the underlying follows a model where d S(T)/d S(0) = S(T)/S(0),
+ * e.g., Black-Scholes.
  * 
  * @author Christian Fries
- * @version 1.0
+ * @version 1.1
  */
 public class EuropeanOptionDeltaPathwise extends AbstractAssetMonteCarloProduct {
 
@@ -35,57 +38,40 @@ public class EuropeanOptionDeltaPathwise extends AbstractAssetMonteCarloProduct 
 		this.strike = strike;
 	}
 	
-	/**
-	 * Calculates the value of the option under a given model.
-	 * 
-	 * @param model A reference to a model
-	 * @return the value
-	 * @throws CalculationException 
-	 */
-	public double getValue(AssetModelMonteCarloSimulationInterface model) throws CalculationException
-	{
-		@SuppressWarnings("unused")
-		MonteCarloBlackScholesModel blackScholesModel = null;
-		try {
-			blackScholesModel = (MonteCarloBlackScholesModel)model;
+    /**
+     * This method returns the value random variable of the product within the specified model, evaluated at a given evalutationTime.
+     * Note: For a lattice this is often the value conditional to evalutationTime, for a Monte-Carlo simulation this is the (sum of) value discounted to evaluation time.
+     * Cashflows prior evaluationTime are not considered.
+     * 
+     * @param evaluationTime The time on which this products value should be observed.
+     * @param model The model used to price the product.
+     * @return The random variable representing the value of the product discounted to evaluation time
+     * @throws net.finmath.exception.CalculationException Thrown if the valuation fails, specific cause may be available via the <code>cause()</code> method.
+     */
+    @Override
+    public RandomVariableInterface getValue(double evaluationTime, AssetModelMonteCarloSimulationInterface model) throws CalculationException {
+		if(!MonteCarloBlackScholesModel.class.isInstance(model)) {
+			Logger.getLogger("net.finmath").warning("This method assumes a Black-Scholes type model (MonteCarloBlackScholesModel).");
 		}
-		catch(Exception e) {
-			throw new ClassCastException("This method requires a Black-Scholes type model (MonteCarloBlackScholesModel).");
-		}
-
-		// Get underlying and numeraire
+    	
+    	// Get S(T), S(0)
 		RandomVariableInterface underlyingAtMaturity	= model.getAssetValue(maturity,0);
-		RandomVariableInterface numeraireAtMaturity		= model.getNumeraire(maturity);
-		RandomVariableInterface underlyingAtToday		= model.getAssetValue(0.0,0);
-		RandomVariableInterface numeraireAtToday		= model.getNumeraire(0);
-		RandomVariableInterface monteCarloWeights		= model.getMonteCarloWeights(maturity);
+        RandomVariableInterface	underlyingAtEvalTime	= model.getAssetValue(evaluationTime,0);
 		
-		/*
-		 *  The following way of calculating the expected value (average) is discouraged since it makes too strong
-		 *  assumptions on the internals of the <code>RandomVariableInterface</code>. Instead you should use
-		 *  the methods sub, div, mult and the getter getAverage. This code is provided for illustrative purposes.
-		 */
-		double average = 0.0;
-		for(int path=0; path<model.getNumberOfPaths(); path++)
-		{
-			if(underlyingAtMaturity.get(path) > strike)
-			{
-				// Get some model parameters
-				double S0		= underlyingAtToday.get(path);
-				double ST		= underlyingAtMaturity.get(path);
+		// The "payoff": values = indicator(S(T)-K) * S(T)/S(0)
+		RandomVariableInterface trigger	= underlyingAtMaturity.sub(strike);
+		RandomVariableInterface values	= underlyingAtMaturity.barrier(trigger, underlyingAtMaturity, 0.0).div(underlyingAtEvalTime);
 
-				double payOff			= 1;
-				double modifiedPayoff	= payOff * ST/S0;
+		// Discounting...
+		RandomVariableInterface numeraireAtMaturity		= model.getNumeraire(maturity);
+		RandomVariableInterface monteCarloWeights		= model.getMonteCarloWeights(maturity);
+        values = values.div(numeraireAtMaturity).mult(monteCarloWeights);
 
-				average += modifiedPayoff / numeraireAtMaturity.get(path) * monteCarloWeights.get(path) * numeraireAtToday.get(path);
-			}
-		}
+		// ...to evaluation time.
+        RandomVariableInterface	numeraireAtEvalTime					= model.getNumeraire(evaluationTime);
+        RandomVariableInterface	monteCarloProbabilitiesAtEvalTime	= model.getMonteCarloWeights(evaluationTime);
+        values = values.mult(numeraireAtEvalTime).div(monteCarloProbabilitiesAtEvalTime);
 
-		return average;
-	}
-
-	@Override
-	public RandomVariableAccumulatorInterface getValue(double evaluationTime, AssetModelMonteCarloSimulationInterface model) {
-		throw new RuntimeException("Method not supported.");
+        return values;
 	}
 }

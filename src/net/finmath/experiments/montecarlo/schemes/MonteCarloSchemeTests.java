@@ -23,15 +23,15 @@ public class MonteCarloSchemeTests {
 				+ "Output shows the error \u0394m and \u0394V.\n");
 		
 		double initialValue = 1.0;
-		double sigma = 0.5;		// Note: Try different sigmas: 0.2, 0.5, 0.7, 0.9		
-		int numberOfPath = 100000;
+		double sigma = 0.5;				// Note: Try different sigmas: 0.2, 0.5, 0.7, 0.9		
+		int numberOfPath = 100000;		// Note: Try different number of path. For 10000000 you need around 6 GB (parameter is -mx6G)
+		double lastTime = 10.0;
 		
 		for(int numberOfTimeSteps=1; numberOfTimeSteps<=2002; numberOfTimeSteps+=20)
 		{
-			double lastTime = 10.0;
 			double deltaT = lastTime/numberOfTimeSteps;
 			
-			// Create an instance of the euler scheme class
+			// Create an instance of the Euler scheme class
 			LogProcessEulerScheme eulerScheme = new LogProcessEulerScheme(
 					numberOfTimeSteps,	// numberOfTimeSteps
 					deltaT,				// deltaT

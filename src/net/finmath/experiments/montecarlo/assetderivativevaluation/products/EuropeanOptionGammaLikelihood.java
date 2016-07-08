@@ -74,8 +74,8 @@ public class EuropeanOptionGammaLikelihood extends AbstractAssetMonteCarloProduc
 				// Get some model parameters
 				double T		= maturity;
 				double S0		= underlyingAtToday.get(path);
-				double r		= blackScholesModel.getRiskFreeRate();
-				double sigma	= blackScholesModel.getVolatility();
+				double r		= blackScholesModel.getModel().getRiskFreeRate();
+				double sigma	= blackScholesModel.getModel().getVolatility();
 
 				double ST		= underlyingAtMaturity.get(path);
 

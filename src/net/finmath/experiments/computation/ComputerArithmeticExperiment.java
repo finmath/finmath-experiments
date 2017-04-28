@@ -72,7 +72,7 @@ public class ComputerArithmeticExperiment {
 		System.out.println("__________________________________________________________________");
 
 		System.out.println("Method 1");
-		double sumClassical		= getSumOfNumberClassical(value, numberOfSummations);
+		double sumClassical		= getSumOfNumbersClassical(value, numberOfSummations);
 		double averageClassical	= sumClassical / numberOfSummations;
 		System.out.println("Average: " + averageClassical);
 
@@ -127,7 +127,7 @@ public class ComputerArithmeticExperiment {
 	 * @param numberOfSummations The number of summations.
 	 * @return The result of summing up value numerToSum times.
 	 */
-	static double getSumOfNumberClassical(double valueToSum, int numberOfSummations) {
+	static double getSumOfNumbersClassical(double valueToSum, int numberOfSummations) {
 		double sum = 0.0;
 		for(int i=0; i<numberOfSummations; i++) sum += valueToSum;
 		return sum;

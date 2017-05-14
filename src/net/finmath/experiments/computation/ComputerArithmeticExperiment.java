@@ -41,7 +41,7 @@ public class ComputerArithmeticExperiment {
 		System.out.println("__________________________________________________________________");
 
 		double maxDouble	= 	Double.MAX_VALUE;
-		
+
 		System.out.println("Largest possible number:              maxDouble = " + maxDouble);
 		System.out.println("                                maxDouble + eps = " + (maxDouble + eps));		
 		System.out.println("                    maxDouble + maxDouble * eps = " + (maxDouble + maxDouble * eps));

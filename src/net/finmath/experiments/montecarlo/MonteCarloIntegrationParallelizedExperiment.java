@@ -31,12 +31,15 @@ public class MonteCarloIntegrationParallelizedExperiment {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws InterruptedException, ExecutionException {
-		int numberOfSimulations = 500000000;
+		int numberOfSimulations = 100000000;
 		int numberOfThreads		= 10;
 		int numberOfTask		= 100;
 
 		final int numberOfSimulationsPerTask	= numberOfSimulations / numberOfTask;
 		final int numberOfSimulationsEffective	= numberOfSimulationsPerTask * numberOfTask;
+
+		// Measure calculation time - start
+		long millisStart = System.currentTimeMillis();
 
 		/*
 		 * Start worker tasks (asynchronously)
@@ -67,12 +70,17 @@ public class MonteCarloIntegrationParallelizedExperiment {
 		}
 		System.out.print("done.\n");
 
-		
 		double pi = sumOfResults / numberOfTask;
-		System.out.println("Simulation with n = " + numberOfSimulationsEffective + " resulted in approximation of pi = " + pi);
+
+		// Measure calculation time - end
+		long millisEnd = System.currentTimeMillis();
+		
+		System.out.println("Simulation with n = " + numberOfSimulations + " resulted in approximation of pi = " + pi +"\n");
 
 		System.out.println("Approximation error is                        = " + Math.abs(pi-Math.PI));
-		System.out.println("Theoretical order of the Monte-Carlo error is = " + 1.0/Math.sqrt(numberOfSimulations));
+		System.out.println("Theoretical order of the Monte-Carlo error is = " + 1.0/Math.sqrt(numberOfSimulations) + "\n");
+
+		System.out.println("Calculation took " + (millisEnd-millisStart)/1000.0 + " sec.");
 		
 		/*
 		 * End/clean up thread pool

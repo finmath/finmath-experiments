@@ -22,11 +22,20 @@ public class MonteCarloIntegrationExperiment {
 	public static void main(String[] args) {
 		long numberOfSimulations = 10000000;
 		
+		// Measure calculation time - start
+		long millisStart = System.currentTimeMillis();
+
 		double pi = getMonteCarloApproximationOfPi(numberOfSimulations);
-		System.out.println("Simulation with n = " + numberOfSimulations + " resulted in approximation of pi = " + pi);
+
+		// Measure calculation time - end
+		long millisEnd = System.currentTimeMillis();
+
+		System.out.println("Simulation with n = " + numberOfSimulations + " resulted in approximation of pi = " + pi +"\n");
 
 		System.out.println("Approximation error is                        = " + Math.abs(pi-Math.PI));
-		System.out.println("Theoretical order of the Monte-Carlo error is = " + 1.0/Math.sqrt(numberOfSimulations));
+		System.out.println("Theoretical order of the Monte-Carlo error is = " + 1.0/Math.sqrt(numberOfSimulations) + "\n");
+
+		System.out.println("Calculation took " + (millisEnd-millisStart)/1000.0 + " sec.");
 	}
 
 	/**

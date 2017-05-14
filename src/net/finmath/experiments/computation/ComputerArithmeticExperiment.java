@@ -19,6 +19,8 @@ public class ComputerArithmeticExperiment {
 	 */
 	public static void main(String[] args) {
 
+		System.out.println("\nSome experiments related to computer arithmetic (IEEE 754).\n");
+
 		/*
 		 * Test the machine precision
 		 */
@@ -29,8 +31,8 @@ public class ComputerArithmeticExperiment {
 
 		System.out.println("Calculated Machine Precision: eps = " + eps);
 		System.out.println("                          1 + eps = " + (1+eps));
-		System.out.println("                            eps/2 = " + eps/2.0);
-		System.out.println("                        1 + eps/2 = " + (1+eps/2.0));
+		System.out.println("                          2.0*eps = " + 2.0*eps);
+		System.out.println("                      1 + 2.0*eps = " + (1+2.0*eps));
 
 		/*
 		 * Test calculations close to the maximum value
@@ -43,14 +45,42 @@ public class ComputerArithmeticExperiment {
 		System.out.println("Largest possible number:              maxDouble = " + maxDouble);
 		System.out.println("                                maxDouble + eps = " + (maxDouble + eps));		
 		System.out.println("                    maxDouble + maxDouble * eps = " + (maxDouble + maxDouble * eps));
-		System.out.println("                maxDouble + maxDouble * eps / 4 = " + (maxDouble + maxDouble * eps/4));
+		System.out.println("                maxDouble + maxDouble * eps / 2 = " + (maxDouble + maxDouble * eps/2));
+
+		/*
+		 * Test the behavior of +0 and -0.
+		 */
+		System.out.println("\n\nTest 3: Check behavior +0 and -0.");
+		System.out.println("__________________________________________________________________");
+
+		// Create +0
+		double zero = 1;
+		while(zero > 0) {
+			zero = zero / 2;
+		}
+		System.out.println("     zero   = " + zero);
+		
+		// Create -0
+		double minusZero = -1;
+		while(minusZero < 0) {
+			minusZero = minusZero / 2;
+		}
+		System.out.println("minusZero   = " + minusZero);
+
+		// Example where +0 and -0 makes a difference
+		System.out.println("1/zero      = " + 1/zero);
+		System.out.println("1/minusZero = " + 1/minusZero);
+
+		// Check +0 and -0
+		System.out.println("Testing 0 == -0 gives " + (zero == minusZero));
+
 
 		/*
 		 * Test solution of quadratic equation
 		 */
 		double p = 1000000.0;
 		double q = 1;
-		System.out.println("\n\nTest 3: Solution of quadratic equation x^2 - 2px + q = 0 with p=" + p + " q="+q+"");
+		System.out.println("\n\nTest 4: Loss of significance: Solution of quadratic equation x^2 - 2px + q = 0 with p=" + p + " q="+q+"");
 		System.out.println("__________________________________________________________________");
 		
 		System.out.println("Method 1");
@@ -64,11 +94,11 @@ public class ComputerArithmeticExperiment {
 		System.out.println("Result: x^2 - 2px + q = " + (x2 * x2 - 2 * p * x2 + q));
 
 		/*
-		 * Test calculations close to the maximum value
+		 * Test summation using classical an Kahan summation
 		 */
 		double value			= 1.0/10.0;
 		int numberOfSummations	= 1000000;
-		System.out.println("\n\nTest 4: Summation: Calculating the average of " + numberOfSummations + " numbers of value " + value + ".");
+		System.out.println("\n\nTest 5: Summation: Calculating the average of " + numberOfSummations + " numbers of value " + value + ".");
 		System.out.println("__________________________________________________________________");
 
 		System.out.println("Method 1");
@@ -95,7 +125,7 @@ public class ComputerArithmeticExperiment {
 			epsilon = epsilon / 2.0;
 		}
 		
-		return epsilon * 2.0;
+		return epsilon;
 	}
 
 	/**

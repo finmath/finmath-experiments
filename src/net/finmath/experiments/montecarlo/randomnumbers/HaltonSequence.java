@@ -71,7 +71,7 @@ public class HaltonSequence {
 	 * @param index Index of the Halton number.
 	 * @return Halton number (vector).
 	 */
-	public double[] getHaltonNumber(int index) {
+	public double[] getHaltonNumber(long index) {
 		double[] x = new double[baseVector.length];
 		for(int baseIndex=0; baseIndex < baseVector.length; baseIndex++) {
 			x[baseIndex] = getHaltonNumber(index, baseVector[baseIndex]);
@@ -86,7 +86,7 @@ public class HaltonSequence {
 	 * @param base Base of the Halton number.
 	 * @return Halton number.
 	 */
-	public static double getHaltonNumber(int index, int base) {
+	public static double getHaltonNumber(long index, int base) {
 		// Check base
 		if(base < 2) throw new RuntimeException("Cannot create Halton number with base less than two.");
 		if(index < 0) throw new RuntimeException("Cannot create Halton number with index less than zero.");

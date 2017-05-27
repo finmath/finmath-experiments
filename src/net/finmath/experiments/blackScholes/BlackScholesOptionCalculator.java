@@ -73,10 +73,8 @@ public class BlackScholesOptionCalculator extends JApplet implements ActionListe
 	    frame.setVisible(true);
 	}
 
-	/**
-     * This method initializes this
-     * 
-     * @return void
+    /* (non-Javadoc)
+     * @see java.applet.Applet#init()
      */
     public void init() {
         this.setSize(450, 250);

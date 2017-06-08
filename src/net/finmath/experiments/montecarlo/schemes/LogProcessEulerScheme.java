@@ -30,11 +30,13 @@ public class LogProcessEulerScheme
 	private RandomVariableInterface[]	discreteProcess = null;
 
 	/**
-	 * @param numberOfTimeSteps
-	 * @param deltaT
-	 * @param paths
-	 * @param initialValue
-	 * @param sigma
+	 * Create a Euler scheme on X.
+	 * 
+	 * @param numberOfTimeSteps The number of time steps.
+	 * @param deltaT The time step size.
+	 * @param numberOfPaths The number of Monte-Carlo paths.
+	 * @param initialValue The inital value.
+	 * @param sigma The parameter sigma.
 	 */
 	public LogProcessEulerScheme(
 			int numberOfTimeSteps,

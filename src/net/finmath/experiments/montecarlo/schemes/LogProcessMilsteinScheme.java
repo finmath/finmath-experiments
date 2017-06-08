@@ -25,12 +25,13 @@ public class LogProcessMilsteinScheme
 	private RandomVariableInterface[]	discreteProcess = null;
 
 	/**
-	 * @param numberOfTimeSteps
-	 * @param deltaT
-	 * @param paths
-	 * @param initialValue
-	 * @param sigma
-	 * gleicher Constructor wie im Euler-Schema. 
+	 * Create a Milstein scheme on X.
+	 * 
+	 * @param numberOfTimeSteps The number of time steps.
+	 * @param deltaT The time step size.
+	 * @param numberOfPaths The number of Monte-Carlo paths.
+	 * @param initialValue The inital value.
+	 * @param sigma The parameter sigma.
 	 */
 	public LogProcessMilsteinScheme(
 			int numberOfTimeSteps,

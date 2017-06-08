@@ -212,8 +212,6 @@ public class BlackScholesMonteCarloValuationTest {
 
 	/**
 	 * Test some properties of the model
-	 * 
-	 * @param model The model to be used for the valuations.
 	 */
 	@Test
 	public void testModelProperties() throws CalculationException {
@@ -307,7 +305,6 @@ public class BlackScholesMonteCarloValuationTest {
 	/**
 	 * Evaluates 100000 Asian options in 10 parallel threads (each valuing 10000 options)
 	 * 
-	 * @param model The model to be used for the valuations.
 	 * @throws InterruptedException 
 	 */
 	public void testMultiThreaddedValuation() throws InterruptedException {

@@ -20,7 +20,7 @@ public class MonteCarloSchemeTests {
 		System.out.println(
 				"Comparing the mean (m) and the variance (V) of the terminal distribution\n" 
 				+ "of log(S(T)), generated using a numerical scheme for S, to the analytic values.\n"
-				+ "Output shows the error \u0394m and \u0394V.\n");
+				+ "Output shows the error \u0394m (error on mean) and \u0394V (error on variance) comparint to theoretical mean and variance at time T.\n");
 		
 		double initialValue = 1.0;
 		double sigma = 0.5;				// Note: Try different sigmas: 0.2, 0.5, 0.7, 0.9		

@@ -25,13 +25,6 @@ import java.util.stream.IntStream;
  * Problem: If the semaphore is used AND the inner forEach is active, then
  * the execution will be DEADLOCKED.
  * 
- * Note: A practical application is the implementation of the parallel
- * LevenbergMarquardt optimizer in
- * {@link http://finmath.net/java/finmath-lib/apidocs/net/finmath/optimizer/LevenbergMarquardt.html}
- * In one application the number of tasks in the outer and inner loop is very large (>1000)
- * and due to memory limitation the outer loop should be limited to a small (5) number
- * of concurrent executions.
- * 
  * @author Christian Fries
  */
 public class ForkJoinPoolTest {

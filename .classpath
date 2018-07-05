@@ -9,6 +9,6 @@
 	<classpathentry kind="lib" path="lib/jblas-1.2.4.jar"/>
 	<classpathentry kind="lib" path="lib/joda-time-2.9.jar"/>
 	<classpathentry kind="lib" path="lib/junit-4.10.jar"/>
-	<classpathentry kind="lib" path="lib/finmath-lib-2.4.2-java6.jar"/>
+	<classpathentry kind="lib" path="lib/finmath-lib-3.2.10.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

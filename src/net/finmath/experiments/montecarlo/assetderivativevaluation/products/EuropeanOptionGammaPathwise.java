@@ -69,8 +69,8 @@ public class EuropeanOptionGammaPathwise extends AbstractAssetMonteCarloProduct 
 			// Get some model parameters
 			double T		= maturity;
 			double S0		= underlyingAtToday.get(0);
-			double r		= blackScholesModel.getModel().getRiskFreeRate();
-			double sigma	= blackScholesModel.getModel().getVolatility();
+			double r		= blackScholesModel.getModel().getRiskFreeRate().doubleValue();
+			double sigma	= blackScholesModel.getModel().getVolatility().doubleValue();
 			double x			= 1.0 / (sigma * Math.sqrt(T)) * (Math.log(strike) - (r * T - 0.5 * sigma*sigma * T + Math.log(S0)));
 			
 			/*

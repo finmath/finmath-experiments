@@ -24,7 +24,7 @@ import net.finmath.time.TimeDiscretization;
 public class DeltaHedgeSimulation {
 
 	/**
-	 * 
+	 *
 	 */
 	public DeltaHedgeSimulation() {
 		// TODO Auto-generated constructor stub
@@ -32,7 +32,7 @@ public class DeltaHedgeSimulation {
 
 	/**
 	 * @param args
-	 * @throws CalculationException 
+	 * @throws CalculationException
 	 */
 	public static void main(String[] args) throws CalculationException {
 		testHedge();
@@ -73,31 +73,31 @@ public class DeltaHedgeSimulation {
 
 			// Hedge portfolio
 			AbstractAssetMonteCarloProduct hedgePortfolio = new BlackScholesDeltaHedgedPortfolio(maturity, strike, riskFreeRate, volatility);
-//			AbstractAssetMonteCarloProduct hedgePortfolio = new BlackScholesExchangeOptionDeltaHedgedPortfolio(maturity, strike, riskFreeRate, volatility);
-//			AbstractAssetMonteCarloProduct hedgePortfolio = new FiniteDifferenceDeltaHedgedPortfolio(product, model2);
+			//			AbstractAssetMonteCarloProduct hedgePortfolio = new BlackScholesExchangeOptionDeltaHedgedPortfolio(maturity, strike, riskFreeRate, volatility);
+			//			AbstractAssetMonteCarloProduct hedgePortfolio = new FiniteDifferenceDeltaHedgedPortfolio(product, model2);
 
-				// Print stuff about model
-				System.out.println("Model............................: " + model.getClass().getSimpleName());
-				System.out.println("Value of calibration product.....: " + product.getValue(model));
+			// Print stuff about model
+			System.out.println("Model............................: " + model.getClass().getSimpleName());
+			System.out.println("Value of calibration product.....: " + product.getValue(model));
 
-				// Check hedge
-				RandomVariableInterface hedgePortfolioValues	= hedgePortfolio.getValue(maturity, model);
-				RandomVariableInterface derivativeValues		= product.getValue(maturity, model);
-				RandomVariableInterface underlyingValues		= model.getAssetValue(maturity, 0);
-		
-				RandomVariableInterface hedgePortfolioErrorValues	= hedgePortfolioValues.sub(derivativeValues);
-				System.out.println("Hedge error (rms)................: " + Math.sqrt(hedgePortfolioErrorValues.squared().getAverage()));
-				System.out.println("");
-				
-				// Output
-				boolean printSamples = false;
-				if(printSamples) {
-					for(int pathIndex=0; pathIndex<hedgePortfolioValues.size(); pathIndex++) {
-						System.out.print(underlyingValues.get(pathIndex) + "\t");
-						System.out.print(hedgePortfolioValues.get(pathIndex) + "\t");
-					}
+			// Check hedge
+			RandomVariableInterface hedgePortfolioValues	= hedgePortfolio.getValue(maturity, model);
+			RandomVariableInterface derivativeValues		= product.getValue(maturity, model);
+			RandomVariableInterface underlyingValues		= model.getAssetValue(maturity, 0);
+
+			RandomVariableInterface hedgePortfolioErrorValues	= hedgePortfolioValues.sub(derivativeValues);
+			System.out.println("Hedge error (rms)................: " + Math.sqrt(hedgePortfolioErrorValues.squared().getAverage()));
+			System.out.println("");
+
+			// Output
+			boolean printSamples = false;
+			if(printSamples) {
+				for(int pathIndex=0; pathIndex<hedgePortfolioValues.size(); pathIndex++) {
+					System.out.print(underlyingValues.get(pathIndex) + "\t");
+					System.out.print(hedgePortfolioValues.get(pathIndex) + "\t");
 				}
+			}
 		}
-	}	
+	}
 }
 

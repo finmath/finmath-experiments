@@ -10,21 +10,21 @@ import java.util.stream.IntStream;
 
 /**
  * This is a test of Java 8 parallel streams.
- * 
+ *
  * The idea behind this code is that the Semaphore concurrentExecutions
  * should limit the parallel executions of the outer forEach (which is an
  * <code>IntStream.range(0,numberOfTasks).parallel().forEach</code> (for example:
  * the parallel executions of the outer forEach should be limited due to a
  * memory constrain).
- * 
+ *
  * Inside the execution block of the outer forEach we use another parallel stream
  * to create an inner forEach. The number of concurrent
  * executions of the inner forEach is not limited by us (it is however limited by a
  * system property "java.util.concurrent.ForkJoinPool.common.parallelism").
- * 
+ *
  * Problem: If the semaphore is used AND the inner forEach is active, then
  * the execution will be DEADLOCKED.
- * 
+ *
  * @author Christian Fries
  */
 public class ForkJoinPoolTest {
@@ -44,7 +44,7 @@ public class ForkJoinPoolTest {
 	public static void main(String[] args) {
 		(new ForkJoinPoolTest()).testNestedLoops();
 	}
-	
+
 	public ForkJoinPoolTest() {
 		super();
 		this.concurrentExecutions = new Semaphore(concurrentExecusionsLimitInOuterLoop);
@@ -91,7 +91,7 @@ public class ForkJoinPoolTest {
 
 	/**
 	 * Runs code in a parallel forEach using streams.
-	 * 
+	 *
 	 * @param numberOfTasksInInnerLoop Number of tasks to execute.
 	 */
 	private void runCodeWhichUsesParallelStream(int i, String callingThread) {
@@ -110,7 +110,7 @@ public class ForkJoinPoolTest {
 			}
 		};
 
-		if(isWrappedInnerLoopThread) { 
+		if(isWrappedInnerLoopThread) {
 			Thread t = new Thread(innerLoop, "Wrapper Thread");
 			try {
 				t.start();

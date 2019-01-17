@@ -14,7 +14,7 @@ import net.finmath.stochastic.RandomVariableInterface;
 
 /**
  * Implements calculation of the delta of a European option using the pathwise method.
- * 
+ *
  * @author Christian Fries
  * @version 1.0
  */
@@ -22,10 +22,10 @@ public class EuropeanOptionGammaPathwise extends AbstractAssetMonteCarloProduct 
 
 	private double	maturity;
 	private double	strike;
-	
+
 	/**
 	 * Construct a product representing an European option on an asset S (where S the asset with index 0 from the model - single asset case).
-	 * 
+	 *
 	 * @param strike The strike K in the option payoff max(S(T)-K,0).
 	 * @param maturity The maturity T in the option payoff max(S(T)-K,0)
 	 */
@@ -34,13 +34,13 @@ public class EuropeanOptionGammaPathwise extends AbstractAssetMonteCarloProduct 
 		this.maturity = maturity;
 		this.strike = strike;
 	}
-	
+
 	/**
 	 * Calculates the value of the option under a given model.
-	 * 
+	 *
 	 * @param model A reference to a model
 	 * @return the value
-	 * @throws CalculationException 
+	 * @throws CalculationException
 	 */
 	public double getValue(AssetModelMonteCarloSimulationInterface model) throws CalculationException
 	{
@@ -57,7 +57,7 @@ public class EuropeanOptionGammaPathwise extends AbstractAssetMonteCarloProduct 
 		RandomVariableInterface underlyingAtToday		= model.getAssetValue(0.0,0);
 		RandomVariableInterface numeraireAtToday		= model.getNumeraire(0);
 		RandomVariableInterface monteCarloWeights		= model.getMonteCarloWeights(maturity);
-		
+
 		/*
 		 *  The following way of calculating the expected value (average) is discouraged since it makes too strong
 		 *  assumptions on the internals of the <code>RandomVariableAccumulatorInterface</code>. Instead you should use
@@ -72,7 +72,7 @@ public class EuropeanOptionGammaPathwise extends AbstractAssetMonteCarloProduct 
 			double r		= blackScholesModel.getModel().getRiskFreeRate().doubleValue();
 			double sigma	= blackScholesModel.getModel().getVolatility().doubleValue();
 			double x			= 1.0 / (sigma * Math.sqrt(T)) * (Math.log(strike) - (r * T - 0.5 * sigma*sigma * T + Math.log(S0)));
-			
+
 			/*
 			 * Since the second derivative of the payoff is a distribution (Dirac delta),
 			 * classical path wise differentiation no longer works, but the expectation of that

@@ -15,13 +15,13 @@ import net.finmath.time.TimeDiscretizationInterface;
 
 /**
  * @author Christian Fries
- * 
+ *
  */
 public class BrownianMotionTests {
 
 	static final DecimalFormat fromatterReal2	= new DecimalFormat("0.00");
 	static final DecimalFormat fromatterSci4	= new DecimalFormat(" 0.0000E00;-0.0000E00");
-	
+
 	public static void main(String[] args)
 	{
 		// The parameters
@@ -40,8 +40,8 @@ public class BrownianMotionTests {
 				1,
 				numberOfPaths,
 				seed
-		);
-		
+				);
+
 		System.out.println("Average, variance and other properties of a BrownianMotion.\nTime step size (dt): " + dt + "  Number of path: " + numberOfPaths + "\n");
 
 		System.out.println("      " + "\t" + "  int dW " + "\t" + "         " + "\t" + "int dW dW" + "\t" + "        ");
@@ -51,7 +51,7 @@ public class BrownianMotionTests {
 		RandomVariableInterface sumOfSquaredIncrements 		= new RandomVariable(0.0);
 		for(int timeIndex=0; timeIndex<timeDiscretization.getNumberOfTimeSteps(); timeIndex++) {
 			RandomVariableInterface brownianIncrement = brownian.getBrownianIncrement(timeIndex,0);
-			
+
 			// Calculate W(t+dt) from dW
 			brownianMotionRealization.add(brownianIncrement);
 
@@ -68,12 +68,12 @@ public class BrownianMotionTests {
 
 			System.out.println(
 					fromatterReal2.format(time) + "\t" +
-					fromatterSci4.format(mean) + "\t" +
-					fromatterSci4.format(variance) + "\t" +
-					fromatterSci4.format(meanOfSumOfSquaredIncrements) + "\t" +
-					fromatterSci4.format(varianceOfSumOfSquaredIncrements) + "\t" +
-					""
-			);
+							fromatterSci4.format(mean) + "\t" +
+							fromatterSci4.format(variance) + "\t" +
+							fromatterSci4.format(meanOfSumOfSquaredIncrements) + "\t" +
+							fromatterSci4.format(varianceOfSumOfSquaredIncrements) + "\t" +
+							""
+					);
 		}
-	}	
+	}
 }

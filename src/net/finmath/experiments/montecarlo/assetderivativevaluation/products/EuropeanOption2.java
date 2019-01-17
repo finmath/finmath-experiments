@@ -14,7 +14,7 @@ import net.finmath.stochastic.RandomVariableInterface;
 /**
  * Implements valuation of a European stock option.
  * The code is equivalent to the code in <code>net.finmath.montecarlo.assetderivativevaluation.products.EuropeanOption</code>.
- * 
+ *
  * @author Christian Fries
  * @version 1.0
  */
@@ -22,10 +22,10 @@ public class EuropeanOption2 extends AbstractAssetMonteCarloProduct {
 
 	private double maturity;
 	private double strike;
-	
+
 	/**
 	 * Construct a product representing an European option on an asset S (where S the asset with index 0 from the model - single asset case).
-	 * 
+	 *
 	 * @param strike The strike K in the option payoff max(S(T)-K,0).
 	 * @param maturity The maturity T in the option payoff max(S(T)-K,0)
 	 */
@@ -34,13 +34,13 @@ public class EuropeanOption2 extends AbstractAssetMonteCarloProduct {
 		this.maturity = maturity;
 		this.strike = strike;
 	}
-	
+
 	/**
 	 * Calculates the value of the option under a given model.
-	 * 
+	 *
 	 * @param model A reference to a model
 	 * @return the value
-	 * @throws CalculationException 
+	 * @throws CalculationException
 	 */
 	public double getValue(AssetModelMonteCarloSimulationInterface model) throws CalculationException
 	{
@@ -49,7 +49,7 @@ public class EuropeanOption2 extends AbstractAssetMonteCarloProduct {
 		RandomVariableInterface numeraireAtMaturity	= model.getNumeraire(maturity);
 		RandomVariableInterface monteCarloWeights		= model.getMonteCarloWeights(maturity);
 		RandomVariableInterface numeraireAtToday		= model.getNumeraire(0);
-		
+
 		/*
 		 *  The following way of calculating the expected value (average) is discouraged since it makes too strong
 		 *  assumptions on the internals of the <code>RandomVariableAccumulatorInterface</code>. Instead you should use
@@ -60,7 +60,7 @@ public class EuropeanOption2 extends AbstractAssetMonteCarloProduct {
 		{
 			// Expectation of N(0) * ( max(S(T)-K,0) / N(T) )
 			if(underlyingAtMaturity.get(path) > strike)
-			{	
+			{
 				average += (underlyingAtMaturity.get(path) - strike) / numeraireAtMaturity.get(path) * monteCarloWeights.get(path)
 						* numeraireAtToday.get(path);
 			}

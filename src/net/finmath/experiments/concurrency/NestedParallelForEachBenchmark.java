@@ -22,24 +22,24 @@ import java.util.stream.IntStream;
 
 /**
  * This is a test of Java 8 parallel streams.
- * 
+ *
  * We are testing nested parallel forEach loops, which appear to
  * have unexpected poor performance in Java 1.8.0u5.
- * 
+ *
  * We have a nested stream.parallel().forEach():
- * 
+ *
  * The inner loop is independent (stateless, no interference, etc. - except of the use of a common pool)
  * and consumes only a small amount of time.
- * 
+ *
  * Half of the tasks of the outer loop consume a larger portion of time prior that loop.
  * Half consume a larger portion of time after that loop.
- * 
+ *
  * Now: submitting 24 outer-loop-tasks to a pool of 2 we observe:
- * 
+ *
  * - With inner sequential loop:					26 seconds.
  * - With inner parallel loop:						41 seconds.
- * 
- * Now, there is a funny workaround. The method 
+ *
+ * Now, there is a funny workaround. The method
  * wraps every operation in its own thread. Use this to wrap the inner loop in its
  * own thread via
  * <code>
@@ -49,22 +49,22 @@ import java.util.stream.IntStream;
  * 						}));
  * </code>
  * And the performance issue is gone.
- * 
+ *
  * - With inner parallel loop, wrapped in thread:	25 seconds.
- * 
+ *
  * For details see: http://www.christian-fries.de/blog/files/2014-nested-java-8-parallel-foreach.html
- * 
+ *
  * @author Christian Fries
  */
 public class NestedParallelForEachBenchmark {
 
 	ExecutorService singleThreadExecutor = Executors.newFixedThreadPool(1);
-	
+
 	final NumberFormat formatter2 = new DecimalFormat("0.00");
-	
+
 	final int		numberOfWarmUpLoops = 20;
 	final int		numberOfBenchmarkLoops = 20;
-	
+
 	final int		numberOfTasksInOuterLoop = 24;
 	final int		numberOfTasksInInnerLoop = 10;
 	final int		concurrentExecutionsLimitForStreams	= 2;	// java.util.concurrent.ForkJoinPool.common.parallelism
@@ -123,7 +123,7 @@ public class NestedParallelForEachBenchmark {
 
 		System.out.println("time for " + testCaseName + " = " + timings);
 	}
-	
+
 	/*
 	 * Test case 3
 	 */
@@ -162,7 +162,7 @@ public class NestedParallelForEachBenchmark {
 		});
 	}
 
-	/* 
+	/*
 	 * Test case 1
 	 */
 	public void timeNestedLoopWithInnerParallelButWrappedInThread() {
@@ -173,10 +173,10 @@ public class NestedParallelForEachBenchmark {
 
 			// Inner loop as parallel
 			wrapInThread(() ->
-				IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
-					results[i * numberOfTasksInInnerLoop + j] += burnTime(1);
-				})
-			);
+			IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
+				results[i * numberOfTasksInInnerLoop + j] += burnTime(1);
+			})
+					);
 
 			if(i >= numberOfTasksInOuterLoop/2) results[i * numberOfTasksInInnerLoop] += burnTime(outerLoopOverheadFactor);
 
@@ -185,13 +185,13 @@ public class NestedParallelForEachBenchmark {
 
 	private double burnTime(long millis) {
 		double x = 0;
- 		for(long i=0; i<millis*calculationTaskFactor; i++) {
+		for(long i=0; i<millis*calculationTaskFactor; i++) {
 			// We use a random number generator here, to prevent some optimization by the JVM
 			x += Math.cos(i*0.0023*Math.random());
 		}
 		return x/calculationTaskFactor;
 	}
-	
+
 	private void wrapInThread(Runnable runnable) {
 		Future<?> result = singleThreadExecutor.submit(runnable);
 		try {
@@ -225,7 +225,7 @@ public class NestedParallelForEachBenchmark {
 			long start = System.currentTimeMillis();
 			action.run();
 			long end = System.currentTimeMillis();
-			
+
 			double seconds = (double)(end-start) / 1000.0;
 			max = Math.max(max, seconds);
 			min = Math.min(min, seconds);
@@ -254,14 +254,14 @@ public class NestedParallelForEachBenchmark {
 		Map<String, Double> cpuTimes = new HashMap<String, Double>();
 
 		ThreadMXBean bean = ManagementFactory.getThreadMXBean( );
-	    if(!bean.isThreadCpuTimeSupported()) return null;
+		if(!bean.isThreadCpuTimeSupported()) return null;
 
 		long[] threads = bean.getAllThreadIds();
-	    for (long threadId : threads) {
-	    	ThreadInfo thread = bean.getThreadInfo(threadId);
-	        long time = bean.getThreadCpuTime(threadId);
-	        cpuTimes.put(thread.getThreadName(), new Double((double)time/1000.0/1000.0/1000.0/(numberOfWarmUpLoops+numberOfBenchmarkLoops)));
-	    }
-	    return cpuTimes;
+		for (long threadId : threads) {
+			ThreadInfo thread = bean.getThreadInfo(threadId);
+			long time = bean.getThreadCpuTime(threadId);
+			cpuTimes.put(thread.getThreadName(), new Double((double)time/1000.0/1000.0/1000.0/(numberOfWarmUpLoops+numberOfBenchmarkLoops)));
+		}
+		return cpuTimes;
 	}
 }

@@ -18,8 +18,8 @@ package net.finmath.experiments.montecarlo.randomnumbers;
  * <i>
  * 	i = &Sigma;x<sub>1 &le; j &le; i</sub> a<sub>i,j</sub> b<sub>j-1</sub>
  * </i>
- * 
- * 
+ *
+ *
  * @author Christian Fries
  */
 public class HaltonSequence {
@@ -29,7 +29,7 @@ public class HaltonSequence {
 	/**
 	 * Construct a Halton sequence with d = base.length dimensions where the i-th component
 	 * uses base[i] as base of the corresponding van der Corput sequence.
-	 * 
+	 *
 	 * @param baseVector Vector of base integers for each component.
 	 */
 	public HaltonSequence(int[] baseVector) {
@@ -37,25 +37,25 @@ public class HaltonSequence {
 		for(int base : baseVector) {
 			if(base < 2) throw new RuntimeException("Cannot create Halton sequence with base less than two.");
 		}
-		
+
 		this.baseVector = baseVector;
 	}
 
 	/**
 	 * Construct a one dimensional Halton sequence (Van der Corput sequence) with given base.
-	 * 
+	 *
 	 * @param base Base of the sequence.
 	 */
 	public HaltonSequence(int base) {
 		// Check base
 		if(base < 2) throw new RuntimeException("Cannot create Halton sequence with base less than two.");
-		
+
 		this.baseVector = new int[] { base };
 	}
-	
+
 	/**
 	 * Print the first 1000 Halton numbers for base b = (2,3).
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -67,7 +67,7 @@ public class HaltonSequence {
 
 	/**
 	 * Get Halton number for given index.
-	 * 
+	 *
 	 * @param index Index of the Halton number.
 	 * @return Halton number (vector).
 	 */
@@ -81,7 +81,7 @@ public class HaltonSequence {
 
 	/**
 	 * Get Halton number for given index and base.
-	 * 
+	 *
 	 * @param index Index of the Halton number (starting at 0).
 	 * @param base Base of the Halton number.
 	 * @return Halton number.

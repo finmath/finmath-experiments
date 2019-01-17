@@ -14,7 +14,7 @@ import net.finmath.stochastic.RandomVariableInterface;
 
 /**
  * Implements calculation of the delta of a European option.
- * 
+ *
  * @author Christian Fries
  * @version 1.0
  */
@@ -22,12 +22,12 @@ public class EuropeanOptionGammaLikelihood extends AbstractAssetMonteCarloProduc
 
 	private double	maturity;
 	private double	strike;
-	
+
 	private boolean	isLikelihoodByFiniteDifference = false;
-	
+
 	/**
 	 * Construct a product representing an European option on an asset S (where S the asset with index 0 from the model - single asset case).
-	 * 
+	 *
 	 * @param strike The strike K in the option payoff max(S(T)-K,0).
 	 * @param maturity The maturity T in the option payoff max(S(T)-K,0)
 	 */
@@ -36,13 +36,13 @@ public class EuropeanOptionGammaLikelihood extends AbstractAssetMonteCarloProduc
 		this.maturity = maturity;
 		this.strike = strike;
 	}
-	
+
 	/**
 	 * Calculates the value of the option under a given model.
-	 * 
+	 *
 	 * @param model A reference to a model
 	 * @return the value
-	 * @throws CalculationException 
+	 * @throws CalculationException
 	 */
 	public double getValue(AssetModelMonteCarloSimulationInterface model) throws CalculationException
 	{
@@ -60,7 +60,7 @@ public class EuropeanOptionGammaLikelihood extends AbstractAssetMonteCarloProduc
 		RandomVariableInterface underlyingAtToday		= model.getAssetValue(0.0,0);
 		RandomVariableInterface numeraireAtToday		= model.getNumeraire(0);
 		RandomVariableInterface monteCarloWeights		= model.getMonteCarloWeights(maturity);
-		
+
 		/*
 		 *  The following way of calculating the expected value (average) is discouraged since it makes too strong
 		 *  assumptions on the internals of the <code>RandomVariableInterface</code>. Instead you should use
@@ -85,13 +85,13 @@ public class EuropeanOptionGammaLikelihood extends AbstractAssetMonteCarloProduc
 
 					double x		= 1.0 / (sigma * Math.sqrt(T)) * (Math.log(ST) - (r * T - 0.5 * sigma*sigma * T + Math.log(S0)));
 					double phi		= (1.0/Math.sqrt(2 * Math.PI) * Math.exp(-x*x/2.0) / (ST * (sigma) * Math.sqrt(T)) );
-	
+
 					double xDown	= 1.0 / (sigma * Math.sqrt(T)) * (Math.log(ST) - (r * T - 0.5 * sigma*sigma * T + Math.log(S0-h)));
 					double phiDown	= (1.0/Math.sqrt(2 * Math.PI) * Math.exp(-xDown*xDown/2.0) / (ST * (sigma) * Math.sqrt(T)) );
-					
+
 					double xUp		= 1.0 / (sigma * Math.sqrt(T)) * (Math.log(ST) - (r * T - 0.5 * sigma*sigma * T + Math.log(S0+h)));
 					double phiUp	= (1.0/Math.sqrt(2 * Math.PI) * Math.exp(-xUp*xUp/2.0) / (ST * (sigma) * Math.sqrt(T)) );
-					
+
 					lr	= (phiUp - 2 * phi + phiDown) / (h * h) / phi;
 				}
 				else {

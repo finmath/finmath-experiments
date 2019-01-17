@@ -8,7 +8,7 @@ package net.finmath.experiments.montecarlo;
 
 /**
  * A simple class illustrating a Monte-Carlo integration.
- * 
+ *
  * @author Christian Fries
  */
 public class MonteCarloIntegrationExperiment {
@@ -16,12 +16,12 @@ public class MonteCarloIntegrationExperiment {
 
 	/**
 	 * Main program to run the experiment.
-	 * 
+	 *
 	 * @param args Arguments, not used
 	 */
 	public static void main(String[] args) {
 		long numberOfSimulations = 10000000;
-		
+
 		// Measure calculation time - start
 		long millisStart = System.currentTimeMillis();
 
@@ -40,7 +40,7 @@ public class MonteCarloIntegrationExperiment {
 
 	/**
 	 * Calculates an approximation of pi via Monte-Carlo integration.
-	 * 
+	 *
 	 * @param numberOfSimulations The number of Monte-Carlo simulations.
 	 * @return An approximation of pi.
 	 */
@@ -51,9 +51,9 @@ public class MonteCarloIntegrationExperiment {
 			double y = 2.0 * (Math.random() - 0.5);
 			if(x*x + y*y < 1.0) numberOfPointsInsideUnitCircle++;
 		}
-		
+
 		double areaOfUnitCircle = 4.0 * (double)numberOfPointsInsideUnitCircle / (double)numberOfSimulations;
-		
+
 		// The theoretical area of a circle is pi r^2. Hence we have:
 		double pi = areaOfUnitCircle;
 

@@ -26,7 +26,7 @@ public class LogProcessMilsteinScheme
 
 	/**
 	 * Create a Milstein scheme on X.
-	 * 
+	 *
 	 * @param numberOfTimeSteps The number of time steps.
 	 * @param deltaT The time step size.
 	 * @param numberOfPaths The number of Monte-Carlo paths.
@@ -60,7 +60,7 @@ public class LogProcessMilsteinScheme
 
 	/**
 	 * Returns the average of the random variable given by the process at the given time index
-	 * 
+	 *
 	 * @param timeIndex The time index
 	 * @return The average
 	 */
@@ -114,12 +114,12 @@ public class LogProcessMilsteinScheme
 				}
 			}
 			else
-			{	
+			{
 				// Milstein Scheme
 				RandomVariableInterface previouseRealization	= discreteProcess[timeIndex-1];
 				RandomVariableInterface deltaW					= brownianMotion.getBrownianIncrement(timeIndex-1, 0);
 
-				// Generate values 
+				// Generate values
 				for (int iPath = 0; iPath < numberOfPaths; iPath++ )
 				{
 					// Drift
@@ -133,7 +133,7 @@ public class LogProcessMilsteinScheme
 					double newValue = previousValue + drift * previousValue * deltaT + previousValue * diffusion
 							+ 1.0/2.0 * previousValue * sigma * sigma * (deltaW.get(iPath) * deltaW.get(iPath) - deltaT);  // Milstein-Zusatz
 
-					newRealization[iPath] = newValue; 
+					newRealization[iPath] = newValue;
 				};
 			}
 

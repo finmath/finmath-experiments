@@ -14,6 +14,8 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
 import net.finmath.exception.CalculationException;
 import net.finmath.experiments.montecarlo.assetderivativevaluation.products.EuropeanOption2;
 import net.finmath.experiments.montecarlo.assetderivativevaluation.products.EuropeanOptionDeltaLikelihood;
@@ -33,14 +35,12 @@ import net.finmath.stochastic.RandomVariableInterface;
 import net.finmath.time.TimeDiscretization;
 import net.finmath.time.TimeDiscretizationInterface;
 
-import org.junit.Test;
-
 
 /**
  * This class represents a collection of several "tests" illustrating different aspects
  * related to the Monte-Carlo Simulation and derivative pricing (using a simple
  * Black-Scholes model.
- * 
+ *
  * @author Christian Fries
  */
 public class BlackScholesMonteCarloValuationTest {
@@ -51,9 +51,9 @@ public class BlackScholesMonteCarloValuationTest {
 	private final double	volatility     = 0.30;
 
 	// Process discretization properties
-	private final int		numberOfPaths		= 10000;
-	private final int		numberOfTimeSteps	= 10;
-	private final double	deltaT				= 0.5;
+	private final int		numberOfPaths		= 100000;
+	private final int		numberOfTimeSteps	= 100;
+	private final double	deltaT				= 0.1;
 
 
 	private AssetModelMonteCarloSimulationInterface model = null;
@@ -61,9 +61,9 @@ public class BlackScholesMonteCarloValuationTest {
 	/**
 	 * This main method will test a Monte-Carlo simulation of a Black-Scholes model and some valuations
 	 * performed with this model.
-	 * 
-	 * @throws net.finmath.exception.CalculationException Thrown if the valuation fails, specific cause may be available via the <code>cause()</code> method. 
-	 * @throws InterruptedException 
+	 *
+	 * @throws net.finmath.exception.CalculationException Thrown if the valuation fails, specific cause may be available via the <code>cause()</code> method.
+	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws IOException, CalculationException, InterruptedException
 	{
@@ -97,15 +97,19 @@ public class BlackScholesMonteCarloValuationTest {
 			break;
 		case 6:
 			// This test requires a MonteCarloBlackScholesModel and will not work with others models
-			pricingTest.testEuropeanCallDelta();    	
+			pricingTest.testEuropeanCallDelta();
 			break;
 		case 7:
 			// This test requires a MonteCarloBlackScholesModel and will not work with others models
-			pricingTest.testEuropeanCallVega();    	
+			pricingTest.testEuropeanCallVega();
 			break;
 		case 8:
 			// This test requires a MonteCarloBlackScholesModel and will not work with others models
-			pricingTest.testEuropeanCallGamma();    	
+			pricingTest.testEuropeanCallGamma();
+			break;
+		case 9:
+			// This test requires a MonteCarloBlackScholesModel and will not work with others models
+			//			pricingTest.testEuropeanCallTheta();
 			break;
 		}
 
@@ -131,6 +135,7 @@ public class BlackScholesMonteCarloValuationTest {
 		System.out.println("\t 6: Sensitivity (Delta) of European call options (with different strikes) using different methods.");
 		System.out.println("\t 7: Sensitivity (Vega) of European call options (with different strikes) using different methods.");
 		System.out.println("\t 8: Sensitivity (Gamma) of European call options (with different strikes) using different methods.");
+		//		System.out.println("\t 9: Sensitivity (Theta) of European call options (with different strikes) using different methods.");
 		System.out.println("");
 		System.out.print("Test to run: ");
 
@@ -181,8 +186,8 @@ public class BlackScholesMonteCarloValuationTest {
 		System.out.println(" Strike \t Monte-Carlo \t Analytic \t Deviation \t Monte-Carlo (alternative implementation)");
 
 		double initialValue	= blackScholesModel.getAssetValue(0.0, 0).get(0);
-		double riskFreeRate	= blackScholesModel.getModel().getRiskFreeRate();
-		double volatility	= blackScholesModel.getModel().getVolatility();
+		double riskFreeRate	= blackScholesModel.getModel().getRiskFreeRate().doubleValue();
+		double volatility	= blackScholesModel.getModel().getVolatility().doubleValue();
 
 		double optionMaturity	= 1.0;
 		for(double optionStrike = 0.60; optionStrike < 1.50; optionStrike += 0.05) {
@@ -201,7 +206,7 @@ public class BlackScholesMonteCarloValuationTest {
 			double valueAnalytic	= net.finmath.functions.AnalyticFormulas.blackScholesOptionValue(initialValue, riskFreeRate, volatility, optionMaturity, optionStrike);
 
 			// Print result
-			System.out.println(numberFormatStrike.format(optionStrike) + 
+			System.out.println(numberFormatStrike.format(optionStrike) +
 					"\t" + numberFormatValue.format(valueMonteCarlo) +
 					"\t" + numberFormatValue.format(valueAnalytic) +
 					"\t" + numberFormatDeviation.format(valueMonteCarlo-valueAnalytic) +
@@ -245,7 +250,7 @@ public class BlackScholesMonteCarloValuationTest {
 
 	/**
 	 * Evaluates different options (European, Asian, Bermudan) using the given model.
-	 * 
+	 *
 	 * The options share the same maturity and strike for the at t=3.0.
 	 * Observations which can be made:
 	 * <ul>
@@ -304,15 +309,15 @@ public class BlackScholesMonteCarloValuationTest {
 
 	/**
 	 * Evaluates 100000 Asian options in 10 parallel threads (each valuing 10000 options)
-	 * 
-	 * @throws InterruptedException 
+	 *
+	 * @throws InterruptedException
 	 */
 	public void testMultiThreaddedValuation() throws InterruptedException {
 		final double[] averagingPoints = { 0.5, 1.0, 1.5, 2.0, 2.5, 2.5, 3.0, 3.0 , 3.0, 3.5, 4.5, 5.0 };
 		final double maturity = 5.0;
 		final double strike = 1.07;
 
-		int			numberOfThreads	= 10;		
+		int			numberOfThreads	= 10;
 		Thread[]	myThreads		= new Thread[numberOfThreads];
 
 		for(int k=0; k<myThreads.length; k++) {
@@ -358,8 +363,8 @@ public class BlackScholesMonteCarloValuationTest {
 		DecimalFormat numberFormatDeviation	= new DecimalFormat("  0.00E00; -0.00E00");
 
 		double initialValue	= blackScholesModel.getAssetValue(0.0, 0).get(0);
-		double riskFreeRate	= blackScholesModel.getModel().getRiskFreeRate();
-		double volatility	= blackScholesModel.getModel().getVolatility();
+		double riskFreeRate	= blackScholesModel.getModel().getRiskFreeRate().doubleValue();
+		double volatility	= blackScholesModel.getModel().getVolatility().doubleValue();
 
 		double optionMaturity	= 1.0;
 
@@ -406,7 +411,7 @@ public class BlackScholesMonteCarloValuationTest {
 			double							deltaLikelihood				= callOptionDeltaLikelihood.getValue(blackScholesModel);
 
 			// Print result
-			System.out.println(numberFormatStrike.format(optionStrike) + 
+			System.out.println(numberFormatStrike.format(optionStrike) +
 					"\t" + numberFormatValue.format(delta) +
 					"\t" + numberFormatValue.format(deltaPathwise) +
 					"\t" + numberFormatValue.format(deltaLikelihood) +
@@ -429,8 +434,8 @@ public class BlackScholesMonteCarloValuationTest {
 		DecimalFormat numberFormatDeviation	= new DecimalFormat("  0.00E00; -0.00E00");
 
 		double initialValue	= blackScholesModel.getAssetValue(0.0, 0).get(0);
-		double riskFreeRate	= blackScholesModel.getModel().getRiskFreeRate();
-		double volatility	= blackScholesModel.getModel().getVolatility();
+		double riskFreeRate	= blackScholesModel.getModel().getRiskFreeRate().doubleValue();
+		double volatility	= blackScholesModel.getModel().getVolatility().doubleValue();
 
 		double optionMaturity	= 5.0;
 
@@ -476,7 +481,7 @@ public class BlackScholesMonteCarloValuationTest {
 			double							vegaLikelihood				= callOptionVegaLikelihood.getValue(blackScholesModel);
 
 			// Print result
-			System.out.println(numberFormatStrike.format(optionStrike) + 
+			System.out.println(numberFormatStrike.format(optionStrike) +
 					"\t" + numberFormatValue.format(vega) +
 					"\t" + numberFormatValue.format(vegaPathwise) +
 					"\t" + numberFormatValue.format(vegaLikelihood) +
@@ -500,8 +505,8 @@ public class BlackScholesMonteCarloValuationTest {
 		DecimalFormat numberFormatDeviation	= new DecimalFormat("  0.00E00; -0.00E00");
 
 		double initialValue	= blackScholesModel.getAssetValue(0.0, 0).get(0);
-		double riskFreeRate	= blackScholesModel.getModel().getRiskFreeRate();
-		double volatility	= blackScholesModel.getModel().getVolatility();
+		double riskFreeRate	= blackScholesModel.getModel().getRiskFreeRate().doubleValue();
+		double volatility	= blackScholesModel.getModel().getVolatility().doubleValue();
 
 		double optionMaturity	= 5.0;
 
@@ -547,7 +552,7 @@ public class BlackScholesMonteCarloValuationTest {
 			double							rhoLikelihood				= callOptionRhoLikelihood.getValue(blackScholesModel);
 
 			// Print result
-			System.out.println(numberFormatStrike.format(optionStrike) + 
+			System.out.println(numberFormatStrike.format(optionStrike) +
 					"\t" + numberFormatValue.format(rho) +
 					"\t" + numberFormatValue.format(rhoPathwise) +
 					"\t" + numberFormatValue.format(rhoLikelihood) +
@@ -571,8 +576,8 @@ public class BlackScholesMonteCarloValuationTest {
 		DecimalFormat numberFormatDeviation	= new DecimalFormat("  0.00E00; -0.00E00");
 
 		double initialValue	= blackScholesModel.getAssetValue(0.0, 0).get(0);
-		double riskFreeRate	= blackScholesModel.getModel().getRiskFreeRate();
-		double volatility	= blackScholesModel.getModel().getVolatility();
+		double riskFreeRate	= blackScholesModel.getModel().getRiskFreeRate().doubleValue();
+		double volatility	= blackScholesModel.getModel().getVolatility().doubleValue();
 
 		// Test options with different strike
 		System.out.println("Calculation of Option Gamma (European options with maturity 1.0):");
@@ -621,7 +626,7 @@ public class BlackScholesMonteCarloValuationTest {
 			double								gammaLikelihood				= callOptionGammaLikelihood.getValue(blackScholesModel);
 
 			// Print result
-			System.out.println(numberFormatStrike.format(optionStrike) + 
+			System.out.println(numberFormatStrike.format(optionStrike) +
 					"\t" + numberFormatValue.format(gamma) +
 					"\t" + numberFormatValue.format(gammaPathwise) +
 					"\t" + numberFormatValue.format(gammaLikelihood) +

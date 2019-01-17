@@ -10,7 +10,7 @@ import java.text.DecimalFormat;
 
 /**
  * Testing the behavior of some time discretization schemes w.r.t. time step size.
- * 
+ *
  * @author Christian Fries
  */
 public class MonteCarloSchemeTests {
@@ -18,19 +18,19 @@ public class MonteCarloSchemeTests {
 	public static void main(String[] args)
 	{
 		System.out.println(
-				"Comparing the mean (m) and the variance (V) of the terminal distribution\n" 
-				+ "of log(S(T)), generated using a numerical scheme for S, to the analytic values.\n"
-				+ "Output shows the error \u0394m (error on mean) and \u0394V (error on variance) comparint to theoretical mean and variance at time T.\n");
-		
+				"Comparing the mean (m) and the variance (V) of the terminal distribution\n"
+						+ "of log(S(T)), generated using a numerical scheme for S, to the analytic values.\n"
+						+ "Output shows the error \u0394m (error on mean) and \u0394V (error on variance) comparint to theoretical mean and variance at time T.\n");
+
 		double initialValue = 1.0;
-		double sigma = 0.5;				// Note: Try different sigmas: 0.2, 0.5, 0.7, 0.9		
+		double sigma = 0.5;				// Note: Try different sigmas: 0.2, 0.5, 0.7, 0.9
 		int numberOfPath = 100000;		// Note: Try different number of path. For 10000000 you need around 6 GB (parameter is -mx6G)
 		double lastTime = 10.0;
-		
+
 		for(int numberOfTimeSteps=1; numberOfTimeSteps<=2002; numberOfTimeSteps+=20)
 		{
 			double deltaT = lastTime/numberOfTimeSteps;
-			
+
 			// Create an instance of the Euler scheme class
 			LogProcessEulerScheme eulerScheme = new LogProcessEulerScheme(
 					numberOfTimeSteps,	// numberOfTimeSteps
@@ -59,12 +59,12 @@ public class MonteCarloSchemeTests {
 			double startMillis = System.currentTimeMillis();
 
 			int		lastTimeIndex	= eulerScheme.getNumberOfTimeSteps();
-			
+
 			double	averageEuler	= eulerScheme.getAverageOfLog( lastTimeIndex );
 			double	averageMilstein	= milsteinScheme.getAverageOfLog( lastTimeIndex );
 			double	averageExpEuler	= expEulerScheme.getAverageOfLog( lastTimeIndex );
 			double	averageAnalytic	= Math.log(initialValue)-(0.5 * sigma * sigma * (lastTimeIndex * deltaT) );
-			
+
 			double	varianceEuler		= eulerScheme.getVarianceOfLog( lastTimeIndex );
 			double	varianceMilstein	= milsteinScheme.getVarianceOfLog( lastTimeIndex );
 			double	varianceExpEuler	= expEulerScheme.getVarianceOfLog( lastTimeIndex );
@@ -84,7 +84,7 @@ public class MonteCarloSchemeTests {
 			double errorVarianceExpEuler = Math.abs(varianceExpEuler- varianceAnalytic);
 			double errorAverageMilstein  = Math.abs(averageMilstein - averageAnalytic);
 			double errorVarianceMilstein = Math.abs(varianceMilstein- varianceAnalytic);
-			
+
 			System.out.print("Path =" + numberOfPath);
 			System.out.print("\tSteps=" + decimalFormatInteger.format(numberOfTimeSteps));
 			System.out.print("\tEuler...: \u0394m=" + decimalFormatPercent.format(errorAverageEuler)    + " \u0394V=" + decimalFormatPercent.format(errorVarianceEuler));

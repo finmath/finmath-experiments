@@ -26,14 +26,14 @@ import net.finmath.experiments.montecarlo.assetderivativevaluation.products.Euro
 import net.finmath.experiments.montecarlo.assetderivativevaluation.products.EuropeanOptionRhoPathwise;
 import net.finmath.experiments.montecarlo.assetderivativevaluation.products.EuropeanOptionVegaLikelihood;
 import net.finmath.experiments.montecarlo.assetderivativevaluation.products.EuropeanOptionVegaPathwise;
-import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationInterface;
+import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationModel;
 import net.finmath.montecarlo.assetderivativevaluation.MonteCarloBlackScholesModel;
 import net.finmath.montecarlo.assetderivativevaluation.products.AsianOption;
 import net.finmath.montecarlo.assetderivativevaluation.products.BermudanOption;
 import net.finmath.montecarlo.assetderivativevaluation.products.EuropeanOption;
-import net.finmath.stochastic.RandomVariableInterface;
+import net.finmath.stochastic.RandomVariable;
 import net.finmath.time.TimeDiscretization;
-import net.finmath.time.TimeDiscretizationInterface;
+import net.finmath.time.TimeDiscretizationFromArray;
 
 
 /**
@@ -56,7 +56,7 @@ public class BlackScholesMonteCarloValuationTest {
 	private final double	deltaT				= 0.1;
 
 
-	private AssetModelMonteCarloSimulationInterface model = null;
+	private AssetModelMonteCarloSimulationModel model = null;
 
 	/**
 	 * This main method will test a Monte-Carlo simulation of a Black-Scholes model and some valuations
@@ -155,13 +155,13 @@ public class BlackScholesMonteCarloValuationTest {
 		return testNumber;
 	}
 
-	public AssetModelMonteCarloSimulationInterface getModel()
+	public AssetModelMonteCarloSimulationModel getModel()
 	{
 		// Create the time discretization
-		TimeDiscretizationInterface timeDiscretization = new TimeDiscretization(0.0, numberOfTimeSteps, deltaT);
+		TimeDiscretization timeDiscretization = new TimeDiscretizationFromArray(0.0, numberOfTimeSteps, deltaT);
 
 		// Create an instance of a black scholes monte carlo model
-		AssetModelMonteCarloSimulationInterface model = new MonteCarloBlackScholesModel(
+		AssetModelMonteCarloSimulationModel model = new MonteCarloBlackScholesModel(
 				timeDiscretization,
 				numberOfPaths,
 				initialValue,
@@ -223,9 +223,9 @@ public class BlackScholesMonteCarloValuationTest {
 
 		System.out.println("Time \tAverage \t\tVariance");
 
-		TimeDiscretizationInterface modelTimeDiscretization = model.getTimeDiscretization();
+		TimeDiscretization modelTimeDiscretization = model.getTimeDiscretization();
 		for(double time : modelTimeDiscretization) {
-			RandomVariableInterface assetValue = model.getAssetValue(time, 0);
+			RandomVariable assetValue = model.getAssetValue(time, 0);
 
 			double average	= assetValue.getAverage();
 			double variance	= assetValue.getVariance();
@@ -239,7 +239,7 @@ public class BlackScholesMonteCarloValuationTest {
 
 	@Test
 	public void testModelRandomVariable() throws CalculationException {
-		RandomVariableInterface stockAtTimeOne = model.getAssetValue(1.0, 0);
+		RandomVariable stockAtTimeOne = model.getAssetValue(1.0, 0);
 
 		System.out.println("The first 100 realizations of the " + stockAtTimeOne.size() + " realizations of S(1) are:");
 		System.out.println("Path\tValue");
@@ -277,7 +277,7 @@ public class BlackScholesMonteCarloValuationTest {
 		 */
 		double[] averagingPoints = { 1.0, 1.5, 2.0, 2.5 , 3.0 };
 
-		AsianOption myAsianOption = new AsianOption(maturity,strike, new TimeDiscretization(averagingPoints));
+		AsianOption myAsianOption = new AsianOption(maturity,strike, new TimeDiscretizationFromArray(averagingPoints));
 		double valueOfAsianOption = myAsianOption.getValue(model);
 
 		/*
@@ -330,7 +330,7 @@ public class BlackScholesMonteCarloValuationTest {
 				public void run() {
 					try {
 						for(int i=0;i<10000; i++) {
-							AsianOption myAsianOption = new AsianOption(maturity,strike, new TimeDiscretization(averagingPoints));
+							AsianOption myAsianOption = new AsianOption(maturity,strike, new TimeDiscretizationFromArray(averagingPoints));
 							double valueOfAsianOption = myAsianOption.getValue(model);
 							System.out.println("Thread " + threadNummer + ": Value of Asian Option " + i + " is " + valueOfAsianOption);
 						}

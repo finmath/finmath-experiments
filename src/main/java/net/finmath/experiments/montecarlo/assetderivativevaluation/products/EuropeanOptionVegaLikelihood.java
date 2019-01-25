@@ -6,11 +6,11 @@
 package net.finmath.experiments.montecarlo.assetderivativevaluation.products;
 
 import net.finmath.exception.CalculationException;
-import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationInterface;
+import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationModel;
 import net.finmath.montecarlo.assetderivativevaluation.MonteCarloBlackScholesModel;
 import net.finmath.montecarlo.assetderivativevaluation.products.AbstractAssetMonteCarloProduct;
+import net.finmath.stochastic.RandomVariable;
 import net.finmath.stochastic.RandomVariableAccumulatorInterface;
-import net.finmath.stochastic.RandomVariableInterface;
 
 /**
  * Implements calculation of the delta of a European option.
@@ -18,7 +18,7 @@ import net.finmath.stochastic.RandomVariableInterface;
  * @author Christian Fries
  * @version 1.0
  */
-public class EuropeanOptionDeltaLikelihood extends AbstractAssetMonteCarloProduct {
+public class EuropeanOptionVegaLikelihood extends AbstractAssetMonteCarloProduct {
 
 	private double	maturity;
 	private double	strike;
@@ -31,7 +31,7 @@ public class EuropeanOptionDeltaLikelihood extends AbstractAssetMonteCarloProduc
 	 * @param strike The strike K in the option payoff max(S(T)-K,0).
 	 * @param maturity The maturity T in the option payoff max(S(T)-K,0)
 	 */
-	public EuropeanOptionDeltaLikelihood(double maturity, double strike) {
+	public EuropeanOptionVegaLikelihood(double maturity, double strike) {
 		super();
 		this.maturity = maturity;
 		this.strike = strike;
@@ -44,7 +44,7 @@ public class EuropeanOptionDeltaLikelihood extends AbstractAssetMonteCarloProduc
 	 * @return the value
 	 * @throws CalculationException
 	 */
-	public double getValue(AssetModelMonteCarloSimulationInterface model) throws CalculationException
+	public double getValue(AssetModelMonteCarloSimulationModel model) throws CalculationException
 	{
 		MonteCarloBlackScholesModel blackScholesModel = null;
 		try {
@@ -55,11 +55,11 @@ public class EuropeanOptionDeltaLikelihood extends AbstractAssetMonteCarloProduc
 		}
 
 		// Get underlying and numeraire
-		RandomVariableInterface underlyingAtMaturity	= model.getAssetValue(maturity,0);
-		RandomVariableInterface numeraireAtMaturity	= model.getNumeraire(maturity);
-		RandomVariableInterface underlyingAtToday		= model.getAssetValue(0.0,0);
-		RandomVariableInterface numeraireAtToday		= model.getNumeraire(0);
-		RandomVariableInterface monteCarloWeights		= model.getMonteCarloWeights(maturity);
+		RandomVariable underlyingAtMaturity	= model.getAssetValue(maturity,0);
+		RandomVariable numeraireAtMaturity		= model.getNumeraire(maturity);
+		RandomVariable underlyingAtToday		= model.getAssetValue(0.0,0);
+		RandomVariable numeraireAtToday		= model.getNumeraire(0);
+		RandomVariable monteCarloWeights		= model.getMonteCarloWeights(maturity);
 
 		/*
 		 *  The following way of calculating the expected value (average) is discouraged since it makes too strong
@@ -88,13 +88,15 @@ public class EuropeanOptionDeltaLikelihood extends AbstractAssetMonteCarloProduc
 					double x1		= 1.0 / (sigma * Math.sqrt(T)) * (Math.log(ST) - (r * T - 0.5 * sigma*sigma * T + Math.log(S0)));
 					double logPhi1	= Math.log(1.0/Math.sqrt(2 * Math.PI) * Math.exp(-x1*x1/2.0) / (ST * (sigma) * Math.sqrt(T)) );
 
-					double x2		= 1.0 / (sigma * Math.sqrt(T)) * (Math.log(ST) - (r * T - 0.5 * sigma*sigma * T + Math.log(S0+h)));
-					double logPhi2	= Math.log(1.0/Math.sqrt(2 * Math.PI) * Math.exp(-x2*x2/2.0) / (ST * (sigma) * Math.sqrt(T)) );
+					double x2		= 1.0 / ((sigma+h) * Math.sqrt(T)) * (Math.log(ST) - (r * T - 0.5 * (sigma+h)*(sigma+h) * T + Math.log(S0)));
+					double logPhi2	= Math.log(1.0/Math.sqrt(2 * Math.PI) * Math.exp(-x2*x2/2.0) / (ST * (sigma+h) * Math.sqrt(T)) );
 
 					lr		= (logPhi2 - logPhi1) / h;
 				}
 				else {
-					lr		= x / (sigma * Math.sqrt(T)) / S0;
+					double dxdsigma = -x / sigma + Math.sqrt(T);
+
+					lr		= - x * dxdsigma - 1/sigma;
 				}
 
 				double payOff			= (underlyingAtMaturity.get(path) - strike);
@@ -108,7 +110,7 @@ public class EuropeanOptionDeltaLikelihood extends AbstractAssetMonteCarloProduc
 	}
 
 	@Override
-	public RandomVariableAccumulatorInterface getValue(double evaluationTime, AssetModelMonteCarloSimulationInterface model) {
+	public RandomVariableAccumulatorInterface getValue(double evaluationTime, AssetModelMonteCarloSimulationModel model) {
 		throw new RuntimeException("Method not supported.");
 	}
 }

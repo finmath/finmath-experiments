@@ -6,10 +6,10 @@
 package net.finmath.experiments.montecarlo.assetderivativevaluation.products;
 
 import net.finmath.exception.CalculationException;
-import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationInterface;
+import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationModel;
 import net.finmath.montecarlo.assetderivativevaluation.products.AbstractAssetMonteCarloProduct;
+import net.finmath.stochastic.RandomVariable;
 import net.finmath.stochastic.RandomVariableAccumulatorInterface;
-import net.finmath.stochastic.RandomVariableInterface;
 
 /**
  * Implements valuation of a European stock option.
@@ -42,13 +42,13 @@ public class EuropeanOption2 extends AbstractAssetMonteCarloProduct {
 	 * @return the value
 	 * @throws CalculationException
 	 */
-	public double getValue(AssetModelMonteCarloSimulationInterface model) throws CalculationException
+	public double getValue(AssetModelMonteCarloSimulationModel model) throws CalculationException
 	{
 		// Get underlying and numeraire
-		RandomVariableInterface underlyingAtMaturity	= model.getAssetValue(maturity,0);
-		RandomVariableInterface numeraireAtMaturity	= model.getNumeraire(maturity);
-		RandomVariableInterface monteCarloWeights		= model.getMonteCarloWeights(maturity);
-		RandomVariableInterface numeraireAtToday		= model.getNumeraire(0);
+		RandomVariable underlyingAtMaturity	= model.getAssetValue(maturity,0);
+		RandomVariable numeraireAtMaturity	= model.getNumeraire(maturity);
+		RandomVariable monteCarloWeights		= model.getMonteCarloWeights(maturity);
+		RandomVariable numeraireAtToday		= model.getNumeraire(0);
 
 		/*
 		 *  The following way of calculating the expected value (average) is discouraged since it makes too strong
@@ -70,7 +70,7 @@ public class EuropeanOption2 extends AbstractAssetMonteCarloProduct {
 	}
 
 	@Override
-	public RandomVariableAccumulatorInterface getValue(double evaluationTime, AssetModelMonteCarloSimulationInterface model) {
+	public RandomVariableAccumulatorInterface getValue(double evaluationTime, AssetModelMonteCarloSimulationModel model) {
 		throw new RuntimeException("Method not supported.");
 	}
 }

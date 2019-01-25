@@ -63,7 +63,7 @@ public class BlackScholesOptionCalculator extends JApplet implements ActionListe
 	 *
 	 * @param argv not used
 	 */
-	static public void main (String argv[]) {
+	public static void main (String argv[]) {
 		JApplet applet = new BlackScholesOptionCalculator();
 		JFrame frame = new JFrame("BlackScholesOptionCalculator");			// create graphics frame
 		frame.getContentPane().add(applet);									// add the applet

@@ -7,18 +7,18 @@
 package net.finmath.experiments.montecarlo.assetderivativevaluation;
 
 import net.finmath.exception.CalculationException;
-import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationInterface;
+import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationModel;
 import net.finmath.montecarlo.assetderivativevaluation.MonteCarloBlackScholesModel;
 import net.finmath.montecarlo.assetderivativevaluation.products.AbstractAssetMonteCarloProduct;
 import net.finmath.montecarlo.assetderivativevaluation.products.EuropeanOption;
-import net.finmath.time.TimeDiscretization;
+import net.finmath.time.TimeDiscretizationFromArray;
 
 /**
  * A simple demo on how to value a financial product with a given model.
  *
  * This relates to the "separation of model and product". The only assumptions
  * made by the valuation code in the product is that the model implements
- * the interface {@code AssetModelMonteCarloSimulationInterface}.
+ * the interface {@code AssetModelMonteCarloSimulationModel}.
  *
  * @author Christian Fries
  */
@@ -32,7 +32,7 @@ public class SimpleBlackScholesMonteCarloValuation {
 	 */
 	public static void main(String[] args) throws CalculationException {
 
-		AssetModelMonteCarloSimulationInterface model = new MonteCarloBlackScholesModel(new TimeDiscretization(0, 10, 0.5), 10000, 100, 0.05, 0.20);
+		AssetModelMonteCarloSimulationModel model = new MonteCarloBlackScholesModel(new TimeDiscretizationFromArray(0, 10, 0.5), 10000, 100, 0.05, 0.20);
 
 		AbstractAssetMonteCarloProduct product = new EuropeanOption(2.0, 110);
 

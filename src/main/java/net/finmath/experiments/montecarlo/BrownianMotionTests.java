@@ -7,11 +7,11 @@ package net.finmath.experiments.montecarlo;
 
 import java.text.DecimalFormat;
 
-import net.finmath.montecarlo.BrownianMotion;
-import net.finmath.montecarlo.RandomVariable;
-import net.finmath.stochastic.RandomVariableInterface;
+import net.finmath.montecarlo.BrownianMotionLazyInit;
+import net.finmath.montecarlo.RandomVariableFromDoubleArray;
+import net.finmath.stochastic.RandomVariable;
 import net.finmath.time.TimeDiscretization;
-import net.finmath.time.TimeDiscretizationInterface;
+import net.finmath.time.TimeDiscretizationFromArray;
 
 /**
  * @author Christian Fries
@@ -32,25 +32,25 @@ public class BrownianMotionTests {
 		double dt = 0.1;
 
 		// Create the time discretization
-		TimeDiscretizationInterface timeDiscretization = new TimeDiscretization(0.0, (int)(lastTime/dt), dt);
+		TimeDiscretization timeDiscretization = new TimeDiscretizationFromArray(0.0, (int)(lastTime/dt), dt);
 
 		// Test the quality of the Brownian motion
-		BrownianMotion brownian = new BrownianMotion(
+		BrownianMotionLazyInit brownian = new BrownianMotionLazyInit(
 				timeDiscretization,
 				1,
 				numberOfPaths,
 				seed
 				);
 
-		System.out.println("Average, variance and other properties of a BrownianMotion.\nTime step size (dt): " + dt + "  Number of path: " + numberOfPaths + "\n");
+		System.out.println("Average, variance and other properties of a BrownianMotionLazyInit.\nTime step size (dt): " + dt + "  Number of path: " + numberOfPaths + "\n");
 
 		System.out.println("      " + "\t" + "  int dW " + "\t" + "         " + "\t" + "int dW dW" + "\t" + "        ");
 		System.out.println("time  " + "\t" + "   mean  " + "\t" + "    var  " + "\t" + "   mean  " + "\t" + "    var  ");
 
-		RandomVariableInterface brownianMotionRealization	= new RandomVariable(0.0);
-		RandomVariableInterface sumOfSquaredIncrements 		= new RandomVariable(0.0);
+		RandomVariable brownianMotionRealization	= new RandomVariableFromDoubleArray(0.0);
+		RandomVariable sumOfSquaredIncrements 		= new RandomVariableFromDoubleArray(0.0);
 		for(int timeIndex=0; timeIndex<timeDiscretization.getNumberOfTimeSteps(); timeIndex++) {
-			RandomVariableInterface brownianIncrement = brownian.getBrownianIncrement(timeIndex,0);
+			RandomVariable brownianIncrement = brownian.getBrownianIncrement(timeIndex,0);
 
 			// Calculate W(t+dt) from dW
 			brownianMotionRealization.add(brownianIncrement);
@@ -60,7 +60,7 @@ public class BrownianMotionTests {
 			double variance	= brownianMotionRealization.getVariance();
 
 			// Calculate x = \int dW(t) * dW(t)
-			RandomVariableInterface squaredIncrements = brownianIncrement.squared();
+			RandomVariable squaredIncrements = brownianIncrement.squared();
 			sumOfSquaredIncrements = sumOfSquaredIncrements.add(squaredIncrements);
 
 			double meanOfSumOfSquaredIncrements		= sumOfSquaredIncrements.getAverage();

@@ -6,11 +6,11 @@
 package net.finmath.experiments.montecarlo.assetderivativevaluation.products;
 
 import net.finmath.exception.CalculationException;
-import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationInterface;
+import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationModel;
 import net.finmath.montecarlo.assetderivativevaluation.MonteCarloBlackScholesModel;
 import net.finmath.montecarlo.assetderivativevaluation.products.AbstractAssetMonteCarloProduct;
+import net.finmath.stochastic.RandomVariable;
 import net.finmath.stochastic.RandomVariableAccumulatorInterface;
-import net.finmath.stochastic.RandomVariableInterface;
 
 /**
  * Implements calculation of the delta of a European option using the pathwise method.
@@ -42,7 +42,7 @@ public class EuropeanOptionGammaPathwise extends AbstractAssetMonteCarloProduct 
 	 * @return the value
 	 * @throws CalculationException
 	 */
-	public double getValue(AssetModelMonteCarloSimulationInterface model) throws CalculationException
+	public double getValue(AssetModelMonteCarloSimulationModel model) throws CalculationException
 	{
 		MonteCarloBlackScholesModel blackScholesModel = null;
 		try {
@@ -53,10 +53,10 @@ public class EuropeanOptionGammaPathwise extends AbstractAssetMonteCarloProduct 
 		}
 
 		// Get underlying and numeraire
-		RandomVariableInterface numeraireAtMaturity	= model.getNumeraire(maturity);
-		RandomVariableInterface underlyingAtToday		= model.getAssetValue(0.0,0);
-		RandomVariableInterface numeraireAtToday		= model.getNumeraire(0);
-		RandomVariableInterface monteCarloWeights		= model.getMonteCarloWeights(maturity);
+		RandomVariable numeraireAtMaturity	= model.getNumeraire(maturity);
+		RandomVariable underlyingAtToday		= model.getAssetValue(0.0,0);
+		RandomVariable numeraireAtToday		= model.getNumeraire(0);
+		RandomVariable monteCarloWeights		= model.getMonteCarloWeights(maturity);
 
 		/*
 		 *  The following way of calculating the expected value (average) is discouraged since it makes too strong
@@ -88,7 +88,7 @@ public class EuropeanOptionGammaPathwise extends AbstractAssetMonteCarloProduct 
 	}
 
 	@Override
-	public RandomVariableAccumulatorInterface getValue(double evaluationTime, AssetModelMonteCarloSimulationInterface model) {
+	public RandomVariableAccumulatorInterface getValue(double evaluationTime, AssetModelMonteCarloSimulationModel model) {
 		throw new RuntimeException("Method not supported.");
 	}
 }

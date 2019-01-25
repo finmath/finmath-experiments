@@ -2,6 +2,11 @@ package net.finmath.experiments.shortrate;
 
 import net.finmath.functions.NormalDistribution;
 
+/**
+ * CIR Simulation.
+ *
+ * @author Gnoatto, Fries
+ */
 public class CIRSimulation {
 
 	/*

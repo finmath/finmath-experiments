@@ -8,14 +8,15 @@ package net.finmath.experiments.montecarlo.assetderivativevaluation;
 
 import net.finmath.exception.CalculationException;
 import net.finmath.montecarlo.BrownianMotion;
-import net.finmath.montecarlo.BrownianMotionInterface;
-import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationInterface;
+import net.finmath.montecarlo.BrownianMotionLazyInit;
+import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimulationModel;
 import net.finmath.montecarlo.assetderivativevaluation.MonteCarloBlackScholesModel;
 import net.finmath.montecarlo.assetderivativevaluation.products.AbstractAssetMonteCarloProduct;
+import net.finmath.montecarlo.assetderivativevaluation.products.AssetMonteCarloProduct;
 import net.finmath.montecarlo.assetderivativevaluation.products.BlackScholesDeltaHedgedPortfolio;
 import net.finmath.montecarlo.assetderivativevaluation.products.EuropeanOption;
-import net.finmath.stochastic.RandomVariableInterface;
-import net.finmath.time.TimeDiscretization;
+import net.finmath.stochastic.RandomVariable;
+import net.finmath.time.TimeDiscretizationFromArray;
 
 /**
  * @author Christian Fries
@@ -48,12 +49,12 @@ public class DeltaHedgeSimulation {
 		double volatility		= 0.32;
 		int numberOfPaths		= 1000;
 		int numberOfTimeSteps	= 100;
-		TimeDiscretization simulationTimeDiscretization = new TimeDiscretization(0.0, numberOfTimeSteps, 2.0 / numberOfTimeSteps);
-		BrownianMotionInterface brownianMotion = new BrownianMotion(simulationTimeDiscretization, 1, numberOfPaths, 3141);
-		AssetModelMonteCarloSimulationInterface model = new MonteCarloBlackScholesModel(simulationTimeDiscretization, numberOfPaths, initialValue, riskFreeRate, volatility);
+		TimeDiscretizationFromArray simulationTimeDiscretization = new TimeDiscretizationFromArray(0.0, numberOfTimeSteps, 2.0 / numberOfTimeSteps);
+		BrownianMotion brownianMotion = new BrownianMotionLazyInit(simulationTimeDiscretization, 1, numberOfPaths, 3141);
+		AssetModelMonteCarloSimulationModel model = new MonteCarloBlackScholesModel(simulationTimeDiscretization, numberOfPaths, initialValue, riskFreeRate, volatility);
 
-		TimeDiscretization simulationTimeDiscretization2 = new TimeDiscretization(0.0, numberOfTimeSteps/100, 2.0 / numberOfTimeSteps * 100);
-		AssetModelMonteCarloSimulationInterface model2 = new MonteCarloBlackScholesModel(simulationTimeDiscretization2, numberOfPaths, initialValue, riskFreeRate, volatility);
+		TimeDiscretizationFromArray simulationTimeDiscretization2 = new TimeDiscretizationFromArray(0.0, numberOfTimeSteps/100, 2.0 / numberOfTimeSteps * 100);
+		AssetModelMonteCarloSimulationModel model2 = new MonteCarloBlackScholesModel(simulationTimeDiscretization2, numberOfPaths, initialValue, riskFreeRate, volatility);
 
 		// Calibration products
 		double maturity = 2.0;
@@ -72,7 +73,7 @@ public class DeltaHedgeSimulation {
 			AbstractAssetMonteCarloProduct product = new EuropeanOption(maturity, strike);
 
 			// Hedge portfolio
-			AbstractAssetMonteCarloProduct hedgePortfolio = new BlackScholesDeltaHedgedPortfolio(maturity, strike, riskFreeRate, volatility);
+			AssetMonteCarloProduct hedgePortfolio = new BlackScholesDeltaHedgedPortfolio(maturity, strike, riskFreeRate, volatility);
 			//			AbstractAssetMonteCarloProduct hedgePortfolio = new BlackScholesExchangeOptionDeltaHedgedPortfolio(maturity, strike, riskFreeRate, volatility);
 			//			AbstractAssetMonteCarloProduct hedgePortfolio = new FiniteDifferenceDeltaHedgedPortfolio(product, model2);
 
@@ -81,11 +82,11 @@ public class DeltaHedgeSimulation {
 			System.out.println("Value of calibration product.....: " + product.getValue(model));
 
 			// Check hedge
-			RandomVariableInterface hedgePortfolioValues	= hedgePortfolio.getValue(maturity, model);
-			RandomVariableInterface derivativeValues		= product.getValue(maturity, model);
-			RandomVariableInterface underlyingValues		= model.getAssetValue(maturity, 0);
+			RandomVariable hedgePortfolioValues	= hedgePortfolio.getValue(maturity, model);
+			RandomVariable derivativeValues		= product.getValue(maturity, model);
+			RandomVariable underlyingValues		= model.getAssetValue(maturity, 0);
 
-			RandomVariableInterface hedgePortfolioErrorValues	= hedgePortfolioValues.sub(derivativeValues);
+			RandomVariable hedgePortfolioErrorValues	= hedgePortfolioValues.sub(derivativeValues);
 			System.out.println("Hedge error (rms)................: " + Math.sqrt(hedgePortfolioErrorValues.squared().getAverage()));
 			System.out.println("");
 

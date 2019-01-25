@@ -7,7 +7,7 @@ package net.finmath.experiments.montecarlo.randomnumbers;
 
 import java.util.Random;
 
-import cern.jet.random.engine.MersenneTwister64;
+import net.finmath.randomnumbers.MersenneTwister;
 
 /**
  * @author Christian Fries
@@ -73,7 +73,7 @@ public class PseudoRandomNumberSequence {
 			break;
 		case MERSENNE_TWISTER:
 		default:
-			MersenneTwister64		mersenneTwister		= new MersenneTwister64((int) seed);
+			MersenneTwister mersenneTwister = new MersenneTwister(seed);
 			for(int numberIndex=0; numberIndex < length; numberIndex++) {
 				randomNumbers[numberIndex] = mersenneTwister.nextDouble();
 			}

@@ -14,8 +14,8 @@
 		<src.test.kotlin.dir>src/test/kotlin</src.test.kotlin.dir>
 		<kotlin.version>1.2.0</kotlin.version>
 		<junit.version>4.12</junit.version>
-		<finmath-lib.version>4.0.12</finmath-lib.version>
-		<finmath-plot.version>0.0.4</finmath-plot.version>
+		<finmath-lib.version>4.0.13</finmath-lib.version>
+		<finmath-plot.version>0.0.5</finmath-plot.version>
 	</properties>
 
 	<licenses>

@@ -20,7 +20,7 @@ import java.util.stream.IntStream;
  * have a deadlock problem in Java 1.8.0u5.
  *
  * The problem is, that the following code will deadlock:
- * <code>
+ * {@code
  * 		// Outer loop
  * 		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
  *
@@ -33,21 +33,21 @@ import java.util.stream.IntStream;
  * 				});
  * 			}
  * 		});
- * </code>
+ * }
  *
  *
  * Now, there is a funny workaround. The method <code>wrapInThread</code>
  * wraps an operation in its own thread, but immediately synchronizes it.
  *
  * If we use this to wrap the inner loop in its own thread via
- * <code>
+ * {@code
  * 				wrapInThread(() ->
  * 					// Inner loop
  * 					IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
  * 						doWork(1);
  * 					})
  * 				);
- * </code>
+ * }
  * And the issue is gone. Note that this does not introduce any new
  * parallelism and that the inner loop tasks are still submitted to the same
  * common fork-join pool!

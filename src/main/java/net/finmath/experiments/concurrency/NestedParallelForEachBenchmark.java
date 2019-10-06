@@ -42,12 +42,12 @@ import java.util.stream.IntStream;
  * Now, there is a funny workaround. The method
  * wraps every operation in its own thread. Use this to wrap the inner loop in its
  * own thread via
- * <code>
+ * {@code
  * 					wrapInThread( () ->
  * 						IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
  * 							burnTime(10);
  * 						}));
- * </code>
+ * }
  * And the performance issue is gone.
  *
  * - With inner parallel loop, wrapped in thread:	25 seconds.

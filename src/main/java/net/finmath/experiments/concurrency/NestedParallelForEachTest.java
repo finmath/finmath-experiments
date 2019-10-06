@@ -25,17 +25,17 @@ import java.util.stream.IntStream;
  *
  * The result is:
  * - With inner sequential loop:	33 seconds.
- * - With inner parallel loop:		>80 seconds (I had 92 seconds).
+ * - With inner parallel loop:		&gt;80 seconds (I had 92 seconds).
  *
  * Now, there is a funny workaround. The method
  * wraps every operation in its own thread. Use this to wrap the inner loop in its
  * own thread via
- * <code>
+ * {@code
  * 					wrapInThread( () ->
  * 						IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
  * 							burnTime(10);
  * 						}));
- * </code>
+ * }
  * And the performance issue is gone. Note that this does not introduce any new
  * parallelism and that the inner loop tasks are still submitted to the same
  * common fork-join pool.

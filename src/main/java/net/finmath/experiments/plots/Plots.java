@@ -60,7 +60,7 @@ public class Plots {
 		}
 
 		List<Plotable2D> plotables = Arrays.asList(
-				new PlotablePoints2D("Scatter", series, new GraphStyle(new Rectangle(2, 2), null, null))
+				new PlotablePoints2D("Scatter", series, new GraphStyle(new Rectangle(1, 1), null, null))
 				);
 
 		return new Plot2D(plotables);

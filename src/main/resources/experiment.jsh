@@ -36,7 +36,7 @@ double modelVolatility = 0.20;
 var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility);
 
 // Create a corresponding MC process
-var td = new TimeDiscretizationFromArray(0.0, 100, 0.1);
+var td = new TimeDiscretizationFromArray(0.0, 100, 0.01);
 var brownianMotion = new BrownianMotionLazyInit(td, 1, 100000, 3231)
 var process = new EulerSchemeFromProcessModel(brownianMotion);
 
@@ -86,8 +86,7 @@ var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVol
 // Create a corresponding MC process
 var td = new TimeDiscretizationFromArray(0.0, 300, 0.01);
 var brownianMotion = new BrownianMotionLazyInit(td, 1, 10000, 3213)
-var process = new EulerSchemeFromProcessModel(brownianMotion, EulerSchemeFromProcessModel.Scheme.EULER_FUNCTIONAL);
-//var process = new EulerSchemeFromProcessModel(brownianMotion);
+var process = new EulerSchemeFromProcessModel(brownianMotion);
 
 // Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
 var simulation = new MonteCarloAssetModel(model, process);

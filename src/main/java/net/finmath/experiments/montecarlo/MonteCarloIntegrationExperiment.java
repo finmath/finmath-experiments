@@ -20,7 +20,7 @@ public class MonteCarloIntegrationExperiment {
 	 * @param args Arguments, not used
 	 */
 	public static void main(String[] args) {
-		long numberOfSimulations = 10000000;
+		long numberOfSimulations = 20000000;
 
 		// Measure calculation time - start
 		long millisStart = System.currentTimeMillis();
@@ -41,14 +41,14 @@ public class MonteCarloIntegrationExperiment {
 	/**
 	 * Calculates an approximation of pi via Monte-Carlo integration.
 	 *
-	 * @param numberOfSimulations The number of Monte-Carlo simulations.
+	 * @param numberOfSimulations The number of elements to use from the random number sequence.
 	 * @return An approximation of pi.
 	 */
 	public static double getMonteCarloApproximationOfPi(long numberOfSimulations) {
 		long numberOfPointsInsideUnitCircle = 0;
 		for(long i=0; i<numberOfSimulations; i++) {
-			double x = 2.0 * (Math.random() - 0.5);
-			double y = 2.0 * (Math.random() - 0.5);
+			double x = 2.0 * (Math.random() - 0.5);		// pseudo random number between -1 and 1
+			double y = 2.0 * (Math.random() - 0.5);		// pseudo random number between -1 and 1
 			if(x*x + y*y < 1.0) numberOfPointsInsideUnitCircle++;
 		}
 

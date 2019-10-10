@@ -22,7 +22,7 @@ public class MonteCarloIntegrationWithQuasiRandomNumbersExperiment {
 	 * @param args Arguments, not used
 	 */
 	public static void main(String[] args) {
-		long numberOfSimulations = 10000000;
+		long numberOfSimulations = 20000000;
 
 		// Measure calculation time - start
 		long millisStart = System.currentTimeMillis();
@@ -32,10 +32,10 @@ public class MonteCarloIntegrationWithQuasiRandomNumbersExperiment {
 		// Measure calculation time - end
 		long millisEnd = System.currentTimeMillis();
 
-		System.out.println("Simulation with n = " + numberOfSimulations + " resulted in approximation of pi = " + pi);
+		System.out.println("Simulation with n = " + numberOfSimulations + " resulted in approximation of pi = " + pi +"\n");
 
-		System.out.println("Approximation error is                        = " + Math.abs(pi-Math.PI));
-		System.out.println("Theoretical order of the Monte-Carlo error is = " + 1.0/Math.sqrt(numberOfSimulations));
+		System.out.println("Approximation error is                                = " + Math.abs(pi-Math.PI));
+		System.out.println("Theoretical order of the (quasi) Monte-Carlo error is = " + Math.pow(Math.log(numberOfSimulations),2)/numberOfSimulations + "\n");
 
 		System.out.println("Calculation took " + (millisEnd-millisStart)/1000.0 + " sec.");
 	}
@@ -49,8 +49,8 @@ public class MonteCarloIntegrationWithQuasiRandomNumbersExperiment {
 	public static double getMonteCarloApproximationOfPi(long numberOfSimulations) {
 		long numberOfPointsInsideUnitCircle = 0;
 		for(long i=0; i<numberOfSimulations; i++) {
-			double x = 2.0 * (HaltonSequence.getHaltonNumber(i, 2) - 0.5);
-			double y = 2.0 * (HaltonSequence.getHaltonNumber(i, 3) - 0.5);
+			double x = 2.0 * (HaltonSequence.getHaltonNumber(i, 2) - 0.5);	// quasi random number between -1 and 1
+			double y = 2.0 * (HaltonSequence.getHaltonNumber(i, 3) - 0.5);	// quasi random number between -1 and 1
 			if(x*x + y*y < 1.0) numberOfPointsInsideUnitCircle++;
 		}
 

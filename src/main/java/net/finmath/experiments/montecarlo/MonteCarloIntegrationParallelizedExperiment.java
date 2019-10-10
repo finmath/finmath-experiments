@@ -31,9 +31,9 @@ public class MonteCarloIntegrationParallelizedExperiment {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws InterruptedException, ExecutionException {
-		long numberOfSimulations = 100000000;
-		int numberOfThreads		= 10;
-		int numberOfTask		= 100;
+		long numberOfSimulations = 200000000;
+		int numberOfThreads		= 8;
+		int numberOfTask		= 80;
 
 		final long numberOfSimulationsPerTask	= numberOfSimulations / numberOfTask;
 		final long numberOfSimulationsEffective	= numberOfSimulationsPerTask * numberOfTask;
@@ -77,8 +77,8 @@ public class MonteCarloIntegrationParallelizedExperiment {
 
 		System.out.println("Simulation with n = " + numberOfSimulations + " resulted in approximation of pi = " + pi +"\n");
 
-		System.out.println("Approximation error is                        = " + Math.abs(pi-Math.PI));
-		System.out.println("Theoretical order of the Monte-Carlo error is = " + 1.0/Math.sqrt(numberOfSimulationsEffective) + "\n");
+		System.out.println("Approximation error is                                = " + Math.abs(pi-Math.PI));
+		System.out.println("Theoretical order of the (quasi) Monte-Carlo error is = " + Math.pow(Math.log(numberOfSimulations),2)/numberOfSimulations + "\n");
 
 		System.out.println("Calculation took " + (millisEnd-millisStart)/1000.0 + " sec.");
 
@@ -98,8 +98,8 @@ public class MonteCarloIntegrationParallelizedExperiment {
 	public static double getMonteCarloApproximationOfPi(long indexStart, long numberOfSimulations) {
 		long numberOfPointsInsideUnitCircle = 0;
 		for(long i=indexStart; i<indexStart+numberOfSimulations; i++) {
-			double x = 2.0 * (HaltonSequence.getHaltonNumber(i, 2) - 0.5);
-			double y = 2.0 * (HaltonSequence.getHaltonNumber(i, 3) - 0.5);
+			double x = 2.0 * (HaltonSequence.getHaltonNumber(i, 2) - 0.5);	// quasi random number between -1 and 1
+			double y = 2.0 * (HaltonSequence.getHaltonNumber(i, 3) - 0.5);	// quasi random number between -1 and 1
 			if(x*x + y*y < 1.0) numberOfPointsInsideUnitCircle++;
 		}
 

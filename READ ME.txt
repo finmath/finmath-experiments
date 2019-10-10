@@ -6,11 +6,11 @@ Experiments and demos based on finmath lib.
 NOTE:
 -----
 
-For updates check http://www.finmath.net/java
+For updates check http://www.finmath.net/finmath-lib
 
 
 DOCUMENTATION:
 --------------
 
-For API documentation see http://www.finmath.net/java
+For API documentation see http://www.finmath.net/finmath-lib
 

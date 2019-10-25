@@ -1,5 +1,4 @@
-
-// Run the JShell from this project using Maven JShell plugin: 	mvn com.github.johnpoth:jshell-maven-plugin:1.1:run
+// Run the JShell from this project using Maven JShell plugin: 	 mvn jshell:run
 
 
 // EXPERIMENT 1
@@ -16,6 +15,7 @@ var x = bm.getBrownianIncrement(0,0)
 
 var plot = createPlotOfHistogram(x, 100, 5.0)
 plot.show()
+
 
 // for func, plot the following
 // for(int i=1; i<100000; i+=10) updatePlotOfHistogram(plot, (new BrownianMotionLazyInit(td, 1, i, 3213)).getBrownianIncrement(0,0), 100, 5.0)
@@ -36,8 +36,8 @@ double modelVolatility = 0.20;
 var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility);
 
 // Create a corresponding MC process
-var td = new TimeDiscretizationFromArray(0.0, 100, 0.01);
-var brownianMotion = new BrownianMotionLazyInit(td, 1, 100000, 3231)
+var td = new TimeDiscretizationFromArray(0.0, 100, 0.1);
+var brownianMotion = new BrownianMotionLazyInit(td, 1, 10000, 3231)
 var process = new EulerSchemeFromProcessModel(brownianMotion);
 
 // Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
@@ -66,6 +66,7 @@ EuropeanOption europeanOption = new EuropeanOption(maturity, strike);
 
 RandomVariable valueOfEuropeanOption = europeanOption.getValue(0.0, simulation).average();
 
+valueOfEuropeanOption.doubleValue()
 
 
 // EXPERIMENT 4 - inject AAD - Delta of European Option
@@ -95,8 +96,9 @@ var valueOfEuropeanOption = (RandomVariableDifferentiable) europeanOption.getVal
 
 var initialValue = (RandomVariableDifferentiable) simulation.getAssetValue(0,0);
 
-double delta = valueOfEuropeanOption.getGradient().get(initialValue.getID()).getAverage()
+var delta = valueOfEuropeanOption.getGradient().get(initialValue.getID()).average()
 
+delta.doubleValue()
 
 
 // EXPERIMENT 5 - Delta of Digital Option with AAD

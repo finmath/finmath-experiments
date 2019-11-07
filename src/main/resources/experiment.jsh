@@ -24,9 +24,14 @@ plot.show()
 
 // EXPERIMENT 2
 
+import net.finmath.montecarlo.*;
 import net.finmath.montecarlo.process.*
 import net.finmath.montecarlo.assetderivativevaluation.*
 import net.finmath.montecarlo.assetderivativevaluation.models.*
+import net.finmath.stochastic.*;
+import net.finmath.time.*;
+import net.finmath.plots.*;
+import static net.finmath.experiments.plots.Plots.*;
 
 double modelInitialValue = 100.0;
 double modelRiskFreeRate = 0.05;
@@ -36,7 +41,7 @@ double modelVolatility = 0.20;
 var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility);
 
 // Create a corresponding MC process
-var td = new TimeDiscretizationFromArray(0.0, 100, 0.1);
+var td = new TimeDiscretizationFromArray(0.0, 300, 0.01);
 var brownianMotion = new BrownianMotionLazyInit(td, 1, 10000, 3231)
 var process = new EulerSchemeFromProcessModel(brownianMotion);
 
@@ -69,6 +74,9 @@ RandomVariable valueOfEuropeanOption = europeanOption.getValue(0.0, simulation).
 valueOfEuropeanOption.doubleValue()
 
 
+
+
+
 // EXPERIMENT 4 - inject AAD - Delta of European Option
 
 import net.finmath.montecarlo.automaticdifferentiation.* 
@@ -86,7 +94,7 @@ var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVol
 
 // Create a corresponding MC process
 var td = new TimeDiscretizationFromArray(0.0, 300, 0.01);
-var brownianMotion = new BrownianMotionLazyInit(td, 1, 10000, 3213)
+var brownianMotion = new BrownianMotionLazyInit(td, 1, 10000, 3231)
 var process = new EulerSchemeFromProcessModel(brownianMotion);
 
 // Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
@@ -94,11 +102,15 @@ var simulation = new MonteCarloAssetModel(model, process);
 
 var valueOfEuropeanOption = (RandomVariableDifferentiable) europeanOption.getValue(0.0, simulation).average();
 
+valueOfEuropeanOption.doubleValue()
+
 var initialValue = (RandomVariableDifferentiable) simulation.getAssetValue(0,0);
 
 var delta = valueOfEuropeanOption.getGradient().get(initialValue.getID()).average()
 
 delta.doubleValue()
+
+
 
 
 // EXPERIMENT 5 - Delta of Digital Option with AAD

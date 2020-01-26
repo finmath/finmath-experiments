@@ -3,4 +3,4 @@
  *
  * @author Christian Fries
  */
-package net.finmath.tests.concurrency;
+package net.finmath.experiments.tests.concurrency;

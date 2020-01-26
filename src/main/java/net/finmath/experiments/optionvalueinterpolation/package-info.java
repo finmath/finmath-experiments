@@ -3,4 +3,4 @@
  *
  * @author Christian Fries
  */
-package net.finmath.experiments.optionvalueInterpolation;
+package net.finmath.experiments.optionvalueinterpolation;

@@ -10,7 +10,7 @@ import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimul
 import net.finmath.montecarlo.assetderivativevaluation.MonteCarloBlackScholesModel;
 import net.finmath.montecarlo.assetderivativevaluation.products.AbstractAssetMonteCarloProduct;
 import net.finmath.stochastic.RandomVariable;
-import net.finmath.stochastic.RandomVariableAccumulatorInterface;
+import net.finmath.stochastic.RandomVariableAccumulator;
 
 /**
  * Implements calculation of the delta of a European option.
@@ -114,7 +114,7 @@ public class EuropeanOptionGammaLikelihood extends AbstractAssetMonteCarloProduc
 	}
 
 	@Override
-	public RandomVariableAccumulatorInterface getValue(double evaluationTime, AssetModelMonteCarloSimulationModel model) {
+	public RandomVariableAccumulator getValue(double evaluationTime, AssetModelMonteCarloSimulationModel model) {
 		throw new RuntimeException("Method not supported.");
 	}
 }

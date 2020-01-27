@@ -10,7 +10,7 @@ import net.finmath.montecarlo.assetderivativevaluation.AssetModelMonteCarloSimul
 import net.finmath.montecarlo.assetderivativevaluation.MonteCarloBlackScholesModel;
 import net.finmath.montecarlo.assetderivativevaluation.products.AbstractAssetMonteCarloProduct;
 import net.finmath.stochastic.RandomVariable;
-import net.finmath.stochastic.RandomVariableAccumulatorInterface;
+import net.finmath.stochastic.RandomVariableAccumulator;
 
 /**
  * Implements calculation of the delta of a European option.
@@ -63,7 +63,7 @@ public class EuropeanOptionRhoLikelihood extends AbstractAssetMonteCarloProduct 
 
 		/*
 		 *  The following way of calculating the expected value (average) is discouraged since it makes too strong
-		 *  assumptions on the internals of the <code>RandomVariableAccumulatorInterface</code>. Instead you should use
+		 *  assumptions on the internals of the <code>RandomVariableAccumulator</code>. Instead you should use
 		 *  the mutators sub, div, mult and the getter getAverage. This code is provided for illustrative purposes.
 		 */
 		double average = 0.0;
@@ -110,7 +110,7 @@ public class EuropeanOptionRhoLikelihood extends AbstractAssetMonteCarloProduct 
 	}
 
 	@Override
-	public RandomVariableAccumulatorInterface getValue(double evaluationTime, AssetModelMonteCarloSimulationModel model) {
+	public RandomVariableAccumulator getValue(double evaluationTime, AssetModelMonteCarloSimulationModel model) {
 		throw new RuntimeException("Method not supported.");
 	}
 }

@@ -10,11 +10,11 @@ import net.finmath.time.*;
 import static net.finmath.experiments.plots.Plots.*;
 
 var td = new TimeDiscretizationFromArray(0.0, 100, 0.1);
-var bm = new BrownianMotionLazyInit(td, 1, 1000, 3213)   // change number of paths
-var x = bm.getBrownianIncrement(0,0)
+var bm = new BrownianMotionLazyInit(td, 1, 1000, 3213);   // change number of paths
+var x = bm.getBrownianIncrement(0,0);
 
-var plot = createPlotOfHistogram(x, 100, 5.0)
-plot.show()
+var plot = createPlotOfHistogram(x, 100, 5.0);
+plot.show();
 
 
 // for func, plot the following
@@ -25,9 +25,9 @@ plot.show()
 // EXPERIMENT 2
 
 import net.finmath.montecarlo.*;
-import net.finmath.montecarlo.process.*
-import net.finmath.montecarlo.assetderivativevaluation.*
-import net.finmath.montecarlo.assetderivativevaluation.models.*
+import net.finmath.montecarlo.process.*;
+import net.finmath.montecarlo.assetderivativevaluation.*;
+import net.finmath.montecarlo.assetderivativevaluation.models.*;
 import net.finmath.stochastic.*;
 import net.finmath.time.*;
 import net.finmath.plots.*;
@@ -42,27 +42,30 @@ var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVol
 
 // Create a corresponding MC process
 var td = new TimeDiscretizationFromArray(0.0, 300, 0.01);
-var brownianMotion = new BrownianMotionLazyInit(td, 1, 10000, 3231)
+var brownianMotion = new BrownianMotionLazyInit(td, 1, 10000, 3231);
 var process = new EulerSchemeFromProcessModel(brownianMotion);
 
 // Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
 var simulation = new MonteCarloAssetModel(model, process);
 
+// Create a function, plotting every paths.
 DoubleFunction<RandomVariable> paths = (time) -> {
 	try {
 		return simulation.getAssetValue(time, 0 /* assetIndex */);
 	} catch (Exception e) { return null; }
 };
 
-var pp = new PlotProcess2D(td, paths, 100)
-pp.show()
+// Plot 100 of paths against the given time discretization.
+var pp = (new PlotProcess2D(td, paths, 100));
+pp.setXAxisLabel("time").setYAxisLabel("value");
+pp.show();
 
 
 
 // EXPERIMENT 3
 
 import net.finmath.functions.AnalyticFormulas;
-import net.finmath.montecarlo.assetderivativevaluation.products.*
+import net.finmath.montecarlo.assetderivativevaluation.products.*;
 
 double maturity = 3.0;
 double strike = 106.0;
@@ -71,7 +74,7 @@ EuropeanOption europeanOption = new EuropeanOption(maturity, strike);
 
 RandomVariable valueOfEuropeanOption = europeanOption.getValue(0.0, simulation).average();
 
-valueOfEuropeanOption.doubleValue()
+var value = valueOfEuropeanOption.doubleValue();
 
 
 
@@ -79,8 +82,8 @@ valueOfEuropeanOption.doubleValue()
 
 // EXPERIMENT 4 - inject AAD - Delta of European Option
 
-import net.finmath.montecarlo.automaticdifferentiation.* 
-import net.finmath.montecarlo.automaticdifferentiation.backward.* 
+import net.finmath.montecarlo.automaticdifferentiation.*;
+import net.finmath.montecarlo.automaticdifferentiation.backward.*;
 
 AbstractRandomVariableFactory randomVariableFactory = new RandomVariableDifferentiableAADFactory();
 

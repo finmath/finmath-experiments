@@ -82,12 +82,7 @@ valueOfEuropeanOption.doubleValue()
 import net.finmath.montecarlo.automaticdifferentiation.* 
 import net.finmath.montecarlo.automaticdifferentiation.backward.* 
 
-Map<String, Object> properties = new HashMap<>();
-properties.put("barrierDiracWidth", new Double(0.1));
-//properties.put("diracDeltaApproximationMethod", "REGRESSION_ON_DENSITY");
-properties.put("isGradientRetainsLeafNodesOnly", new Boolean(false));
-
-AbstractRandomVariableFactory randomVariableFactory = new RandomVariableDifferentiableAADFactory(new RandomVariableFactory(), properties);
+AbstractRandomVariableFactory randomVariableFactory = new RandomVariableDifferentiableAADFactory();
 
 // Create a model
 var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility, randomVariableFactory);
@@ -104,12 +99,26 @@ var valueOfEuropeanOption = (RandomVariableDifferentiable) europeanOption.getVal
 
 valueOfEuropeanOption.doubleValue()
 
-var initialValue = (RandomVariableDifferentiable) simulation.getAssetValue(0,0);
+var initialValue = (RandomVariableDifferentiable) model.getInitialValue()[0]
 
 var delta = valueOfEuropeanOption.getGradient().get(initialValue.getID()).average()
 
 delta.doubleValue()
 
+initialValue.doubleValue()
+
+
+
+
+
+
+
+
+
+// Map<String, Object> properties = new HashMap<>();
+//properties.put("barrierDiracWidth", new Double(0.1));
+////properties.put("diracDeltaApproximationMethod", "REGRESSION_ON_DENSITY");
+//properties.put("isGradientRetainsLeafNodesOnly", new Boolean(false));
 
 
 

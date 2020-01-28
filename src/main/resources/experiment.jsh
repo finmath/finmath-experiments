@@ -92,7 +92,7 @@ var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVol
 
 // Create a corresponding MC process
 var td = new TimeDiscretizationFromArray(0.0, 300, 0.01);
-var brownianMotion = new BrownianMotionLazyInit(td, 1, 10000, 3231)
+var brownianMotion = new BrownianMotionLazyInit(td, 1, 10000, 3231);
 var process = new EulerSchemeFromProcessModel(brownianMotion);
 
 // Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
@@ -100,15 +100,15 @@ var simulation = new MonteCarloAssetModel(model, process);
 
 var valueOfEuropeanOption = (RandomVariableDifferentiable) europeanOption.getValue(0.0, simulation).average();
 
-valueOfEuropeanOption.doubleValue()
+valueOfEuropeanOption.doubleValue();
 
-var initialValue = (RandomVariableDifferentiable) model.getInitialValue()[0]
+var initialValue = (RandomVariableDifferentiable) model.getInitialValue()[0];
 
-var delta = valueOfEuropeanOption.getGradient().get(initialValue.getID()).average()
+var delta = valueOfEuropeanOption.getGradient().get(initialValue.getID()).average();
 
-delta.doubleValue()
+delta.doubleValue();
 
-initialValue.doubleValue()
+initialValue.doubleValue();
 
 
 
@@ -127,13 +127,13 @@ initialValue.doubleValue()
 
 // EXPERIMENT 5 - Delta of Digital Option with AAD
  
-valueOfEuropeanOption.getGradient().get(initialValue.getID()).getAverage()
+valueOfEuropeanOption.getGradient().get(initialValue.getID()).getAverage();
 
 var digitalOption = new DigitalOption(maturity, strike);
 var valueOfDigitalOption = (RandomVariableDifferentiable) digitalOption.getValue(0.0, simulation).average();
-valueOfDigitalOption.getGradient().get(initialValue.getID()).getAverage()
+valueOfDigitalOption.getGradient().get(initialValue.getID()).getAverage();
 
-AnalyticFormulas.blackScholesDigitalOptionDelta(modelInitialValue, modelRiskFreeRate, modelVolatility, maturity, strike)
+AnalyticFormulas.blackScholesDigitalOptionDelta(modelInitialValue, modelRiskFreeRate, modelVolatility, maturity, strike);
 
 
 // EXPERIMENT 5 - Delta Hedge with AAD
@@ -141,7 +141,7 @@ AnalyticFormulas.blackScholesDigitalOptionDelta(modelInitialValue, modelRiskFree
 var hedge = new DeltaHedgedPortfolioWithAAD(europeanOption);
 var underlyingAtMaturity = simulation.getAssetValue(maturity, 0);
 var hedgeValue = hedge.getValue(maturity, simulation);
-createPlotScatter(underlyingAtMaturity, hedgeValue, 90.0, 110.0).show()
+createPlotScatter(underlyingAtMaturity, hedgeValue, 90.0, 110.0).show();
 
 
 

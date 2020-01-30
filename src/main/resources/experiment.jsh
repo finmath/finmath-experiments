@@ -78,7 +78,7 @@ RandomVariable valueOfEuropeanOption = europeanOption.getValue(0.0, simulation).
 var value = valueOfEuropeanOption.doubleValue();
 
 
-createPlotOfHistogramBehindValues(simulation.getAssetValue(maturity, 0 /* assetIndex */), europeanOption.getValue(0.0, simulation), 100, 5.0).show()
+createPlotOfHistogramBehindValues(simulation.getAssetValue(maturity, 0 /* assetIndex */), europeanOption.getValue(0.0, simulation), 100, 5.0).show();
 
 
 
@@ -154,7 +154,7 @@ createPlotScatter(underlyingAtMaturity, hedgeValue, 90.0, 110.0).show();
 
 var underlyingAtMaturity = simulation.getAssetValue(maturity-0.3, 0);
 var hedgeValue = hedge.getValue(maturity-0.3, simulation);
-createPlotScatter(underlyingAtMaturity, hedgeValue, 90.0, 110.0).show()
+createPlotScatter(underlyingAtMaturity, hedgeValue, 90.0, 110.0).show();
 
 
 

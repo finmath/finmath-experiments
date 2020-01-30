@@ -14,6 +14,7 @@ var bm = new BrownianMotionLazyInit(td, 1, 1000, 3213);   // change number of pa
 var x = bm.getBrownianIncrement(0,0);
 
 var plot = createPlotOfHistogram(x, 100, 5.0);
+plot.setTitle("Histogram").setXAxisLabel("value").setYAxisLabel("frequency");
 plot.show();
 
 
@@ -56,13 +57,13 @@ DoubleFunction<RandomVariable> paths = (time) -> {
 };
 
 // Plot 100 of paths against the given time discretization.
-var pp = (new PlotProcess2D(td, paths, 100));
-pp.setXAxisLabel("time").setYAxisLabel("value");
-pp.show();
+var plot = (new PlotProcess2D(td, paths, 100));
+plot.setTitle("Black Scholes model paths").setXAxisLabel("time").setYAxisLabel("value");
+plot.show();
 
 
 
-// EXPERIMENT 3
+// EXPERIMENT 3 (requires run of experiment 2)
 
 import net.finmath.functions.AnalyticFormulas;
 import net.finmath.montecarlo.assetderivativevaluation.products.*;
@@ -77,15 +78,19 @@ RandomVariable valueOfEuropeanOption = europeanOption.getValue(0.0, simulation).
 var value = valueOfEuropeanOption.doubleValue();
 
 
+createPlotOfHistogramBehindValues(simulation.getAssetValue(maturity, 0 /* assetIndex */), europeanOption.getValue(0.0, simulation), 100, 5.0).show()
 
 
 
-// EXPERIMENT 4 - inject AAD - Delta of European Option
+// EXPERIMENT 4 - Dependency Injection of AAD - Delta of European Option
 
+import net.finmath.montecarlo.*;
 import net.finmath.montecarlo.automaticdifferentiation.*;
 import net.finmath.montecarlo.automaticdifferentiation.backward.*;
 
-AbstractRandomVariableFactory randomVariableFactory = new RandomVariableDifferentiableAADFactory();
+// Use the AAD factory to create AAD enabled random variables
+Map<String, Object> properties = Map.of("isGradientRetainsLeafNodesOnly", false);
+RandomVariableFactory randomVariableFactory = new RandomVariableDifferentiableAADFactory(properties);
 
 // Create a model
 var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility, randomVariableFactory);
@@ -106,22 +111,11 @@ var initialValue = (RandomVariableDifferentiable) model.getInitialValue()[0];
 
 var delta = valueOfEuropeanOption.getGradient().get(initialValue.getID()).average();
 
-delta.doubleValue();
+var S0 = initialValue.doubleValue();
 
-initialValue.doubleValue();
-
-
+var deltaValue = delta.doubleValue();
 
 
-
-
-
-
-
-// Map<String, Object> properties = new HashMap<>();
-//properties.put("barrierDiracWidth", new Double(0.1));
-////properties.put("diracDeltaApproximationMethod", "REGRESSION_ON_DENSITY");
-//properties.put("isGradientRetainsLeafNodesOnly", new Boolean(false));
 
 
 
@@ -131,27 +125,28 @@ valueOfEuropeanOption.getGradient().get(initialValue.getID()).getAverage();
 
 var digitalOption = new DigitalOption(maturity, strike);
 var valueOfDigitalOption = (RandomVariableDifferentiable) digitalOption.getValue(0.0, simulation).average();
-valueOfDigitalOption.getGradient().get(initialValue.getID()).getAverage();
 
-AnalyticFormulas.blackScholesDigitalOptionDelta(modelInitialValue, modelRiskFreeRate, modelVolatility, maturity, strike);
+var deltaMonteCarloAAD = valueOfDigitalOption.getGradient().get(initialValue.getID()).getAverage();
+
+var deltaAnalytic = AnalyticFormulas.blackScholesDigitalOptionDelta(modelInitialValue, modelRiskFreeRate, modelVolatility, maturity, strike);
 
 
-// EXPERIMENT 5 - Delta Hedge with AAD
+// EXPERIMENT 5 - Delta Hedge with AAD - European Option
 
 var hedge = new DeltaHedgedPortfolioWithAAD(europeanOption);
 var underlyingAtMaturity = simulation.getAssetValue(maturity, 0);
 var hedgeValue = hedge.getValue(maturity, simulation);
-createPlotScatter(underlyingAtMaturity, hedgeValue, 90.0, 110.0).show();
+createPlotScatter(underlyingAtMaturity, hedgeValue, 50.0, 110.0).show();
 
 
 
-// EXPERIMENT 6 - Delta Hedge with AAD
+// EXPERIMENT 6 - Delta Hedge with AAD - Digital Option
 
 var digitalOption = new DigitalOption(maturity, strike);
 var hedge = new DeltaHedgedPortfolioWithAAD(digitalOption);
 var underlyingAtMaturity = simulation.getAssetValue(maturity, 0);
 var hedgeValue = hedge.getValue(maturity, simulation);
-createPlotScatter(underlyingAtMaturity, hedgeValue, 90.0, 110.0).show()
+createPlotScatter(underlyingAtMaturity, hedgeValue, 90.0, 110.0).show();
 
 
 
@@ -160,4 +155,10 @@ createPlotScatter(underlyingAtMaturity, hedgeValue, 90.0, 110.0).show()
 var underlyingAtMaturity = simulation.getAssetValue(maturity-0.3, 0);
 var hedgeValue = hedge.getValue(maturity-0.3, simulation);
 createPlotScatter(underlyingAtMaturity, hedgeValue, 90.0, 110.0).show()
+
+
+
+
+//properties.put("barrierDiracWidth", new Double(0.1));
+////properties.put("diracDeltaApproximationMethod", "REGRESSION_ON_DENSITY");
 

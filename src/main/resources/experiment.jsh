@@ -1,25 +1,37 @@
-// Run the JShell from this project using Maven JShell plugin: 	 mvn jshell:run
+/* 
+ * Run the experiments below from jshell lauching the shell from this project via Maven.
+ * 
+ * 		mvn compile jshell:run
+ * 
+ * The experiments will generate plots in a separate window. Some experiments require
+ * running the previous one, so run them in the numbered order.
+ */
 
 
 // EXPERIMENT 1
 
 import net.finmath.montecarlo.*;
 import net.finmath.plots.*;
-import net.finmath.stochastic.*;
 import net.finmath.time.*;
-import static net.finmath.experiments.plots.Plots.*;
 
 var td = new TimeDiscretizationFromArray(0.0, 100, 0.1);
 var bm = new BrownianMotionLazyInit(td, 1, 1000, 3213);   // change number of paths
 var x = bm.getBrownianIncrement(0,0);
 
-var plot = createPlotOfHistogram(x, 100, 5.0);
+var plot = Plots.createPlotOfHistogram(x, 100, 5.0);
 plot.setTitle("Histogram").setXAxisLabel("value").setYAxisLabel("frequency");
 plot.show();
 
 
-// for func, plot the following
-// for(int i=1; i<100000; i+=10) updatePlotOfHistogram(plot, (new BrownianMotionLazyInit(td, 1, i, 3213)).getBrownianIncrement(0,0), 100, 5.0)
+// for fun, plot the following
+/*
+for(int i=2; i<100; i+=1) {
+	int numberOfPaths = i*i*Math.max(i/10,1);
+	Plots.updatePlotOfHistogram(plot, (new BrownianMotionLazyInit(td, 1, numberOfPaths, 3213)).getBrownianIncrement(0,0), 100, 5.0);
+	System.out.println(numberOfPaths);
+	Thread.sleep(100);
+}
+*/
 
 
 
@@ -32,7 +44,6 @@ import net.finmath.montecarlo.assetderivativevaluation.models.*;
 import net.finmath.stochastic.*;
 import net.finmath.time.*;
 import net.finmath.plots.*;
-import static net.finmath.experiments.plots.Plots.*;
 
 double modelInitialValue = 100.0;
 double modelRiskFreeRate = 0.05;
@@ -71,15 +82,15 @@ import net.finmath.montecarlo.assetderivativevaluation.products.*;
 double maturity = 3.0;
 double strike = 106.0;
 
-EuropeanOption europeanOption = new EuropeanOption(maturity, strike);
+var europeanOption = new EuropeanOption(maturity, strike);
 
-RandomVariable valueOfEuropeanOption = europeanOption.getValue(0.0, simulation).average();
+var valueOfEuropeanOption = europeanOption.getValue(0.0, simulation).average();
 
 var value = valueOfEuropeanOption.doubleValue();
 
-
-createPlotOfHistogramBehindValues(simulation.getAssetValue(maturity, 0 /* assetIndex */), europeanOption.getValue(0.0, simulation), 100, 5.0).show();
-
+var plot = Plots.createPlotOfHistogramBehindValues(simulation.getAssetValue(maturity, 0 /* assetIndex */), europeanOption.getValue(0.0, simulation), 100, 5.0);
+plot.setTitle("European option value and distribution of underlying").setXAxisLabel("underlying").setYAxisLabel("value");
+plot.show();
 
 
 // EXPERIMENT 4 - Dependency Injection of AAD - Delta of European Option
@@ -107,6 +118,7 @@ var valueOfEuropeanOption = (RandomVariableDifferentiable) europeanOption.getVal
 
 valueOfEuropeanOption.doubleValue();
 
+
 var initialValue = (RandomVariableDifferentiable) model.getInitialValue()[0];
 
 var delta = valueOfEuropeanOption.getGradient().get(initialValue.getID()).average();
@@ -117,9 +129,34 @@ var deltaValue = delta.doubleValue();
 
 
 
+// EXPERIMENT 5 - Dependency Injection of OpenCL
 
 
-// EXPERIMENT 5 - Delta of Digital Option with AAD
+import net.finmath.montecarlo.opencl.*;
+
+// Use the Cuda factory to create GPU enabled random variables
+RandomVariableFactory randomVariableFactory = new RandomVariableOpenCLFactory();
+//RandomVariableFactory randomVariableFactory = new RandomVariableFromArrayFactory();
+
+// Create a model
+var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility, randomVariableFactory);
+
+// Create a corresponding MC process
+var td = new TimeDiscretizationFromArray(0.0, 30, 0.1);
+var brownianMotion = new BrownianMotionLazyInit(td, 1, 5000000, 3231);
+var process = new EulerSchemeFromProcessModel(brownianMotion);
+
+// Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
+var simulation = new MonteCarloAssetModel(model, process);
+
+var valueOfEuropeanOption = europeanOption.getValue(0.0, simulation).average();
+
+valueOfEuropeanOption.doubleValue();
+
+
+
+
+// EXPERIMENT 6 - Delta of Digital Option with AAD
  
 valueOfEuropeanOption.getGradient().get(initialValue.getID()).getAverage();
 
@@ -131,33 +168,34 @@ var deltaMonteCarloAAD = valueOfDigitalOption.getGradient().get(initialValue.get
 var deltaAnalytic = AnalyticFormulas.blackScholesDigitalOptionDelta(modelInitialValue, modelRiskFreeRate, modelVolatility, maturity, strike);
 
 
-// EXPERIMENT 5 - Delta Hedge with AAD - European Option
+// EXPERIMENT 7 - Delta Hedge with AAD - European Option
 
 var hedge = new DeltaHedgedPortfolioWithAAD(europeanOption);
 var underlyingAtMaturity = simulation.getAssetValue(maturity, 0);
 var hedgeValue = hedge.getValue(maturity, simulation);
-createPlotScatter(underlyingAtMaturity, hedgeValue, 50.0, 110.0).show();
+var plot = Plots.createPlotScatter(underlyingAtMaturity, hedgeValue, 50.0, 110.0);
+plot.setTitle("Hedge Portfolio").setXAxisLabel("underlying").setYAxisLabel("portfolio value");
+plot.show();
 
 
-
-// EXPERIMENT 6 - Delta Hedge with AAD - Digital Option
+// EXPERIMENT 8 - Delta Hedge with AAD - Digital Option
 
 var digitalOption = new DigitalOption(maturity, strike);
 var hedge = new DeltaHedgedPortfolioWithAAD(digitalOption);
 var underlyingAtMaturity = simulation.getAssetValue(maturity, 0);
 var hedgeValue = hedge.getValue(maturity, simulation);
-createPlotScatter(underlyingAtMaturity, hedgeValue, 90.0, 110.0).show();
+var plot = Plots.createPlotScatter(underlyingAtMaturity, hedgeValue, 90.0, 110.0);
+plot.setTitle("Hedge Portfolio").setXAxisLabel("underlying").setYAxisLabel("portfolio value");
+plot.show();
 
 
-
-// EXPERIMENT 7 - Delta Hedge with AAD
+// EXPERIMENT 9 - Delta Hedge with AAD
 
 var underlyingAtMaturity = simulation.getAssetValue(maturity-0.3, 0);
 var hedgeValue = hedge.getValue(maturity-0.3, simulation);
-createPlotScatter(underlyingAtMaturity, hedgeValue, 90.0, 110.0).show();
-
-
-
+var plot = Plots.createPlotScatter(underlyingAtMaturity, hedgeValue, 90.0, 110.0);
+plot.setTitle("Hedge Portfolio").setXAxisLabel("underlying").setYAxisLabel("portfolio value");
+plot.show();
 
 //properties.put("barrierDiracWidth", new Double(0.1));
 ////properties.put("diracDeltaApproximationMethod", "REGRESSION_ON_DENSITY");

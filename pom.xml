@@ -17,6 +17,8 @@
 		<junit.version>4.12</junit.version>
 		<finmath-lib.version>4.1.0</finmath-lib.version>
 		<finmath-plot.version>0.0.7</finmath-plot.version>
+		<finmath-cuda.version>4.0.12</finmath-cuda.version>
+		<finmath-cuda.classifier></finmath-cuda.classifier>
 	</properties>
 
 	<licenses>
@@ -170,6 +172,14 @@
 			<artifactId>finmath-lib-plot-extensions</artifactId>
 			<version>${finmath-plot.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>net.finmath</groupId>
+			<artifactId>finmath-lib-cuda-extensions</artifactId>
+			<version>${finmath-cuda.version}</version>
+			<classifier>${finmath-cuda.classifier}</classifier>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>

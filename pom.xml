@@ -222,6 +222,15 @@
 		</dependency>
 	</dependencies>
 
+	<repositories>
+		<repository>
+			<id>jcuda-6</id>
+			<url>
+				https://raw.githubusercontent.com/MysterionRise/mavenized-jcuda/master/repo
+			</url>
+		</repository>
+	</repositories>
+
 	<scm>
 		<url>https://github.com/finmath/finmath-experiments</url>
 		<connection>scm:git:https://github.com/finmath/finmath-experiments.git</connection>

@@ -104,29 +104,12 @@
 				</configuration>
 			</plugin>
 
-			<!-- 			
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.3</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<transformers>
-								<transformer
-									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>net.finmath.experiments.hedgesimulator.HedgeSimulatorMain</mainClass>
-								</transformer>
-							</transformers>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			-->
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-shade-plugin</artifactId> 
+				<version>2.3</version> <executions> <execution> <phase>package</phase> <goals> 
+				<goal>shade</goal> </goals> <configuration> <transformers> <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"> 
+				<mainClass>net.finmath.experiments.hedgesimulator.HedgeSimulatorMain</mainClass> 
+				</transformer> </transformers> </configuration> </execution> </executions> 
+				</plugin> -->
 
 		</plugins>
 
@@ -140,6 +123,35 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<envClassifier />
+			</properties>
+		</profile>
+		<profile>
+			<id>experimental</id>
+			<properties>
+				<envClassifier>experimental</envClassifier>
+				<finmath-lib.version>4.1.1-SNAPSHOT</finmath-lib.version>
+				<finmath-plot.version>0.0.8.SNAPSHOT</finmath-plot.version>
+				<finmath-cuda.version>4.1.1-SNAPSHOT</finmath-cuda.version>
+				<finmath-cuda.classifier></finmath-cuda.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>cuda-6.0</id>
+			<properties>
+				<finmath-cuda.classifier>cuda-6.0</finmath-cuda.classifier>
+			</properties>
+		</profile>
+
+	</profiles>
 
 	<dependencies>
 		<!-- Java FX -->

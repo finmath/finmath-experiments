@@ -141,26 +141,42 @@
 				<finmath-lib.version>4.1.1-SNAPSHOT</finmath-lib.version>
 				<finmath-plot.version>0.0.8-SNAPSHOT</finmath-plot.version>
 				<finmath-cuda.version>4.1.1-SNAPSHOT</finmath-cuda.version>
-				<finmath-cuda.classifier></finmath-cuda.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>cuda-10.1</id>
+			<properties>
+				<cuda.version>10.1</cuda.version>
+				<finmath-cuda.classifier>cuda-${cuda.version}</finmath-cuda.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>cuda-10.0</id>
+			<properties>
+				<cuda.version>10.0</cuda.version>
+				<finmath-cuda.classifier>cuda-${cuda.version}</finmath-cuda.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>cuda-9.2</id>
+			<properties>
+				<cuda.version>9.2</cuda.version>
+				<finmath-cuda.classifier>cuda-${cuda.version}</finmath-cuda.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>cuda-8.0</id>
+			<properties>
+				<cuda.version>8.0</cuda.version>
+				<finmath-cuda.classifier>cuda-${cuda.version}</finmath-cuda.classifier>
 			</properties>
 		</profile>
 		<profile>
 			<id>cuda-6.0</id>
 			<properties>
-				<finmath-cuda.classifier>cuda-6.0</finmath-cuda.classifier>
+				<cuda.version>6.0</cuda.version>
+				<finmath-cuda.classifier>cuda-${cuda.version}</finmath-cuda.classifier>
 			</properties>
-			<dependencies>
-				<dependency>
-					<groupId>jcuda</groupId>
-					<artifactId>jcuda</artifactId>
-					<version>0.6.0</version>
-				</dependency>
-				<dependency>
-					<groupId>jcuda</groupId>
-					<artifactId>jcurand</artifactId>
-					<version>0.6.0</version>
-				</dependency>
-			</dependencies>
 		</profile>
 
 	</profiles>
@@ -203,7 +219,6 @@
 			<version>${finmath-cuda.version}</version>
 			<classifier>${finmath-cuda.classifier}</classifier>
 		</dependency>
-
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>

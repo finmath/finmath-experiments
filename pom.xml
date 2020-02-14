@@ -149,6 +149,18 @@
 			<properties>
 				<finmath-cuda.classifier>cuda-6.0</finmath-cuda.classifier>
 			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>jcuda</groupId>
+					<artifactId>jcuda</artifactId>
+					<version>0.6.0</version>
+				</dependency>
+				<dependency>
+					<groupId>jcuda</groupId>
+					<artifactId>jcurand</artifactId>
+					<version>0.6.0</version>
+				</dependency>
+			</dependencies>
 		</profile>
 
 	</profiles>

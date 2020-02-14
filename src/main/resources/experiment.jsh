@@ -129,13 +129,15 @@ var deltaValue = delta.doubleValue();
 
 
 
-// EXPERIMENT 5 - Dependency Injection of OpenCL
+// EXPERIMENT 5 - Dependency Injection of GPU Computing - Cuda or OpenCL
 
 
 import net.finmath.montecarlo.opencl.*;
+import net.finmath.montecarlo.cuda.*;
 
 // Use the Cuda factory to create GPU enabled random variables
-RandomVariableFactory randomVariableFactory = new RandomVariableOpenCLFactory();
+//RandomVariableFactory randomVariableFactory = new RandomVariableOpenCLFactory();
+RandomVariableFactory randomVariableFactory = new RandomVariableCudaFactory();
 //RandomVariableFactory randomVariableFactory = new RandomVariableFromArrayFactory();
 
 // Create a model
@@ -143,7 +145,7 @@ var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVol
 
 // Create a corresponding MC process
 var td = new TimeDiscretizationFromArray(0.0, 30, 0.1);
-var brownianMotion = new BrownianMotionLazyInit(td, 1, 5000000, 3231);
+var brownianMotion = new BrownianMotionLazyInit(td, 1, 50000, 3231);
 var process = new EulerSchemeFromProcessModel(brownianMotion);
 
 // Using the process (Euler scheme), create an MC simulation of a Black-Scholes model

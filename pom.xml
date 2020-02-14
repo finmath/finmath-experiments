@@ -144,41 +144,16 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>cuda-10.1</id>
+			<id>cudaversion</id>
+			<activation>
+				<property>
+					<name>cuda.version</name>
+				</property>
+			</activation>
 			<properties>
-				<cuda.version>10.1</cuda.version>
 				<finmath-cuda.classifier>cuda-${cuda.version}</finmath-cuda.classifier>
 			</properties>
 		</profile>
-		<profile>
-			<id>cuda-10.0</id>
-			<properties>
-				<cuda.version>10.0</cuda.version>
-				<finmath-cuda.classifier>cuda-${cuda.version}</finmath-cuda.classifier>
-			</properties>
-		</profile>
-		<profile>
-			<id>cuda-9.2</id>
-			<properties>
-				<cuda.version>9.2</cuda.version>
-				<finmath-cuda.classifier>cuda-${cuda.version}</finmath-cuda.classifier>
-			</properties>
-		</profile>
-		<profile>
-			<id>cuda-8.0</id>
-			<properties>
-				<cuda.version>8.0</cuda.version>
-				<finmath-cuda.classifier>cuda-${cuda.version}</finmath-cuda.classifier>
-			</properties>
-		</profile>
-		<profile>
-			<id>cuda-6.0</id>
-			<properties>
-				<cuda.version>6.0</cuda.version>
-				<finmath-cuda.classifier>cuda-${cuda.version}</finmath-cuda.classifier>
-			</properties>
-		</profile>
-
 	</profiles>
 
 	<dependencies>

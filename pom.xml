@@ -139,7 +139,7 @@
 			<properties>
 				<envClassifier>experimental</envClassifier>
 				<finmath-lib.version>4.1.1-SNAPSHOT</finmath-lib.version>
-				<finmath-plot.version>0.0.8.SNAPSHOT</finmath-plot.version>
+				<finmath-plot.version>0.0.8-SNAPSHOT</finmath-plot.version>
 				<finmath-cuda.version>4.1.1-SNAPSHOT</finmath-cuda.version>
 				<finmath-cuda.classifier></finmath-cuda.classifier>
 			</properties>

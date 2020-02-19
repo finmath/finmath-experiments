@@ -163,7 +163,21 @@ valueOfEuropeanOption.doubleValue();
 
 
 
-// EXPERIMENT 7 - Delta of Digital Option with AAD
+// EXPERIMENT 7 - requires that you run EXP 5 before, not 6 - Delta Hedge with AAD - European Option 
+
+var hedge = new DeltaHedgedPortfolioWithAAD(europeanOption);
+var underlyingAtMaturity = simulation.getAssetValue(maturity, 0);
+var hedgeValue = hedge.getValue(maturity, simulation);
+var plot = Plots.createPlotScatter(underlyingAtMaturity, hedgeValue, 50.0, 110.0);
+plot.setTitle("Hedge Portfolio").setXAxisLabel("underlying").setYAxisLabel("portfolio value");
+plot.show();
+
+
+
+
+
+
+// EXPERIMENT 8 - Delta of Digital Option with AAD
  
 valueOfEuropeanOption.getGradient().get(initialValue.getID()).getAverage();
 
@@ -173,17 +187,6 @@ var valueOfDigitalOption = (RandomVariableDifferentiable) digitalOption.getValue
 var deltaMonteCarloAAD = valueOfDigitalOption.getGradient().get(initialValue.getID()).getAverage();
 
 var deltaAnalytic = AnalyticFormulas.blackScholesDigitalOptionDelta(modelInitialValue, modelRiskFreeRate, modelVolatility, maturity, strike);
-
-
-
-// EXPERIMENT 8 - Delta Hedge with AAD - European Option
-
-var hedge = new DeltaHedgedPortfolioWithAAD(europeanOption);
-var underlyingAtMaturity = simulation.getAssetValue(maturity, 0);
-var hedgeValue = hedge.getValue(maturity, simulation);
-var plot = Plots.createPlotScatter(underlyingAtMaturity, hedgeValue, 50.0, 110.0);
-plot.setTitle("Hedge Portfolio").setXAxisLabel("underlying").setYAxisLabel("portfolio value");
-plot.show();
 
 
 

@@ -16,7 +16,7 @@
 		<kotlin.version>1.2.0</kotlin.version>
 		<junit.version>4.12</junit.version>
 		<finmath-lib.version>4.1.1</finmath-lib.version>
-		<finmath-plot.version>0.1.0</finmath-plot.version>
+		<finmath-plot.version>0.2.0</finmath-plot.version>
 		<finmath-cuda.version>4.1.1</finmath-cuda.version>
 		<finmath-cuda.classifier></finmath-cuda.classifier>
 	</properties>
@@ -138,9 +138,9 @@
 			<id>experimental</id>
 			<properties>
 				<envClassifier>experimental</envClassifier>
-				<finmath-lib.version>4.1.2-SNAPSHOT</finmath-lib.version>
-				<finmath-plot.version>0.1.1-SNAPSHOT</finmath-plot.version>
-				<finmath-cuda.version>4.1.2-SNAPSHOT</finmath-cuda.version>
+				<finmath-lib.version>4.1.1</finmath-lib.version>
+				<finmath-plot.version>0.2.1-SNAPSHOT</finmath-plot.version>
+				<finmath-cuda.version>4.1.1</finmath-cuda.version>
 			</properties>
 		</profile>
 		<profile>

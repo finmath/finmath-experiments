@@ -1,7 +1,7 @@
 /* 
  * Run the experiments below from jshell lauching the shell from this project via Maven.
  * 
- * 		mvn compile jshell:run
+ * 		mvn clean compile jshell:run
  * 
  * The experiments will generate plots in a separate window. Some experiments require
  * running the previous one, so run them in the numbered order.
@@ -60,15 +60,11 @@ var process = new EulerSchemeFromProcessModel(brownianMotion);
 // Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
 var simulation = new MonteCarloAssetModel(model, process);
 
-// Create a function, plotting every paths.
-DoubleFunction<RandomVariable> paths = (time) -> {
-	try {
-		return simulation.getAssetValue(time, 0 /* assetIndex */);
-	} catch (Exception e) { return null; }
-};
+// Create a function, plotting paths t -> S(t)
+DoubleToRandomVariableFunction paths = time -> simulation.getAssetValue(time, 0 /* assetIndex */);
 
 // Plot 100 of paths against the given time discretization.
-var plot = (new PlotProcess2D(td, paths, 100));
+var plot = new PlotProcess2D(td, paths, 100);
 plot.setTitle("Black Scholes model paths").setXAxisLabel("time").setYAxisLabel("value");
 plot.show();
 
@@ -84,16 +80,28 @@ double strike = 106.0;
 
 var europeanOption = new EuropeanOption(maturity, strike);
 
-var valueOfEuropeanOption = europeanOption.getValue(0.0, simulation).average();
+var valueOfEuropeanOption = europeanOption.getValue(0.0, simulation);
 
-var value = valueOfEuropeanOption.doubleValue();
+var value = valueOfEuropeanOption.average().doubleValue();
 
-var plot = Plots.createPlotOfHistogramBehindValues(simulation.getAssetValue(maturity, 0 /* assetIndex */), europeanOption.getValue(0.0, simulation), 100, 5.0);
+var underlying = simulation.getAssetValue(maturity, 0 /* assetIndex */);
+
+var plot = Plots.createPlotOfHistogramBehindValues(underlying, valueOfEuropeanOption, 100 /* bins */, 5.0 /* stddev */);
 plot.setTitle("European option value and distribution of underlying").setXAxisLabel("underlying").setYAxisLabel("value");
 plot.show();
 
 
-// EXPERIMENT 4 - Dependency Injection of AAD - Delta of European Option
+
+// EXPERIMENT 4 - Finite difference dV/dS(0) = V(M(S(0)+h))-V(M(S(0)-h)) / (2h)   (requires run of experiment 3)
+
+double h = 1E-2;
+var valueUpShift = europeanOption.getValue(simulation.getCloneWithModifiedData(Map.of("initialValue", modelInitialValue+h)));
+var valueDownShift = europeanOption.getValue(simulation.getCloneWithModifiedData(Map.of("initialValue", modelInitialValue-h)));
+var deltaNumerical = (valueUpShift - valueDownShift) / (2 * h);
+
+
+
+// EXPERIMENT 5 - Dependency Injection of AAD - Delta of European Option
 
 import net.finmath.montecarlo.*;
 import net.finmath.montecarlo.automaticdifferentiation.*;
@@ -118,7 +126,6 @@ var valueOfEuropeanOption = (RandomVariableDifferentiable) europeanOption.getVal
 
 valueOfEuropeanOption.doubleValue();
 
-
 var initialValue = (RandomVariableDifferentiable) model.getInitialValue()[0];
 
 var delta = valueOfEuropeanOption.getGradient().get(initialValue.getID()).average();
@@ -129,8 +136,7 @@ var deltaValue = delta.doubleValue();
 
 
 
-// EXPERIMENT 5 - Dependency Injection of GPU Computing - Cuda or OpenCL
-
+// EXPERIMENT 6 - Dependency Injection of GPU Computing - Cuda or OpenCL
 
 import net.finmath.montecarlo.opencl.*;
 import net.finmath.montecarlo.cuda.*;
@@ -157,8 +163,7 @@ valueOfEuropeanOption.doubleValue();
 
 
 
-
-// EXPERIMENT 6 - Delta of Digital Option with AAD
+// EXPERIMENT 7 - Delta of Digital Option with AAD
  
 valueOfEuropeanOption.getGradient().get(initialValue.getID()).getAverage();
 
@@ -170,7 +175,8 @@ var deltaMonteCarloAAD = valueOfDigitalOption.getGradient().get(initialValue.get
 var deltaAnalytic = AnalyticFormulas.blackScholesDigitalOptionDelta(modelInitialValue, modelRiskFreeRate, modelVolatility, maturity, strike);
 
 
-// EXPERIMENT 7 - Delta Hedge with AAD - European Option
+
+// EXPERIMENT 8 - Delta Hedge with AAD - European Option
 
 var hedge = new DeltaHedgedPortfolioWithAAD(europeanOption);
 var underlyingAtMaturity = simulation.getAssetValue(maturity, 0);
@@ -180,7 +186,8 @@ plot.setTitle("Hedge Portfolio").setXAxisLabel("underlying").setYAxisLabel("port
 plot.show();
 
 
-// EXPERIMENT 8 - Delta Hedge with AAD - Digital Option
+
+// EXPERIMENT 9 - Delta Hedge with AAD - Digital Option
 
 var digitalOption = new DigitalOption(maturity, strike);
 var hedge = new DeltaHedgedPortfolioWithAAD(digitalOption);
@@ -191,7 +198,8 @@ plot.setTitle("Hedge Portfolio").setXAxisLabel("underlying").setYAxisLabel("port
 plot.show();
 
 
-// EXPERIMENT 9 - Delta Hedge with AAD
+
+// EXPERIMENT 10 - Delta Hedge with AAD
 
 var underlyingAtMaturity = simulation.getAssetValue(maturity-0.3, 0);
 var hedgeValue = hedge.getValue(maturity-0.3, simulation);

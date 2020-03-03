@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>finMath.net: Experiments: Monte-Carlo Simulation, Algorithmic Differentiation and Dependency Injection</title>
+		<link rel="stylesheet" type="text/css" href="../../finmathnet-style.css"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	</head>
+	<body>
+		<!--
+		<script type="text/javascript">
+			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+		<script type="text/javascript">
+			var pageTracker = _gat._getTracker("UA-849152-2");
+			pageTracker._trackPageview();
+		</script>
+		-->
+		<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+		<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+		<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+		<script>new ClipboardJS('.btn');</script>
+
+	
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.css" rel="stylesheet" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/components/prism-core.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/plugins/autoloader/prism-autoloader.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/plugins/normalize-whitespace/prism-normalize-whitespace.js"></script>
+
+		<script type="text/javascript">
+			Prism.plugins.NormalizeWhitespace.setDefaults({
+				'remove-trailing': true,
+				'remove-indent': true,
+				'left-trim': true,
+				'right-trim': true
+				});
+		</script>
+
+		<style>
+			body {
+				font-family: "Arial";
+				line-height: 22pt;
+				font-size: 14pt;
+			}
+			.codeinline {
+				font-size: 12pt;
+			}
+			.codebox {
+				background: gainsboro;
+				border: solid 1px;
+				margin-top: 10px;
+				margin-bottom: 10px;
+				font-size: 11pt;
+			}
+			pre {
+				margin-top: 0px;
+				background: white;
+			}
+			pre > code {
+				margin-top: 0px;
+				background: white;
+				font-family: "Lucida Console";
+			}
+			.btn {
+				font-family: "Arial";
+				font-size: 14pt;
+			}
+		</style>
+		<header>
+			<span class="logo-white">finMath</span><span class="logo-red">.net</span>
+		</header>
+
+		<h1>Algorithmic Differentiation and Dependency Injection</h1>
+
+		<h1>Getting started</h1>
+
+		The experiments below use Java JShell started from a Maven project as a starting point (if you already started JShell from <code>finmath-experiments</code> you may continue in that shell, although it is safer to <code>/exit</code> that shell and restart a new one).
+		<ol>
+			<li>Open a command shell</li>
+			<li>Type <code>mkdir git</code> (to create a folder <code>git</code>, if you do not have one)</li>
+			<li>Type <code>cd git</code> (to enter your  <code>git</code> folder)</li>
+			<li>Next, clone (i.e. download) the repository (<code>git</code>), change to the cloned directory (<code>cd</code>) and start jshell via Maven (<code>mvn</code>) by typing the following three commands:</li>
+		</ol>
+        
+		<div class="codebox">
+			Terminal Window
+			<span style="float: right;"><button class="btn" data-clipboard-target="#setup1">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-sh" id="setup1">
+				git clone https://github.com/finmath/finmath-experiments        
+				cd finmath-experiments
+				mvn clean compile jshell:run
+			</code></pre>
+		</div>
+
+		<h1>Experiment 0: Monte-Carlo Simulation and Valuation (Recap)</h1>
+
+		Run the following experiment from your JShell (which was launched from finmath-experiments).
+
+		<h2>Initial Setup</h2>
+
+		<p>
+			In the <a href="../montecarlo-blackscholes">experiments on the Monte-Carlo simulation</a> a simulation object and a product object has been created and the delta of option has been evaluated using finite difference. Repeat this:
+		</p>
+
+		<p>
+			Create the model and its simulation:
+		</p>
+		<div class="codebox">
+			JShell: 
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment2">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment2">
+				import net.finmath.montecarlo.*;
+				import net.finmath.montecarlo.process.*;
+				import net.finmath.montecarlo.assetderivativevaluation.*;
+				import net.finmath.montecarlo.assetderivativevaluation.models.*;
+				import net.finmath.stochastic.*;
+				import net.finmath.time.*;
+				
+				double modelInitialValue = 100.0;
+				double modelRiskFreeRate = 0.05;
+				double modelVolatility = 0.20;
+				
+				// Create a model
+				var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility);
+				
+				// Create a corresponding MC process
+				var td = new TimeDiscretizationFromArray(0.0, 300, 0.01);
+				var brownianMotion = new BrownianMotionLazyInit(td, 1, 10000, 3231);
+				var process = new EulerSchemeFromProcessModel(brownianMotion);
+				
+				// Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
+				var simulation = new MonteCarloAssetModel(model, process);
+			</code></pre>
+		</div>
+		
+		<p>
+			Create the product:
+		</p>
+		<div class="codebox">
+			JShell:
+			<span style="float: right;"><button class="btn" data-clipboard-target="#createProduct">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="createProduct">
+				import net.finmath.montecarlo.assetderivativevaluation.products.*;
+				
+				double maturity = 3.0;
+				double strike = 106.0;
+				
+				var europeanOption = new EuropeanOption(maturity, strike);
+			</code></pre>
+		</div>
+
+		<h2>Experiment 1 - Finite difference (requires run of "Initial Setup")</h2>
+
+		<p>
+		We like to calculate a finite difference approximation of the partial derivative of the value \( V \) (being <code>europeanOption.getValue(0.0, simulation)</code>) with respect to \( S_{0} \) (being the <code>initialValue</code> of <code>simulation</code>) that is \( \partial V/ \partial S_{0} \approx \frac{V(M(S_0+h))-V(M(S_0-h))}{2h} \) (where \( M(x) \) refers to the model with the initial value \( x \)).
+		</p>
+
+		<p>
+		The object <code>simulation</code> has a method <code>getCloneWithModifiedData(Map)</code>
+		which allows to create a new simulation with modified data. As argument we pass a <code>Map</code> of the parameters to modify, in our case
+		<code>Map.of("initialValue", modelInitialValue+h))</code>
+		</p>
+
+		<div class="codebox">
+			JShell: (continued)
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment4">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment4">
+				double h = 1E-2;
+				var valueUpShift = europeanOption.getValue(simulation.getCloneWithModifiedData(Map.of("initialValue", modelInitialValue+h)));
+				var valueDownShift = europeanOption.getValue(simulation.getCloneWithModifiedData(Map.of("initialValue", modelInitialValue-h)));
+				var deltaNumerical = (valueUpShift - valueDownShift) / (2 * h);
+			</code></pre>
+		</div>
+
+		The value reported for  is 0.67361.... 
+		
+		<h1>Algorithmic Differentiation</h1>
+
+		<h2>Experiment 2</h2>
+
+		In order to enable algorithmic differentiation we make a small modification to the creation of the <code>model</code> (and hence to the <code>simulation</code>): we “inject” a factory creating AD enabled random variables into the model. As a result, the value calculated has the additional method <code>getGradient</code>.
+
+		The difference of the following experiment is line
+		<pre class="prettyprint"><code class="language-java" style="font-size: 12pt">
+			RandomVariableFactory randomVariableFactory = new RandomVariableDifferentiableAADFactory();
+		</code></pre>
+		creating a factory to create AAD enabled RandomVariables, and passing it to the model
+		<pre class="prettyprint"><code class="language-java" style="font-size: 12pt">
+			var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility, randomVariableFactory);
+		</code></pre>
+		Injecting the factory has the effect that
+		<pre class="prettyprint"><code class="language-java" style="font-size: 12pt">
+			var valueOfEuropeanOption = (RandomVariableDifferentiable) europeanOption.getValue(0.0, simulation);
+		</code></pre>
+		returns an object of type <code>RandomVariableDifferentiableAAD</code>.
+
+		<p>
+			Remark: The code below requires that the object <code>europeanOption</code> has been initialised. If you haven't done so you can <button class="btn" data-clipboard-target="#createProduct">copy the relevant code block to clipboard</button> and execute it before.
+		</p>
+		<div class="codebox">
+			JShell: (requires that the object <code>europeanOption</code> has been created in Experiment 3)
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment5">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment5">
+				import net.finmath.montecarlo.*;
+				import net.finmath.montecarlo.assetderivativevaluation.*;
+				import net.finmath.montecarlo.assetderivativevaluation.models.*;
+				import net.finmath.montecarlo.automaticdifferentiation.*;
+				import net.finmath.montecarlo.automaticdifferentiation.backward.*;
+				import net.finmath.montecarlo.process.*;
+				import net.finmath.time.*;
+				
+				double modelInitialValue = 100.0;
+				double modelRiskFreeRate = 0.05;
+				double modelVolatility = 0.20;
+				
+				RandomVariableFactory randomVariableFactory = new RandomVariableDifferentiableAADFactory();
+				
+				// Create a model
+				var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility, randomVariableFactory);
+				
+				// Create a corresponding MC process
+				var td = new TimeDiscretizationFromArray(0.0, 300, 0.01);
+				var brownianMotion = new BrownianMotionLazyInit(td, 1, 10000, 3231);
+				var process = new EulerSchemeFromProcessModel(brownianMotion);
+				
+				// Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
+				var simulation = new MonteCarloAssetModel(model, process);
+				
+				var valueOfEuropeanOption = (RandomVariableDifferentiable) europeanOption.getValue(0.0, simulation);
+				
+				var initialValue = (RandomVariableDifferentiable) model.getInitialValue()[0];
+				
+				var deltaPathwise = valueOfEuropeanOption.getGradient().get(initialValue.getID());
+				var deltaValue = deltaPathwise.average().doubleValue();
+			</code></pre>
+		</div>
+		
+		The value reported for deltaValue is <code>0.6736406559419106</code> (compare this to the finite difference approximation <code>0.6736119988879352</code>.
+
+		<p>
+			The variable <code>deltaPathwise</code> is the algorithmic differentiation of <code>valueOfEuropeanOption</code> with respect to the variable <code>initialValue</code>. It is a path-wise derivative \( \partial V(t_{n},\omega_{k}) / \partial S(t_{0},\omega_{k}) \) (note: the initial value is a deterministic random variable, i.e. \( S(t_{0}, \omega_{k}) \equiv S_{0} \quad \forall k \)). Hence <code>deltaPathwise</code> is a random variable too - the path wise differentiation of the (discounted) payoff with respect to \( S_{0} \). We may plot this path-wise differentiation:
+		</p>
+		
+		<div class="codebox">
+			JShell: (continued)
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment5-1">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment5-1">
+				import net.finmath.plots.*;
+
+				var underlying = simulation.getAssetValue(maturity, 0 /* assetIndex */);
+				
+				var plot = Plots.createPlotOfHistogramBehindValues(underlying, deltaPathwise, 100 /* bins */, 5.0 /* stddev */);
+				plot.setTitle("European option path-wise delta and distribution of underlying");
+				plot.setXAxisLabel("underlying").setYAxisLabel("path-wise delta");
+				plot.show();
+			</code></pre>
+		</div>
+
+		<center>
+			<img src="experiment-05.svg"/>
+		</center>
+
+		<h1>Forward versus Backward mode Algorithmic Differentiation</h1>
+		
+		<h2>Experiment 3</h2>
+		
+		The following code is a minor modification of that in experiment 2, instead of <code>RandomVariableDifferentiableADFactory</code> we use <code>RandomVariableDifferentiableAADFactory</code>, that is AD instead of AAD. The class <code>RandomVariableDifferentiableADFactory</code> resides in the package <code>net.finmath.montecarlo.automaticdifferentiation.forward</code>, while the class <code>RandomVariableDifferentiableADFactory</code> resides in <code>net.finmath.montecarlo.automaticdifferentiation.backward</code>.
+		
+		<div class="codebox">
+			JShell: (requires that the object <code>europeanOption</code> has been created)
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment6">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment6">
+				import net.finmath.montecarlo.*;
+				import net.finmath.montecarlo.assetderivativevaluation.*;
+				import net.finmath.montecarlo.assetderivativevaluation.models.*;
+				import net.finmath.montecarlo.automaticdifferentiation.*;
+				import net.finmath.montecarlo.automaticdifferentiation.forward.*;
+				import net.finmath.montecarlo.process.*;
+				import net.finmath.time.*;
+				
+				double modelInitialValue = 100.0;
+				double modelRiskFreeRate = 0.05;
+				double modelVolatility = 0.20;
+				
+				RandomVariableFactory randomVariableFactory = new RandomVariableDifferentiableADFactory();
+				
+				// Create a model
+				var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility, randomVariableFactory);
+				
+				// Create a corresponding MC process
+				var td = new TimeDiscretizationFromArray(0.0, 300, 0.01);
+				var brownianMotion = new BrownianMotionLazyInit(td, 1, 10000, 3231);
+				var process = new EulerSchemeFromProcessModel(brownianMotion);
+				
+				// Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
+				var simulation = new MonteCarloAssetModel(model, process);
+				
+				var valueOfEuropeanOption = (RandomVariableDifferentiable) europeanOption.getValue(0.0, simulation);
+				
+				var initialValue = (RandomVariableDifferentiable) model.getInitialValue()[0];
+				
+				var deltaPathwise = valueOfEuropeanOption.getGradient().get(initialValue.getID());
+				var deltaValue = deltaPathwise.average().doubleValue();
+			</code></pre>
+		</div>
+		The value reported is <code>0.6736406559419106</code> (identical to the AAD implementation).
+				
+	</body>
+</html>

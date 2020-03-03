@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>finMath.net: Experiments: Monte-Carlo Simulation</title>
+		<link rel="stylesheet" type="text/css" href="../../finmathnet-style.css"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="keywords" content="mathematical finance finmath java monte-carlo simulation"/>
+		<meta name="description" content="Monte-Carlo simulation of a Black Scholes model using Java JShell."/>
+	</head>
+	<body>
+		<!--
+		<script type="text/javascript">
+			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+		<script type="text/javascript">
+			var pageTracker = _gat._getTracker("UA-849152-2");
+			pageTracker._trackPageview();
+		</script>
+		-->
+		<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+		<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+		<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+		<script>new ClipboardJS('.btn');</script>
+
+	
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.css" rel="stylesheet" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/components/prism-core.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/plugins/autoloader/prism-autoloader.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/plugins/normalize-whitespace/prism-normalize-whitespace.js"></script>
+
+		<script type="text/javascript">
+			Prism.plugins.NormalizeWhitespace.setDefaults({
+				'remove-trailing': true,
+				'remove-indent': true,
+				'left-trim': true,
+				'right-trim': true
+				});
+		</script>
+
+		<style>
+			body {
+				font-family: "Arial";
+				line-height: 22pt;
+				font-size: 14pt;
+			}
+			.codeinline {
+				font-size: 12pt;
+			}
+			.codebox {
+				background: gainsboro;
+				border: solid 1px;
+				margin-top: 10px;
+				margin-bottom: 10px;
+				font-size: 11pt;
+			}
+			pre {
+				margin-top: 0px;
+				background: white;
+			}
+			pre > code {
+				margin-top: 0px;
+				background: white;
+				font-family: "Lucida Console";
+			}
+			.btn {
+				font-family: "Arial";
+				font-size: 14pt;
+			}
+		</style>
+		<header>
+			<span class="logo-white">finMath</span><span class="logo-red">.net</span>
+		</header>
+
+		<h1>Monte-Carlo Simulation of a Black Scholes Model</h1>
+
+		<h1>Getting started</h1>
+
+		The experiments below use Java JShell started from a Maven project as a starting point (if you already started JShell from <code>finmath-experiments</code> you may continue in that shell, although it is safer to <code>/exit</code> that shell and restart a new one).
+		<ol>
+			<li>Open a command shell</li>
+			<li>Type <code>mkdir git</code> (to create a folder <code>git</code>, if you do not have one)</li>
+			<li>Type <code>cd git</code> (to enter your  <code>git</code> folder)</li>
+			<li>Next, clone (i.e. download) the repository (<code>git</code>), change to the cloned directory (<code>cd</code>) and start jshell via Maven (<code>mvn</code>) by typing the following three commands:</li>
+		</ol>
+        
+		<div class="codebox">
+			Terminal Window
+			<span style="float: right;"><button class="btn" data-clipboard-target="#setup1">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-sh" id="setup1">
+				git clone https://github.com/finmath/finmath-experiments        
+				cd finmath-experiments
+				mvn clean compile jshell:run
+			</code></pre>
+		</div>
+
+		<h1>Experiment 0-4: Monte-Carlo Simulation and Valuation</h1>
+
+		Run the following experiment from your JShell (which was launched from finmath-experiments).
+
+		<h2>Experiment 0</h2>
+
+		The following will create an object of type <code>net.finmath.time.TimeDiscretizationFromArray</code> and then print the object (using the <code>toString()</code>-method). The time discretization starts in 0.0 and has 100 time steps of size 0.1.
+
+		<div class="codebox">
+			JShell: 
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment0">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment0">
+				var td = new net.finmath.time.TimeDiscretizationFromArray(0.0, 100, 0.1);
+				td.toString();
+			</code></pre>
+		</div>
+
+		We may shorten the name of object by importing a classes from the package or all classes from the packages (like name-spaces), e.g. here from <code>net.finmath.time</code> via <code>import net.finmath.time.*;</code>.
+
+		<h2>Experiment 1</h2>
+
+		<p>
+			In the following experiment we create a class of type <code>net.finmath.montecarlo.BrownianMotionLazyInit</code> which represent samples of a set of (independent) normal distributed random variables \( \Delta W(t_{i}) \) (the so called Brownian increments). The arguments of <code>BrownianMotionLazyInit</code> are <code>(timeDiscretization, numberOfFactors, numberOfPaths, seed)</code>, where numberOfFactors refers to the vector dimension of \( \Delta W(t_{i}) \). In the following we create a one factorial (one dimensional) Brownian motion:
+		</p>
+		
+		<div class="codebox">
+			JShell: 
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment1">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment1">
+				import net.finmath.montecarlo.*;
+				import net.finmath.plots.*;
+				import net.finmath.time.*;
+				
+				var td = new TimeDiscretizationFromArray(0.0, 100, 0.1);
+				var bm = new BrownianMotionLazyInit(td, 1, 10000, 3213);   // change number of paths
+				var x = bm.getBrownianIncrement(0,0);
+			</code></pre>
+		</div>
+
+		To plot a histogram of the random variable <code>x</code> enter
+		<div class="codebox">
+			JShell: 
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment1-2">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment1-2">
+				var plot = Plots.createPlotOfHistogram(x, 100, 5.0);
+				plot.setTitle("Histogram").setXAxisLabel("value").setYAxisLabel("frequency");
+				plot.show();
+			</code></pre>
+		</div>
+
+		For fun, you may also create an animation:
+		<div class="codebox">
+			JShell: 
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment1-3">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment1-3">
+				for(int i=2; i<100; i+=1) {
+					int numberOfPaths = i*i*Math.max(i/10,1);
+					Plots.updatePlotOfHistogram(plot, (new BrownianMotionLazyInit(td, 1, numberOfPaths, 3213)).getBrownianIncrement(0,0), 100, 5.0);
+					Thread.sleep(100);
+				}
+			</code></pre>
+		</div>
+
+		<center>
+			<img src="experiment-01.svg"/>
+		</center>
+
+		<h2>Experiment 2</h2>
+
+		Given a Brownian motion, we create a model (here a BlackScholesModel) and from that a simulation of this model using an Euler scheme (via EulerSchemeFromProcessModel).
+		<div class="codebox">
+			JShell: 
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment2">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment2">
+				import net.finmath.montecarlo.*;
+				import net.finmath.montecarlo.process.*;
+				import net.finmath.montecarlo.assetderivativevaluation.*;
+				import net.finmath.montecarlo.assetderivativevaluation.models.*;
+				import net.finmath.stochastic.*;
+				import net.finmath.time.*;
+				import net.finmath.plots.*;
+				
+				double modelInitialValue = 100.0;
+				double modelRiskFreeRate = 0.05;
+				double modelVolatility = 0.20;
+				
+				// Create a model
+				var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility);
+				
+				// Create a corresponding MC process
+				var td = new TimeDiscretizationFromArray(0.0, 300, 0.01);
+				var brownianMotion = new BrownianMotionLazyInit(td, 1, 10000, 3231);
+				var process = new EulerSchemeFromProcessModel(brownianMotion);
+				
+				// Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
+				var simulation = new MonteCarloAssetModel(model, process);
+				
+				// Create a function, plotting paths t -> S(t)
+				DoubleToRandomVariableFunction paths = time -> simulation.getAssetValue(time, 0 /* assetIndex */);
+				
+				// Plot 100 of paths against the given time discretization.
+				var plot = new PlotProcess2D(td, paths, 100);
+				plot.setTitle("Black Scholes model paths").setXAxisLabel("time").setYAxisLabel("value");
+				plot.show();
+			</code></pre>
+		</div>
+		
+		<center>
+			<img src="experiment-02.svg"/>
+		</center>
+		
+		<h2>Experiment 3</h2>
+		
+		We value a financial product on our simulation, that is we calculate the expectation \( E(f(S(T)) \) for, e.g. \( f(x) = \max(x - K) \). The function \( f \) represents the financial product, in the example below we use an <code>EuropeanOption</code>. The product provides a method getValue which implements \( E(f(S(T)) \) given a simulation providing S(T), in our example the object <code>simulation</code>. Note: the following requires that Experiment 2 has initialized the object <code>simulation</code>. We first create the product
+		<div class="codebox">
+			JShell: (continued from experiment 2)
+			<span style="float: right;"><button class="btn" data-clipboard-target="#createProduct">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="createProduct">
+				import net.finmath.montecarlo.assetderivativevaluation.products.*;
+				
+				double maturity = 3.0;
+				double strike = 106.0;
+				
+				var europeanOption = new EuropeanOption(maturity, strike);
+			</code></pre>
+		</div>
+
+		Given that the objects <code>simulation</code> and <code>europeanOption</code> have been initialized, we can value the product against the simulation:
+
+		<div class="codebox">
+			JShell: (continued)
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment3-1">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment3-1">
+				var valueOfEuropeanOption = europeanOption.getValue(0.0, simulation);
+				var value = valueOfEuropeanOption.average().doubleValue();
+			</code></pre>
+		</div>
+		The value reported it <code>18.115...</code>.  Request the standard error via
+		<div class="codebox">
+			JShell: (continued)
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment3-2">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment3-2">
+				valueOfEuropeanOption.getStandardError();
+			</code></pre>
+		</div>
+		<p>
+			The reported standard error is <code>0.27...</code>.
+		</p>
+		
+		<p>
+			You can plot the products payoff function and the histogram of the simulated values of \( S(T) \) where \( T \) corresponds to the <code>optionMaturity</code>:
+		</p>
+		<div class="codebox">
+			JShell: (continued)
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment3-3">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment3-3">
+				var underlying = simulation.getAssetValue(maturity, 0 /* assetIndex */);
+				
+				var plot = Plots.createPlotOfHistogramBehindValues(underlying, valueOfEuropeanOption, 100 /* bins */, 5.0 /* stddev */);
+				plot.setTitle("European option value and distribution of underlying").setXAxisLabel("underlying").setYAxisLabel("value");
+				plot.show();
+			</code></pre>
+		</div>
+
+		We may compare the value obtained from the Monte-Carlo simulation with the analytic solution using Black-Scholes formula:
+
+		<div class="codebox">
+			JShell: (continued)
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment3-4">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment3-4">
+				import net.finmath.functions.AnalyticFormulas;
+				
+				AnalyticFormulas.blackScholesOptionValue(modelInitialValue, modelRiskFreeRate, modelVolatility, maturity, strike);
+			</code></pre>
+		</div>
+
+		The value reported is 17.984... .
+
+		<center>
+			<img src="experiment-03.svg"/>
+		</center>
+
+		<h2>Summary (Experiments 1-3)</h2>
+		
+		We have created a simulation, calculated the value of a European option.
+
+		<h2>Where to continue</h2>
+		
+		You may continue with
+		<ul>
+			<li>
+				<a href="../algorithmicdifferentiation-dependencyinjection">Algorithmic Differentiation and Dependency Injection</a>
+			</li>
+		</ul>
+		
+	</body>
+</html>

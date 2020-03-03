@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>finMath.net: Experiments: Monte-Carlo Simulation, Algorithmic Differentiation and Dependency Injection</title>
+		<link rel="stylesheet" type="text/css" href="../../finmathnet-style.css"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	</head>
+	<body>
+		<!--
+		<script type="text/javascript">
+			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+		<script type="text/javascript">
+			var pageTracker = _gat._getTracker("UA-849152-2");
+			pageTracker._trackPageview();
+		</script>
+		-->
+		<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+		<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+		<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+		<script>new ClipboardJS('.btn');</script>
+
+	
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.css" rel="stylesheet" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/components/prism-core.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/plugins/autoloader/prism-autoloader.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/plugins/normalize-whitespace/prism-normalize-whitespace.js"></script>
+
+		<script type="text/javascript">
+			Prism.plugins.NormalizeWhitespace.setDefaults({
+				'remove-trailing': true,
+				'remove-indent': true,
+				'left-trim': true,
+				'right-trim': true
+				});
+		</script>
+
+		<style>
+			body {
+				font-family: "Arial";
+				line-height: 22pt;
+				font-size: 14pt;
+			}
+			.codeinline {
+				font-size: 12pt;
+			}
+			.codebox {
+				background: gainsboro;
+				border: solid 1px;
+				margin-top: 10px;
+				margin-bottom: 10px;
+				font-size: 11pt;
+			}
+			pre {
+				margin-top: 0px;
+				background: white;
+			}
+			pre > code {
+				margin-top: 0px;
+				background: white;
+				font-family: "Lucida Console";
+			}
+			.btn {
+				font-family: "Arial";
+				font-size: 14pt;
+			}
+		</style>
+		<header>
+			<span class="logo-white">finMath</span><span class="logo-red">.net</span>
+		</header>
+
+		<h1>Algorithmic Differentiation to derive Forward Sensitivities</h1>
+
+		<h1>Getting started</h1>
+
+		The experiments below use Java JShell started from a Maven project as a starting point (if you already started JShell from <code>finmath-experiments</code> you may continue in that shell, although it is safer to <code>/exit</code> that shell and restart a new one).
+		<ol>
+			<li>Open a command shell</li>
+			<li>Type <code>mkdir git</code> (to create a folder <code>git</code>, if you do not have one)</li>
+			<li>Type <code>cd git</code> (to enter your  <code>git</code> folder)</li>
+			<li>Next, clone (i.e. download) the repository (<code>git</code>), change to the cloned directory (<code>cd</code>) and start jshell via Maven (<code>mvn</code>) by typing the following three commands:</li>
+		</ol>
+        
+		<div class="codebox">
+			Terminal Window
+			<span style="float: right;"><button class="btn" data-clipboard-target="#setup1">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-sh" id="setup1">
+				git clone https://github.com/finmath/finmath-experiments        
+				cd finmath-experiments
+				mvn clean compile jshell:run
+			</code></pre>
+		</div>
+
+		<h1>Experiment 0: Monte-Carlo Simulation and Valuation (Recap)</h1>
+
+		Run the following experiment from your JShell (which was launched from finmath-experiments).
+
+		<h2>Initial Setup</h2>
+
+		<p>
+			In the <a href="../montecarlo-blackscholes">experiments on the Monte-Carlo simulation</a> a simulation object and a product object has been created and the delta of option has been evaluated using finite difference. Repeat this:
+		</p>
+
+		<p>
+			Create the model and its simulation:
+		</p>
+		<div class="codebox">
+			JShell: 
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment2">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment2">
+				import net.finmath.montecarlo.*;
+				import net.finmath.montecarlo.assetderivativevaluation.*;
+				import net.finmath.montecarlo.assetderivativevaluation.models.*;
+				import net.finmath.montecarlo.automaticdifferentiation.*;
+				import net.finmath.montecarlo.automaticdifferentiation.backward.*;
+				import net.finmath.montecarlo.process.*;
+				import net.finmath.time.*;
+				
+				double modelInitialValue = 100.0;
+				double modelRiskFreeRate = 0.05;
+				double modelVolatility = 0.20;
+				
+				RandomVariableFactory randomVariableFactory = new RandomVariableDifferentiableAADFactory();
+				
+				// Create a model
+				var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility, randomVariableFactory);
+				
+				// Create a corresponding MC process
+				var td = new TimeDiscretizationFromArray(0.0, 300, 0.01);
+				var brownianMotion = new BrownianMotionLazyInit(td, 1, 10000, 3231);
+				var process = new EulerSchemeFromProcessModel(brownianMotion);
+				
+				// Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
+				var simulation = new MonteCarloAssetModel(model, process);
+			</code></pre>
+		</div>
+		
+		<p>
+			Create the product:
+		</p>
+		<div class="codebox">
+			JShell:
+			<span style="float: right;"><button class="btn" data-clipboard-target="#createProduct">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="createProduct">
+				import net.finmath.montecarlo.assetderivativevaluation.products.*;
+				
+				double maturity = 3.0;
+				double strike = 106.0;
+				
+				var europeanOption = new EuropeanOption(maturity, strike);
+			</code></pre>
+		</div>
+
+		<h2>Experiment 1 - Dynamic delta hedge using algorithmic differentiation (requires run of "Initial Setup")</h2>
+
+		<p>
+			The class <code>DeltaHedgedPortfolioWithAAD</code> takes <i>any</i> financial product (any object implementing <code>AssetMonteCarloProduct</code>) and performs a so called “delta hedge” (on the <code>simulation</code>'s time discretization). It uses AAD to calculate the delta \( \phi(t,\omega_{k}) = V(T,\omega_{k}) / S(t,\omega_{k}) \) and constructs the hedge portfolio (replication portfolio) from it.
+		</p>
+
+		<p>
+			<b style="color: red;">Important: We will first conduct an experiment which will (likely) give wrong results. We will then fix the issue.</b>
+		</p>
+
+		<div class="codebox">
+			JShell: (continued)
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment4">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment4">
+				import net.finmath.plots.*;
+
+				var hedge = new DeltaHedgedPortfolioWithAAD(europeanOption);
+				var underlyingAtMaturity = simulation.getAssetValue(maturity, 0);
+				var hedgeValue = hedge.getValue(maturity, simulation);
+
+				var plot = Plots.createPlotScatter(underlyingAtMaturity, hedgeValue, 50.0, 110.0);
+				plot.setTitle("Hedge Portfolio").setXAxisLabel("underlying").setYAxisLabel("portfolio value");
+				plot.show();
+			</code></pre>
+		</div>
+
+		<p>
+		The result of this experiment is a hedge portfolio which is constant at maturities. The reason is that all values of delta are 0 (except the one at the initial time t0).
+In the default setting, the algorithm implemented in RandomVariableDifferentiableAAD will only retain derivatives of the leaf nodes of the operator tree. It does not retain the derivatives of intermediate values (since this consumes a significant amount of memory).
+We can change this by passing a property to the RandomVariableDifferentiableAADFactory.
+		</p>
+		
+		<p>
+			Re-create the model and its simulation (with the modified <code>RandomVariableDifferentiableAADFactory</code>):
+		</p>
+		<div class="codebox">
+			JShell: 
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment5">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment5">
+				import net.finmath.montecarlo.*;
+				import net.finmath.montecarlo.automaticdifferentiation.*;
+				import net.finmath.montecarlo.automaticdifferentiation.backward.*;
+				
+				Map&lt;String, Object&gt; properties = Map.of("isGradientRetainsLeafNodesOnly", false);		// CHANGE MADE HERE
+				RandomVariableFactory randomVariableFactory = new RandomVariableDifferentiableAADFactory(properties);
+				
+				// Create a model
+				var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility, randomVariableFactory);
+				
+				// Create a corresponding MC process
+				var td = new TimeDiscretizationFromArray(0.0, 300, 0.01);
+				var brownianMotion = new BrownianMotionLazyInit(td, 1, 10000, 3231);
+				var process = new EulerSchemeFromProcessModel(brownianMotion);
+				
+				// Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
+				var simulation = new MonteCarloAssetModel(model, process);
+			</code></pre>
+		</div>
+
+		Now perform the hedge simulation on the newly created simulation.
+		<div class="codebox">
+			JShell: (continued)
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment6">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment6">
+				import net.finmath.plots.*;
+
+				var hedge = new DeltaHedgedPortfolioWithAAD(europeanOption);
+				var underlyingAtMaturity = simulation.getAssetValue(maturity, 0);
+				var hedgeValue = hedge.getValue(maturity, simulation);
+
+				var plot = Plots.createPlotScatter(underlyingAtMaturity, hedgeValue, 50.0, 110.0);
+				plot.setTitle("Hedge Portfolio").setXAxisLabel("underlying").setYAxisLabel("portfolio value");
+				plot.show();
+			</code></pre>
+		</div>
+
+	</body>
+</html>

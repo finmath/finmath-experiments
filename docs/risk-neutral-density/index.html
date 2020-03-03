@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>finMath.net: Experiments: Risk Neutral Density</title>
+		<link rel="stylesheet" type="text/css" href="../../finmathnet-style.css"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	</head>
+	<body>
+		<!--
+		<script type="text/javascript">
+			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+		<script type="text/javascript">
+			var pageTracker = _gat._getTracker("UA-849152-2");
+			pageTracker._trackPageview();
+		</script>
+		-->
+		<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+		<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+		<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+		<script>new ClipboardJS('.btn');</script>
+
+	
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.css" rel="stylesheet" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/components/prism-core.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/plugins/autoloader/prism-autoloader.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/plugins/normalize-whitespace/prism-normalize-whitespace.js"></script>
+
+		<script type="text/javascript">
+			Prism.plugins.NormalizeWhitespace.setDefaults({
+				'remove-trailing': true,
+				'remove-indent': true,
+				'left-trim': true,
+				'right-trim': true
+				});
+		</script>
+
+		<style>
+			body {
+				font-family: "Arial";
+				line-height: 22pt;
+				font-size: 14pt;
+			}
+			.codeinline {
+				font-size: 12pt;
+			}
+			.codebox {
+				background: gainsboro;
+				border: solid 1px;
+				margin-top: 10px;
+				margin-bottom: 10px;
+				font-size: 11pt;
+			}
+			pre {
+				margin-top: 0px;
+				background: white;
+			}
+			pre > code {
+				margin-top: 0px;
+				background: white;
+				font-family: "Lucida Console";
+			}
+			.btn {
+				font-family: "Arial";
+				font-size: 14pt;
+			}
+		</style>
+		<header>
+			<span class="logo-white">finMath</span><span class="logo-red">.net</span>
+		</header>
+
+		<h1>Risk Neutral Density</h1>
+
+		<h1>Getting started</h1>
+
+		The experiments below use Java JShell started from a Maven project as a starting point (if you already started JShell from <code>finmath-experiments</code> you may continue in that shell, although it is safer to <code>/exit</code> that shell and restart a new one).
+		<ol>
+			<li>Open a command shell</li>
+			<li>Type <code>mkdir git</code> (to create a folder <code>git</code>, if you do not have one)</li>
+			<li>Type <code>cd git</code> (to enter your  <code>git</code> folder)</li>
+			<li>Next, clone (i.e. download) the repository (<code>git</code>), change to the cloned directory (<code>cd</code>) and start jshell via Maven (<code>mvn</code>) by typing the following three commands:</li>
+		</ol>
+        
+		<div class="codebox">
+			Terminal Window
+			<span style="float: right;"><button class="btn" data-clipboard-target="#setup1">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-sh" id="setup1">
+				git clone https://github.com/finmath/finmath-experiments        
+				cd finmath-experiments
+				mvn clean compile jshell:run
+			</code></pre>
+		</div>
+
+		<h1>Experiment 1-2: Risk neutral density/h1>
+
+		Run the following experiment from your JShell (which was launched from finmath-experiments).
+
+		<h2>Experiment 1</h2>
+
+		The following will plot the value of a European option as a function of the strike.
+
+		<div class="codebox">
+			JShell: 
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment1">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment1">
+				DoubleUnaryOperator value = strike -> net.finmath.functions.AnalyticFormulas.blackScholesOptionValue(100.0, 0.05, 0.20, 2.0, strike);
+				(new net.finmath.plots.Plot2D(0.0, 300.0, 100, value)).show();
+			</code></pre>
+		</div>
+
+		<h2>Experiment 2</h2>
+
+		<p>
+			In the following we plot the finite difference approximation of the second derivative of the value of the European option.
+		</p>
+		
+		<div class="codebox">
+			JShell: 
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment2">Copy to clipboard</button></span>
+			<pre class="prettyprint"><code class="language-java" id="experiment2">
+				import net.finmath.functions.AnalyticFormulas;
+				import net.finmath.plots.Plot2D;
+				
+				DoubleUnaryOperator value = strike -> AnalyticFormulas.blackScholesOptionValue(100.0, 0.05, 0.20, 2.0, strike);
+
+				double h = 1E-2;
+				DoubleUnaryOperator secondDerivative = strike -> (value.applyAsDouble(strike+h) - 2*value.applyAsDouble(strike) + value.applyAsDouble(strike-h))/(2*h);
+
+				Plot2D plot = new Plot2D(0.0, 300.0, 100, secondDerivative);
+				plot.setYAxisNumberFormat(new java.text.DecimalFormat("0.0E00"));
+				plot.setXAxisLabel("strike").setYAxisLabel("frequency");
+				plot.show();
+			</code></pre>
+		</div>
+
+		<center>
+			<img src="experiment-02.svg"/>
+		</center>
+
+		<h2>Summary (Experiments 1-2)</h2>
+		
+		We have created a plot of the value and the second derivative of the Black-Scholes formula.
+		The second derivative of the value with respect to the price is (up to a scaling) the probability density of the underlying stock at maturity (under the terminal measure).
+
+		<h2>Where to continue</h2>
+		
+		You may continue with
+		<ul>
+			<li>
+				<a href="montecarlo-blackscholes">Monte-Carlo Simulation</a>
+			</li>
+		</ul>
+		
+	</body>
+</html>

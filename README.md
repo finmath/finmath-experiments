@@ -3,25 +3,31 @@ finmath experiments
 
 Experiments and demos based on finmath lib.
 
+See also http://finmath.net/experiments/
+
 Projects
 --------
-
-You will find several project in the repository.
 
 **finmath lib**  
     Java library providing implementations of methodologies related to
     mathematical finance, but applicable to other fields (e.g., the
     Monte-Carlo simulation of SDEs and the estimation of conditional
     expectations in Monte-Carlo).
+    See http://finmath.net/finmath-lib
 
 **finmath spreadsheets**  
     A collection of spreadsheets building upon *finmath lib* and
     providing end user solutions (e.g, interest rate curve calibration
     or calibration of a forward rate model, aka LIBOR market model).
+    See http://finmath.net/spreadsheets/
 
 **finmath experiments**  
     Small experiments, illustrating some aspects of mathematical
     finance. Also illustrates how to use the finmath lib.
+
+**finmath lib plot extensions**
+	Convenient abstractions of some plotting libraries and example usages of finmath lib.
+	See http://finmath.net/finmath-lib-plot-extensions/
     
 
 Documentation

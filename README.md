@@ -3,7 +3,7 @@ finmath experiments
 
 Experiments and demos based on finmath lib.
 
-See also http://finmath.net/experiments/
+See also http://finmath.github.io/finmath-experiments/
 
 Projects
 --------

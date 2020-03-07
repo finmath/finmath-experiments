@@ -29,6 +29,11 @@
 		</license>
 	</licenses>
 
+	<organization>
+		<name>finmath.net</name>
+		<url>http://finmath.net</url>
+	</organization>
+
 	<developers>
 		<developer>
 			<id>fries</id>

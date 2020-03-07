@@ -1,5 +1,5 @@
 /* 
- * Run the experiments below from jshell lauching the shell from this project via Maven.
+ * Run the experiments below from jshell launching the shell from this project via Maven.
  * 
  * 		mvn clean compile jshell:run
  * 
@@ -15,7 +15,7 @@ import net.finmath.plots.*;
 import net.finmath.time.*;
 
 var td = new TimeDiscretizationFromArray(0.0, 100, 0.1);
-var bm = new BrownianMotionLazyInit(td, 1, 1000, 3213);   // change number of paths
+var bm = new BrownianMotionLazyInit(td, 1, 10000, 3213);   // change number of paths
 var x = bm.getBrownianIncrement(0,0);
 
 var plot = Plots.createPlotOfHistogram(x, 100, 5.0);
@@ -90,6 +90,11 @@ var plot = Plots.createPlotOfHistogramBehindValues(underlying, valueOfEuropeanOp
 plot.setTitle("European option value and distribution of underlying").setXAxisLabel("underlying").setYAxisLabel("value");
 plot.show();
 
+
+// EXPERIMENT 3b - compare with analytic value - (requires run of experiment 2 and 3)
+
+import net.finmath.functions.AnalyticFormulas;
+AnalyticFormulas.blackScholesOptionValue(modelInitialValue, modelRiskFreeRate, modelVolatility, maturity, strike);
 
 
 // EXPERIMENT 4 - Finite difference dV/dS(0) = V(M(S(0)+h))-V(M(S(0)-h)) / (2h)   (requires run of experiment 3)

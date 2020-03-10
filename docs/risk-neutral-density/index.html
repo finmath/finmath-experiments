@@ -102,6 +102,8 @@
 		<h2>Experiment 1</h2>
 
 		The following will plot the value of a European option as a function of the strike.
+		That is \( V(0) = E^{\mathbb{Q}}\left( V(T,K) \frac{N(0)}{N(T)}\right) \) where \( V(T,K) = \max(S(T)-K,0) \) is the payoff function
+		and \( N(T) = \exp(r T) \) is a numeraire.
 
 		<div class="codebox">
 			JShell: 
@@ -112,10 +114,20 @@
 			</code></pre>
 		</div>
 
+		<center>
+			<img src="experiment-01.svg"/>
+		</center>
+
 		<h2>Experiment 2</h2>
 
 		<p>
 			In the following we plot the finite difference approximation of the second derivative of the value of the European option.
+			
+			It can be shown that the second derivative of \( V \) with respect to \( K \) is
+			related to the probability density of \( S(T) \) under \( \mathbb{Q} \), that is
+			\[
+				\frac{\partial V(T,K)}{\partial K} \ = \ \phi_{S(T)}(K) \ \frac{N(0)}{N(T)} \text{.}
+			\]
 		</p>
 		
 		<div class="codebox">

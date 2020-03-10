@@ -22,17 +22,17 @@ public class MonteCarloSchemeTests {
 						+ "of log(S(T)), generated using a numerical scheme for S, to the analytic values.\n"
 						+ "Output shows the error \u0394m (error on mean) and \u0394V (error on variance) comparint to theoretical mean and variance at time T.\n");
 
-		double initialValue = 1.0;
-		double sigma = 0.5;				// Note: Try different sigmas: 0.2, 0.5, 0.7, 0.9
-		int numberOfPath = 100000;		// Note: Try different number of path. For 10000000 you need around 6 GB (parameter is -mx6G)
-		double lastTime = 10.0;
+		final double initialValue = 1.0;
+		final double sigma = 0.5;				// Note: Try different sigmas: 0.2, 0.5, 0.7, 0.9
+		final int numberOfPath = 100000;		// Note: Try different number of path. For 10000000 you need around 6 GB (parameter is -mx6G)
+		final double lastTime = 10.0;
 
 		for(int numberOfTimeSteps=1; numberOfTimeSteps<=2002; numberOfTimeSteps+=20)
 		{
-			double deltaT = lastTime/numberOfTimeSteps;
+			final double deltaT = lastTime/numberOfTimeSteps;
 
 			// Create an instance of the Euler scheme class
-			LogProcessEulerScheme eulerScheme = new LogProcessEulerScheme(
+			final LogProcessEulerScheme eulerScheme = new LogProcessEulerScheme(
 					numberOfTimeSteps,	// numberOfTimeSteps
 					deltaT,				// deltaT
 					numberOfPath,		// numberOfPaths
@@ -40,7 +40,7 @@ public class MonteCarloSchemeTests {
 					sigma);				// sigma
 
 			// Create an instance of the euler scheme class
-			LogProcessMilsteinScheme milsteinScheme = new LogProcessMilsteinScheme(
+			final LogProcessMilsteinScheme milsteinScheme = new LogProcessMilsteinScheme(
 					numberOfTimeSteps,	// numberOfTimeSteps
 					deltaT,				// deltaT
 					numberOfPath,		// numberOfPaths
@@ -48,7 +48,7 @@ public class MonteCarloSchemeTests {
 					sigma);				// sigma
 
 			// Create an instance of the euler scheme class
-			LogProcessExpEulerScheme expEulerScheme = new LogProcessExpEulerScheme(
+			final LogProcessExpEulerScheme expEulerScheme = new LogProcessExpEulerScheme(
 					numberOfTimeSteps,	// numberOfTimeSteps
 					deltaT,				// deltaT
 					numberOfPath,		// numberOfPaths
@@ -56,34 +56,34 @@ public class MonteCarloSchemeTests {
 					sigma);				// sigma
 
 			// Get start time of calculation
-			double startMillis = System.currentTimeMillis();
+			final double startMillis = System.currentTimeMillis();
 
-			int		lastTimeIndex	= eulerScheme.getNumberOfTimeSteps();
+			final int		lastTimeIndex	= eulerScheme.getNumberOfTimeSteps();
 
-			double	averageEuler	= eulerScheme.getAverageOfLog( lastTimeIndex );
-			double	averageMilstein	= milsteinScheme.getAverageOfLog( lastTimeIndex );
-			double	averageExpEuler	= expEulerScheme.getAverageOfLog( lastTimeIndex );
-			double	averageAnalytic	= Math.log(initialValue)-(0.5 * sigma * sigma * (lastTimeIndex * deltaT) );
+			final double	averageEuler	= eulerScheme.getAverageOfLog( lastTimeIndex );
+			final double	averageMilstein	= milsteinScheme.getAverageOfLog( lastTimeIndex );
+			final double	averageExpEuler	= expEulerScheme.getAverageOfLog( lastTimeIndex );
+			final double	averageAnalytic	= Math.log(initialValue)-(0.5 * sigma * sigma * (lastTimeIndex * deltaT) );
 
-			double	varianceEuler		= eulerScheme.getVarianceOfLog( lastTimeIndex );
-			double	varianceMilstein	= milsteinScheme.getVarianceOfLog( lastTimeIndex );
-			double	varianceExpEuler	= expEulerScheme.getVarianceOfLog( lastTimeIndex );
-			double	varianceAnalytic	= sigma * sigma * (lastTimeIndex * deltaT);
+			final double	varianceEuler		= eulerScheme.getVarianceOfLog( lastTimeIndex );
+			final double	varianceMilstein	= milsteinScheme.getVarianceOfLog( lastTimeIndex );
+			final double	varianceExpEuler	= expEulerScheme.getVarianceOfLog( lastTimeIndex );
+			final double	varianceAnalytic	= sigma * sigma * (lastTimeIndex * deltaT);
 
 			// Get end time of calculation
-			double endMillis = System.currentTimeMillis();
+			final double endMillis = System.currentTimeMillis();
 
-			double calculationTimeInSeconds = ((float)( endMillis - startMillis )) / 1000.0;
+			final double calculationTimeInSeconds = ((float)( endMillis - startMillis )) / 1000.0;
 
 			// Print result
-			DecimalFormat decimalFormatPercent = new DecimalFormat("0.000%");
-			DecimalFormat decimalFormatInteger = new DecimalFormat("000");
-			double errorAverageEuler     = Math.abs(averageEuler    - averageAnalytic);
-			double errorVarianceEuler    = Math.abs(varianceEuler   - varianceAnalytic);
-			double errorAverageExpEuler  = Math.abs(averageExpEuler - averageAnalytic);
-			double errorVarianceExpEuler = Math.abs(varianceExpEuler- varianceAnalytic);
-			double errorAverageMilstein  = Math.abs(averageMilstein - averageAnalytic);
-			double errorVarianceMilstein = Math.abs(varianceMilstein- varianceAnalytic);
+			final DecimalFormat decimalFormatPercent = new DecimalFormat("0.000%");
+			final DecimalFormat decimalFormatInteger = new DecimalFormat("000");
+			final double errorAverageEuler     = Math.abs(averageEuler    - averageAnalytic);
+			final double errorVarianceEuler    = Math.abs(varianceEuler   - varianceAnalytic);
+			final double errorAverageExpEuler  = Math.abs(averageExpEuler - averageAnalytic);
+			final double errorVarianceExpEuler = Math.abs(varianceExpEuler- varianceAnalytic);
+			final double errorAverageMilstein  = Math.abs(averageMilstein - averageAnalytic);
+			final double errorVarianceMilstein = Math.abs(varianceMilstein- varianceAnalytic);
 
 			System.out.print("Path =" + numberOfPath);
 			System.out.print("\tSteps=" + decimalFormatInteger.format(numberOfTimeSteps));

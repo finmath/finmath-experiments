@@ -64,8 +64,8 @@ public class BlackScholesOptionCalculator extends JApplet implements ActionListe
 	 * @param argv not used
 	 */
 	public static void main (String argv[]) {
-		JApplet applet = new BlackScholesOptionCalculator();
-		JFrame frame = new JFrame("BlackScholesOptionCalculator");			// create graphics frame
+		final JApplet applet = new BlackScholesOptionCalculator();
+		final JFrame frame = new JFrame("BlackScholesOptionCalculator");			// create graphics frame
 		frame.getContentPane().add(applet);									// add the applet
 		frame.setSize(500,300);
 		applet.init();														// initialise applet
@@ -76,6 +76,7 @@ public class BlackScholesOptionCalculator extends JApplet implements ActionListe
 	/* (non-Javadoc)
 	 * @see java.applet.Applet#init()
 	 */
+	@Override
 	public void init() {
 		this.setSize(450, 250);
 		this.setContentPane(getAppletPanel());
@@ -83,16 +84,17 @@ public class BlackScholesOptionCalculator extends JApplet implements ActionListe
 		this.actionPerformed(new ActionEvent(this, 0, "init"));
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		// If the is an input in any field, this method will be called
 		if(e.getSource() == optionValue) {
 			// Value was changed, calculate implied volatility
-			double payoffUnit	= Math.exp(-this.riskFreeRate.getDoubleValue()* this.optionMaturity.getDoubleValue());
-			double forward		= this.spot.getDoubleValue() / payoffUnit;
-			double impliedVolatility = net.finmath.functions.AnalyticFormulas.blackScholesOptionImpliedVolatility(forward, this.optionMaturity.getDoubleValue(), this.optionStrike.getDoubleValue(), payoffUnit, this.optionValue.getDoubleValue());
+			final double payoffUnit	= Math.exp(-this.riskFreeRate.getDoubleValue()* this.optionMaturity.getDoubleValue());
+			final double forward		= this.spot.getDoubleValue() / payoffUnit;
+			final double impliedVolatility = net.finmath.functions.AnalyticFormulas.blackScholesOptionImpliedVolatility(forward, this.optionMaturity.getDoubleValue(), this.optionStrike.getDoubleValue(), payoffUnit, this.optionValue.getDoubleValue());
 			this.volatility.setValue(impliedVolatility);
 		}
-		double value = net.finmath.functions.AnalyticFormulas.blackScholesOptionValue(this.spot.getDoubleValue(), this.riskFreeRate.getDoubleValue(), this.volatility.getDoubleValue(), this.optionMaturity.getDoubleValue(), this.optionStrike.getDoubleValue());
+		final double value = net.finmath.functions.AnalyticFormulas.blackScholesOptionValue(this.spot.getDoubleValue(), this.riskFreeRate.getDoubleValue(), this.volatility.getDoubleValue(), this.optionMaturity.getDoubleValue(), this.optionStrike.getDoubleValue());
 		this.optionValue.setValue(value);
 	}
 

@@ -19,9 +19,9 @@ public class PseudoRandomNumberSequence {
 		MERSENNE_TWISTER
 	}
 
-	private RandomNumberGeneratorType	type;
-	private long						seed;
-	private int							length;
+	private final RandomNumberGeneratorType	type;
+	private final long						seed;
+	private final int							length;
 	private double[]					randomNumbers;
 
 
@@ -56,7 +56,9 @@ public class PseudoRandomNumberSequence {
 	}
 
 	public double getRandomNumber(int index) {
-		if(randomNumbers == null || randomNumbers.length < length) initRandomNumbers();
+		if(randomNumbers == null || randomNumbers.length < length) {
+			initRandomNumbers();
+		}
 		return randomNumbers[index];
 	}
 
@@ -66,14 +68,14 @@ public class PseudoRandomNumberSequence {
 		// Create random number sequence
 		switch(type) {
 		case LCG_JAVA:
-			Random lcgJava = new Random(seed);
+			final Random lcgJava = new Random(seed);
 			for(int numberIndex=0; numberIndex < length; numberIndex++) {
 				randomNumbers[numberIndex] = lcgJava.nextDouble();
 			}
 			break;
 		case MERSENNE_TWISTER:
 		default:
-			MersenneTwister mersenneTwister = new MersenneTwister(seed);
+			final MersenneTwister mersenneTwister = new MersenneTwister(seed);
 			for(int numberIndex=0; numberIndex < length; numberIndex++) {
 				randomNumbers[numberIndex] = mersenneTwister.nextDouble();
 			}

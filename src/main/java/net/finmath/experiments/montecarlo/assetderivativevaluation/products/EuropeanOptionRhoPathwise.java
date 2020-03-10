@@ -20,8 +20,8 @@ import net.finmath.stochastic.RandomVariableAccumulator;
  */
 public class EuropeanOptionRhoPathwise extends AbstractAssetMonteCarloProduct {
 
-	private double	maturity;
-	private double	strike;
+	private final double	maturity;
+	private final double	strike;
 
 	/**
 	 * Construct a product representing an European option on an asset S (where S the asset with index 0 from the model - single asset case).
@@ -48,16 +48,16 @@ public class EuropeanOptionRhoPathwise extends AbstractAssetMonteCarloProduct {
 		try {
 			blackScholesModel = (MonteCarloBlackScholesModel)model;
 		}
-		catch(Exception e) {
+		catch(final Exception e) {
 			throw new ClassCastException("This method requires a Black-Scholes type model (MonteCarloBlackScholesModel).");
 		}
 
 		// Get underlying and numeraire
-		RandomVariable underlyingAtMaturity	= model.getAssetValue(maturity,0);
-		RandomVariable numeraireAtMaturity		= model.getNumeraire(maturity);
-		RandomVariable underlyingAtToday		= model.getAssetValue(0.0,0);
-		RandomVariable numeraireAtToday		= model.getNumeraire(0);
-		RandomVariable monteCarloWeights		= model.getMonteCarloWeights(maturity);
+		final RandomVariable underlyingAtMaturity	= model.getAssetValue(maturity,0);
+		final RandomVariable numeraireAtMaturity		= model.getNumeraire(maturity);
+		final RandomVariable underlyingAtToday		= model.getAssetValue(0.0,0);
+		final RandomVariable numeraireAtToday		= model.getNumeraire(0);
+		final RandomVariable monteCarloWeights		= model.getMonteCarloWeights(maturity);
 
 		/*
 		 *  The following way of calculating the expected value (average) is discouraged since it makes too strong
@@ -70,11 +70,11 @@ public class EuropeanOptionRhoPathwise extends AbstractAssetMonteCarloProduct {
 			if(underlyingAtMaturity.get(path) > strike)
 			{
 				// Get some model parameters
-				double T		= maturity;
-				double ST		= underlyingAtMaturity.get(path);
+				final double T		= maturity;
+				final double ST		= underlyingAtMaturity.get(path);
 
-				double payOff			= 1;
-				double modifiedPayoff	= payOff * ST * T - (ST-strike) * T;
+				final double payOff			= 1;
+				final double modifiedPayoff	= payOff * ST * T - (ST-strike) * T;
 
 				average += modifiedPayoff / numeraireAtMaturity.get(path) * monteCarloWeights.get(path) * numeraireAtToday.get(path);
 			}

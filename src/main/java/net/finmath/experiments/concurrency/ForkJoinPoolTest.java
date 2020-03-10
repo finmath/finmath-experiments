@@ -68,14 +68,14 @@ public class ForkJoinPoolTest {
 				if(isUseInnerStream) {
 					try {
 						Thread.sleep(10*numberOfTasksInInnerLoop);
-					} catch (Exception e) {
+					} catch (final Exception e) {
 					}
 					runCodeWhichUsesParallelStream(i, Thread.currentThread().toString());
 				}
 				else {
 					try {
 						Thread.sleep(10*numberOfTasksInInnerLoop);
-					} catch (Exception e) {
+					} catch (final Exception e) {
 					}
 				}
 			}
@@ -96,7 +96,7 @@ public class ForkJoinPoolTest {
 	 */
 	private void runCodeWhichUsesParallelStream(int i, String callingThread) {
 
-		Runnable innerLoop = new Runnable() {
+		final Runnable innerLoop = new Runnable() {
 			@Override
 			public void run() {
 				// Inner loop
@@ -104,18 +104,18 @@ public class ForkJoinPoolTest {
 					try {
 						System.out.println(i + "\t" + j + "\t" + concurrentExecutions.availablePermits() + "\t" + callingThread + "\t" + Thread.currentThread());
 						Thread.sleep(10);
-					} catch (Exception e) {
+					} catch (final Exception e) {
 					}
 				});
 			}
 		};
 
 		if(isWrappedInnerLoopThread) {
-			Thread t = new Thread(innerLoop, "Wrapper Thread");
+			final Thread t = new Thread(innerLoop, "Wrapper Thread");
 			try {
 				t.start();
 				t.join();
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 			}
 		}
 		else {

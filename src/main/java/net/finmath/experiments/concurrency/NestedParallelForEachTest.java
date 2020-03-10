@@ -67,7 +67,7 @@ public class NestedParallelForEachTest {
 
 	public void testNestedLoops() {
 
-		long start = System.currentTimeMillis();
+		final long start = System.currentTimeMillis();
 
 		System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism",Integer.toString(concurrentExecutionsLimitForStreams));
 		System.out.println("java.util.concurrent.ForkJoinPool.common.parallelism = " + System.getProperty("java.util.concurrent.ForkJoinPool.common.parallelism"));
@@ -76,7 +76,9 @@ public class NestedParallelForEachTest {
 		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
 
 			try {
-				if(i < 10) burnTime(10 * 1000);
+				if(i < 10) {
+					burnTime(10 * 1000);
+				}
 
 				System.out.println(i + "\t" + Thread.currentThread());
 
@@ -93,12 +95,14 @@ public class NestedParallelForEachTest {
 					});
 				}
 
-				if(i >= 10) burnTime(10 * 1000);
-			} catch (Exception e) { e.printStackTrace(); }
+				if(i >= 10) {
+					burnTime(10 * 1000);
+				}
+			} catch (final Exception e) { e.printStackTrace(); }
 
 		});
 
-		long end = System.currentTimeMillis();
+		final long end = System.currentTimeMillis();
 
 		System.out.println("Done in " + (end-start)/1000 + " sec.");
 	}
@@ -114,19 +118,19 @@ public class NestedParallelForEachTest {
 		else {
 			try {
 				Thread.sleep(millis);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			return (double)millis;
+			return millis;
 		}
 	}
 
 	private void wrapInThread(Runnable runnable) {
-		Thread t = new Thread(runnable, "Wrapper Thread");
+		final Thread t = new Thread(runnable, "Wrapper Thread");
 		try {
 			t.start();
 			t.join();
-		} catch (InterruptedException e) { }
+		} catch (final InterruptedException e) { }
 	}
 }

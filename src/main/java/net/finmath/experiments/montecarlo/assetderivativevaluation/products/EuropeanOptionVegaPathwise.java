@@ -20,8 +20,8 @@ import net.finmath.stochastic.RandomVariableAccumulator;
  */
 public class EuropeanOptionVegaPathwise extends AbstractAssetMonteCarloProduct {
 
-	private double	maturity;
-	private double	strike;
+	private final double	maturity;
+	private final double	strike;
 
 	/**
 	 * Construct a product representing an European option on an asset S (where S the asset with index 0 from the model - single asset case).
@@ -48,16 +48,16 @@ public class EuropeanOptionVegaPathwise extends AbstractAssetMonteCarloProduct {
 		try {
 			blackScholesModel = (MonteCarloBlackScholesModel)model;
 		}
-		catch(Exception e) {
+		catch(final Exception e) {
 			throw new ClassCastException("This method requires a Black-Scholes type model (MonteCarloBlackScholesModel).");
 		}
 
 		// Get underlying and numeraire
-		RandomVariable underlyingAtMaturity	= model.getAssetValue(maturity,0);
-		RandomVariable numeraireAtMaturity	= model.getNumeraire(maturity);
-		RandomVariable underlyingAtToday		= model.getAssetValue(0.0,0);
-		RandomVariable numeraireAtToday		= model.getNumeraire(0);
-		RandomVariable monteCarloWeights		= model.getMonteCarloWeights(maturity);
+		final RandomVariable underlyingAtMaturity	= model.getAssetValue(maturity,0);
+		final RandomVariable numeraireAtMaturity	= model.getNumeraire(maturity);
+		final RandomVariable underlyingAtToday		= model.getAssetValue(0.0,0);
+		final RandomVariable numeraireAtToday		= model.getNumeraire(0);
+		final RandomVariable monteCarloWeights		= model.getMonteCarloWeights(maturity);
 
 		/*
 		 *  The following way of calculating the expected value (average) is discouraged since it makes too strong
@@ -70,16 +70,16 @@ public class EuropeanOptionVegaPathwise extends AbstractAssetMonteCarloProduct {
 			if(underlyingAtMaturity.get(path) > strike)
 			{
 				// Get some model parameters
-				double T		= maturity;
-				double S0		= underlyingAtToday.get(path);
-				double r		= blackScholesModel.getModel().getRiskFreeRate().doubleValue();
-				double sigma	= blackScholesModel.getModel().getVolatility().doubleValue();
+				final double T		= maturity;
+				final double S0		= underlyingAtToday.get(path);
+				final double r		= blackScholesModel.getModel().getRiskFreeRate().doubleValue();
+				final double sigma	= blackScholesModel.getModel().getVolatility().doubleValue();
 
-				double ST		= underlyingAtMaturity.get(path);
-				double WT		= (Math.log(ST/S0) - r * T + 0.5 * sigma * sigma * T)/sigma;
+				final double ST		= underlyingAtMaturity.get(path);
+				final double WT		= (Math.log(ST/S0) - r * T + 0.5 * sigma * sigma * T)/sigma;
 
-				double payOff			= 1;
-				double modifiedPayoff	= payOff * ST * (-sigma * T + WT);
+				final double payOff			= 1;
+				final double modifiedPayoff	= payOff * ST * (-sigma * T + WT);
 
 				average += modifiedPayoff / numeraireAtMaturity.get(path) * monteCarloWeights.get(path) * numeraireAtToday.get(path);
 			}

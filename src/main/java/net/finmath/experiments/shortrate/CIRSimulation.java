@@ -12,21 +12,21 @@ public class CIRSimulation {
 	/*
 	 * Model parameters
 	 */
-	private double initialValue;
-	private double b;
-	private double beta;
-	private double sigma;
+	private final double initialValue;
+	private final double b;
+	private final double beta;
+	private final double sigma;
 
 	/*
 	 * Discretization parameters
 	 */
-	private double numberOfPaths;
-	private double deltaT;
+	private final double numberOfPaths;
+	private final double deltaT;
 
 	/*
 	 * Product parameters
 	 */
-	private double maturity;
+	private final double maturity;
 
 	public CIRSimulation(
 			double initialValue,
@@ -53,18 +53,18 @@ public class CIRSimulation {
 	 */
 	public static void main(String[] args)
 	{
-		double	initialValue   = 0.01;
-		double	b              = 0.05;
-		double	beta           = 1.3;
-		double  sigma          = 0.05;
+		final double	initialValue   = 0.01;
+		final double	b              = 0.05;
+		final double	beta           = 1.3;
+		final double  sigma          = 0.05;
 
 		// Process discretization properties
-		int		numberOfPaths	    = 10000;
-		double	deltaT				= 0.001;
+		final int		numberOfPaths	    = 10000;
+		final double	deltaT				= 0.001;
 
-		double  maturity            = 1;
+		final double  maturity            = 1;
 
-		CIRSimulation cirSimulationTest = new CIRSimulation(initialValue,b,beta,sigma,maturity,numberOfPaths,deltaT);
+		final CIRSimulation cirSimulationTest = new CIRSimulation(initialValue,b,beta,sigma,maturity,numberOfPaths,deltaT);
 
 		System.out.println("              Analytic value: " + cirSimulationTest.valueAnalytic());
 		System.out.println("Monte-Carlo simulation value: " + cirSimulationTest.valueMonteCarlo());
@@ -73,11 +73,11 @@ public class CIRSimulation {
 
 	public double valueAnalytic()
 	{
-		double gamma	= Math.sqrt(beta*beta+2*sigma*sigma);
-		double phi		= (-2*b)/(sigma*sigma)*Math.log((2*gamma*Math.exp(0.5*(gamma-beta)*maturity))/(2*gamma+(gamma-beta)*(Math.exp(maturity*gamma)-1)));
-		double psi		= (2*(Math.exp(gamma*maturity)-1))/(2*gamma+(gamma-beta)*(Math.exp(maturity*gamma)-1));
+		final double gamma	= Math.sqrt(beta*beta+2*sigma*sigma);
+		final double phi		= (-2*b)/(sigma*sigma)*Math.log((2*gamma*Math.exp(0.5*(gamma-beta)*maturity))/(2*gamma+(gamma-beta)*(Math.exp(maturity*gamma)-1)));
+		final double psi		= (2*(Math.exp(gamma*maturity)-1))/(2*gamma+(gamma-beta)*(Math.exp(maturity*gamma)-1));
 
-		double value = Math.exp(-phi-psi*initialValue);
+		final double value = Math.exp(-phi-psi*initialValue);
 
 		return value;
 	}
@@ -93,11 +93,11 @@ public class CIRSimulation {
 			double rateAtCurrentTime	= initialValue;
 			for(double t = 0; t<maturity; t+=deltaT){
 				// Calculate the rate at the next time step
-				double random	= Math.random();
-				double z		= NormalDistribution.inverseCumulativeDistribution(random);
+				final double random	= Math.random();
+				final double z		= NormalDistribution.inverseCumulativeDistribution(random);
 
 				// Euler scheme
-				double rateAtNextTime = rateAtCurrentTime+(b+beta*rateAtCurrentTime)*deltaT+sigma*Math.sqrt(rateAtCurrentTime)*Math.sqrt(deltaT)*z;
+				final double rateAtNextTime = rateAtCurrentTime+(b+beta*rateAtCurrentTime)*deltaT+sigma*Math.sqrt(rateAtCurrentTime)*Math.sqrt(deltaT)*z;
 
 				/*
 				 *  Calculate the integral of the rates as a simple pice-wise constant approximation, here forward difference

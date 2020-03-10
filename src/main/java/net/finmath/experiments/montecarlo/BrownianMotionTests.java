@@ -25,17 +25,17 @@ public class BrownianMotionTests {
 	public static void main(String[] args)
 	{
 		// The parameters
-		int numberOfPaths	= 10000;
-		int seed			= 53252;
+		final int numberOfPaths	= 10000;
+		final int seed			= 53252;
 
-		double lastTime = 4.0;
-		double dt = 0.1;
+		final double lastTime = 4.0;
+		final double dt = 0.1;
 
 		// Create the time discretization
-		TimeDiscretization timeDiscretization = new TimeDiscretizationFromArray(0.0, (int)(lastTime/dt), dt);
+		final TimeDiscretization timeDiscretization = new TimeDiscretizationFromArray(0.0, (int)(lastTime/dt), dt);
 
 		// Test the quality of the Brownian motion
-		BrownianMotionLazyInit brownian = new BrownianMotionLazyInit(
+		final BrownianMotionLazyInit brownian = new BrownianMotionLazyInit(
 				timeDiscretization,
 				1,
 				numberOfPaths,
@@ -47,24 +47,24 @@ public class BrownianMotionTests {
 		System.out.println("      " + "\t" + "  int dW " + "\t" + "         " + "\t" + "int dW dW" + "\t" + "        ");
 		System.out.println("time  " + "\t" + "   mean  " + "\t" + "    var  " + "\t" + "   mean  " + "\t" + "    var  ");
 
-		RandomVariable brownianMotionRealization	= new RandomVariableFromDoubleArray(0.0);
+		final RandomVariable brownianMotionRealization	= new RandomVariableFromDoubleArray(0.0);
 		RandomVariable sumOfSquaredIncrements 		= new RandomVariableFromDoubleArray(0.0);
 		for(int timeIndex=0; timeIndex<timeDiscretization.getNumberOfTimeSteps(); timeIndex++) {
-			RandomVariable brownianIncrement = brownian.getBrownianIncrement(timeIndex,0);
+			final RandomVariable brownianIncrement = brownian.getBrownianIncrement(timeIndex,0);
 
 			// Calculate W(t+dt) from dW
 			brownianMotionRealization.add(brownianIncrement);
 
-			double time		= timeDiscretization.getTime(timeIndex);
-			double mean		= brownianMotionRealization.getAverage();
-			double variance	= brownianMotionRealization.getVariance();
+			final double time		= timeDiscretization.getTime(timeIndex);
+			final double mean		= brownianMotionRealization.getAverage();
+			final double variance	= brownianMotionRealization.getVariance();
 
 			// Calculate x = \int dW(t) * dW(t)
-			RandomVariable squaredIncrements = brownianIncrement.squared();
+			final RandomVariable squaredIncrements = brownianIncrement.squared();
 			sumOfSquaredIncrements = sumOfSquaredIncrements.add(squaredIncrements);
 
-			double meanOfSumOfSquaredIncrements		= sumOfSquaredIncrements.getAverage();
-			double varianceOfSumOfSquaredIncrements	= sumOfSquaredIncrements.getVariance();
+			final double meanOfSumOfSquaredIncrements		= sumOfSquaredIncrements.getAverage();
+			final double varianceOfSumOfSquaredIncrements	= sumOfSquaredIncrements.getVariance();
 
 			System.out.println(
 					fromatterReal2.format(time) + "\t" +

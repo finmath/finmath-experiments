@@ -107,52 +107,64 @@ public class NestedParallelForEachAndSynchronization {
 	}
 
 	public void runNestedLoopWithInnerParallelSynchronized() {
-		Set<String> threadsUsedInThisTest = Collections.synchronizedSet(new HashSet<String>());
+		final Set<String> threadsUsedInThisTest = Collections.synchronizedSet(new HashSet<String>());
 
 		// Outer loop
 		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
 			doWork(outerLoopOverheadFactor);
-			if(threadsUsedInThisTest.add(Thread.currentThread().toString())) System.out.println("\t" + Thread.currentThread());
+			if(threadsUsedInThisTest.add(Thread.currentThread().toString())) {
+				System.out.println("\t" + Thread.currentThread());
+			}
 			synchronized(this) {
 				// Inner loop
 				IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
 					doWork(1);
-					if(threadsUsedInThisTest.add(Thread.currentThread().toString())) System.out.println("\t" + Thread.currentThread());
+					if(threadsUsedInThisTest.add(Thread.currentThread().toString())) {
+						System.out.println("\t" + Thread.currentThread());
+					}
 				});
 			}
 		});
 	}
 
 	public void runNestedLoopWithInnerSequentialSynchronized() {
-		Set<String> threadsUsedInThisTest = Collections.synchronizedSet(new HashSet<String>());
+		final Set<String> threadsUsedInThisTest = Collections.synchronizedSet(new HashSet<String>());
 
 		// Outer loop
 		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
 			doWork(outerLoopOverheadFactor);
-			if(threadsUsedInThisTest.add(Thread.currentThread().toString())) System.out.println("\t" + Thread.currentThread());
+			if(threadsUsedInThisTest.add(Thread.currentThread().toString())) {
+				System.out.println("\t" + Thread.currentThread());
+			}
 			synchronized(this) {
 				// Inner loop
 				IntStream.range(0,numberOfTasksInInnerLoop).sequential().forEach(j -> {
 					doWork(1);
-					if(threadsUsedInThisTest.add(Thread.currentThread().toString())) System.out.println("\t" + Thread.currentThread());
+					if(threadsUsedInThisTest.add(Thread.currentThread().toString())) {
+						System.out.println("\t" + Thread.currentThread());
+					}
 				});
 			}
 		});
 	}
 
 	public void runNestedLoopWithInnerParallelSynchronizedButWrappedInThread() {
-		Set<String> threadsUsedInThisTest = Collections.synchronizedSet(new HashSet<String>());
+		final Set<String> threadsUsedInThisTest = Collections.synchronizedSet(new HashSet<String>());
 
 		// Outer loop
 		IntStream.range(0,numberOfTasksInOuterLoop).parallel().forEach(i -> {
 			doWork(outerLoopOverheadFactor);
-			if(threadsUsedInThisTest.add(Thread.currentThread().toString())) System.out.println("\t" + Thread.currentThread());
+			if(threadsUsedInThisTest.add(Thread.currentThread().toString())) {
+				System.out.println("\t" + Thread.currentThread());
+			}
 			synchronized(this) {
 				wrapInThread(() ->
 				// Inner loop
 				IntStream.range(0,numberOfTasksInInnerLoop).parallel().forEach(j -> {
 					doWork(1);
-					if(threadsUsedInThisTest.add(Thread.currentThread().toString())) System.out.println("\t" + Thread.currentThread());
+					if(threadsUsedInThisTest.add(Thread.currentThread().toString())) {
+						System.out.println("\t" + Thread.currentThread());
+					}
 				})
 						);
 			}
@@ -168,16 +180,16 @@ public class NestedParallelForEachAndSynchronization {
 	}
 
 	private void wrapInThread(Runnable runnable) {
-		Thread t = new Thread(runnable, "wrapper");
+		final Thread t = new Thread(runnable, "wrapper");
 		try {
 			t.start();
 			t.join();
-		} catch (InterruptedException e) { }
+		} catch (final InterruptedException e) { }
 	}
 
 	public static void nestedLoopDeadlockDemo() {
 		System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism","8");
-		Object lock = new Object();
+		final Object lock = new Object();
 
 		IntStream.range(0,24).parallel().forEach(i -> {
 			// do some work here
@@ -193,8 +205,8 @@ public class NestedParallelForEachAndSynchronization {
 
 
 	public static int twoDimenstionalIntegrationDemo() {
-		IntUnaryOperator func = (i) -> IntStream.range(0,100).parallel().map(j -> i*j).sum();
-		int m = IntStream.range(0,100).parallel().map(func).sum();
+		final IntUnaryOperator func = (i) -> IntStream.range(0,100).parallel().map(j -> i*j).sum();
+		final int m = IntStream.range(0,100).parallel().map(func).sum();
 
 		System.out.println(m);
 		return m;

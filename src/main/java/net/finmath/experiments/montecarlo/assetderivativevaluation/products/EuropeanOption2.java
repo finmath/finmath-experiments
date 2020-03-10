@@ -20,8 +20,8 @@ import net.finmath.stochastic.RandomVariableAccumulator;
  */
 public class EuropeanOption2 extends AbstractAssetMonteCarloProduct {
 
-	private double maturity;
-	private double strike;
+	private final double maturity;
+	private final double strike;
 
 	/**
 	 * Construct a product representing an European option on an asset S (where S the asset with index 0 from the model - single asset case).
@@ -45,10 +45,10 @@ public class EuropeanOption2 extends AbstractAssetMonteCarloProduct {
 	public double getValue(AssetModelMonteCarloSimulationModel model) throws CalculationException
 	{
 		// Get underlying and numeraire
-		RandomVariable underlyingAtMaturity	= model.getAssetValue(maturity,0);
-		RandomVariable numeraireAtMaturity	= model.getNumeraire(maturity);
-		RandomVariable monteCarloWeights		= model.getMonteCarloWeights(maturity);
-		RandomVariable numeraireAtToday		= model.getNumeraire(0);
+		final RandomVariable underlyingAtMaturity	= model.getAssetValue(maturity,0);
+		final RandomVariable numeraireAtMaturity	= model.getNumeraire(maturity);
+		final RandomVariable monteCarloWeights		= model.getMonteCarloWeights(maturity);
+		final RandomVariable numeraireAtToday		= model.getNumeraire(0);
 
 		/*
 		 *  The following way of calculating the expected value (average) is discouraged since it makes too strong

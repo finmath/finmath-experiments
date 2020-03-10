@@ -31,26 +31,27 @@ public class MonteCarloIntegrationParallelizedExperiment {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws InterruptedException, ExecutionException {
-		long numberOfSimulations = 200000000;
-		int numberOfThreads		= 8;
-		int numberOfTask		= 80;
+		final long numberOfSimulations = 200000000;
+		final int numberOfThreads		= 8;
+		final int numberOfTask		= 80;
 
 		final long numberOfSimulationsPerTask	= numberOfSimulations / numberOfTask;
 		final long numberOfSimulationsEffective	= numberOfSimulationsPerTask * numberOfTask;
 
 		// Measure calculation time - start
-		long millisStart = System.currentTimeMillis();
+		final long millisStart = System.currentTimeMillis();
 
 		/*
 		 * Start worker tasks (asynchronously)
 		 */
 		System.out.print("Distributing tasks...");
-		ExecutorService				executor	= Executors.newFixedThreadPool(numberOfThreads);
-		ArrayList<Future<Double>>	results		= new ArrayList<Future<Double>>();
+		final ExecutorService				executor	= Executors.newFixedThreadPool(numberOfThreads);
+		final ArrayList<Future<Double>>	results		= new ArrayList<Future<Double>>();
 		for(int taskIndex=0; taskIndex<numberOfTask; taskIndex++) {
 
 			final long startIndex					=  taskIndex * numberOfSimulationsPerTask;
-			Future<Double> value = executor.submit(new Callable<Double>() {
+			final Future<Double> value = executor.submit(new Callable<Double>() {
+				@Override
 				public Double call() {
 					return getMonteCarloApproximationOfPi(startIndex, numberOfSimulationsPerTask);
 				}
@@ -70,10 +71,10 @@ public class MonteCarloIntegrationParallelizedExperiment {
 		}
 		System.out.print("done.\n");
 
-		double pi = sumOfResults / numberOfTask;
+		final double pi = sumOfResults / numberOfTask;
 
 		// Measure calculation time - end
-		long millisEnd = System.currentTimeMillis();
+		final long millisEnd = System.currentTimeMillis();
 
 		System.out.println("Simulation with n = " + numberOfSimulations + " resulted in approximation of pi = " + pi +"\n");
 
@@ -98,15 +99,17 @@ public class MonteCarloIntegrationParallelizedExperiment {
 	public static double getMonteCarloApproximationOfPi(long indexStart, long numberOfSimulations) {
 		long numberOfPointsInsideUnitCircle = 0;
 		for(long i=indexStart; i<indexStart+numberOfSimulations; i++) {
-			double x = 2.0 * (HaltonSequence.getHaltonNumber(i, 2) - 0.5);	// quasi random number between -1 and 1
-			double y = 2.0 * (HaltonSequence.getHaltonNumber(i, 3) - 0.5);	// quasi random number between -1 and 1
-			if(x*x + y*y < 1.0) numberOfPointsInsideUnitCircle++;
+			final double x = 2.0 * (HaltonSequence.getHaltonNumber(i, 2) - 0.5);	// quasi random number between -1 and 1
+			final double y = 2.0 * (HaltonSequence.getHaltonNumber(i, 3) - 0.5);	// quasi random number between -1 and 1
+			if(x*x + y*y < 1.0) {
+				numberOfPointsInsideUnitCircle++;
+			}
 		}
 
-		double areaOfUnitCircle = 4.0 * (double)numberOfPointsInsideUnitCircle / (double)numberOfSimulations;
+		final double areaOfUnitCircle = 4.0 * numberOfPointsInsideUnitCircle / numberOfSimulations;
 
 		// The theoretical area of a circle is pi r^2. Hence we have:
-		double pi = areaOfUnitCircle;
+		final double pi = areaOfUnitCircle;
 
 		return pi;
 	}

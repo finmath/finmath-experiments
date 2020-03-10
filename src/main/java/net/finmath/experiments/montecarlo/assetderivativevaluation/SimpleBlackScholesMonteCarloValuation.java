@@ -32,11 +32,11 @@ public class SimpleBlackScholesMonteCarloValuation {
 	 */
 	public static void main(String[] args) throws CalculationException {
 
-		AssetModelMonteCarloSimulationModel model = new MonteCarloBlackScholesModel(new TimeDiscretizationFromArray(0, 10, 0.5), 10000, 100, 0.05, 0.20);
+		final AssetModelMonteCarloSimulationModel model = new MonteCarloBlackScholesModel(new TimeDiscretizationFromArray(0, 10, 0.5), 10000, 100, 0.05, 0.20);
 
-		AbstractAssetMonteCarloProduct product = new EuropeanOption(2.0, 110);
+		final AbstractAssetMonteCarloProduct product = new EuropeanOption(2.0, 110);
 
-		double value = product.getValue(model);
+		final double value = product.getValue(model);
 
 		System.out.println("The value is " + value);
 	}

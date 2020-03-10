@@ -20,15 +20,15 @@ public class MonteCarloIntegrationExperiment {
 	 * @param args Arguments, not used
 	 */
 	public static void main(String[] args) {
-		long numberOfSimulations = 20000000;
+		final long numberOfSimulations = 20000000;
 
 		// Measure calculation time - start
-		long millisStart = System.currentTimeMillis();
+		final long millisStart = System.currentTimeMillis();
 
-		double pi = getMonteCarloApproximationOfPi(numberOfSimulations);
+		final double pi = getMonteCarloApproximationOfPi(numberOfSimulations);
 
 		// Measure calculation time - end
-		long millisEnd = System.currentTimeMillis();
+		final long millisEnd = System.currentTimeMillis();
 
 		System.out.println("Simulation with n = " + numberOfSimulations + " resulted in approximation of pi = " + pi +"\n");
 
@@ -47,15 +47,17 @@ public class MonteCarloIntegrationExperiment {
 	public static double getMonteCarloApproximationOfPi(long numberOfSimulations) {
 		long numberOfPointsInsideUnitCircle = 0;
 		for(long i=0; i<numberOfSimulations; i++) {
-			double x = 2.0 * (Math.random() - 0.5);		// pseudo random number between -1 and 1
-			double y = 2.0 * (Math.random() - 0.5);		// pseudo random number between -1 and 1
-			if(x*x + y*y < 1.0) numberOfPointsInsideUnitCircle++;
+			final double x = 2.0 * (Math.random() - 0.5);		// pseudo random number between -1 and 1
+			final double y = 2.0 * (Math.random() - 0.5);		// pseudo random number between -1 and 1
+			if(x*x + y*y < 1.0) {
+				numberOfPointsInsideUnitCircle++;
+			}
 		}
 
-		double areaOfUnitCircle = 4.0 * (double)numberOfPointsInsideUnitCircle / (double)numberOfSimulations;
+		final double areaOfUnitCircle = 4.0 * numberOfPointsInsideUnitCircle / numberOfSimulations;
 
 		// The theoretical area of a circle is pi r^2. Hence we have:
-		double pi = areaOfUnitCircle;
+		final double pi = areaOfUnitCircle;
 
 		return pi;
 	}

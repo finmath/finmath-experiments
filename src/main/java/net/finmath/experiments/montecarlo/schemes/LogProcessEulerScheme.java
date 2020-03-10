@@ -21,11 +21,11 @@ import net.finmath.time.TimeDiscretizationFromArray;
  */
 public class LogProcessEulerScheme
 {
-	private int		numberOfTimeSteps;
-	private double	deltaT;
-	private int		numberOfPaths;
-	private double	initialValue;
-	private double	sigma;
+	private final int		numberOfTimeSteps;
+	private final double	deltaT;
+	private final int		numberOfPaths;
+	private final double	initialValue;
+	private final double	sigma;
 
 	private RandomVariable[]	discreteProcess = null;
 
@@ -72,21 +72,21 @@ public class LogProcessEulerScheme
 	public double getAverage(int timeIndex)
 	{
 		// Get the random variable from the process represented by this object
-		RandomVariable randomVariable = getProcessValue(timeIndex);
+		final RandomVariable randomVariable = getProcessValue(timeIndex);
 		return randomVariable.getAverage();
 	}
 
 	public double getAverageOfLog(int timeIndex)
 	{
 		// Get the random variable from the process represented by this object
-		RandomVariable randomVariable = getProcessValue(timeIndex);
+		final RandomVariable randomVariable = getProcessValue(timeIndex);
 		return randomVariable.log().getAverage();
 	}
 
 	public double getVarianceOfLog(int timeIndex)
 	{
 		// Get the random variable from the process represented by this object
-		RandomVariable randomVariable = getProcessValue(timeIndex);
+		final RandomVariable randomVariable = getProcessValue(timeIndex);
 		return randomVariable.log().getVariance();
 	}
 
@@ -95,7 +95,7 @@ public class LogProcessEulerScheme
 	 */
 	private void doPrecalculateProcess() {
 
-		BrownianMotion	brownianMotion	= new BrownianMotionLazyInit(
+		final BrownianMotion	brownianMotion	= new BrownianMotionLazyInit(
 				new TimeDiscretizationFromArray(0.0, getNumberOfTimeSteps(), getDeltaT()),
 				1,						// numberOfFactors
 				getNumberOfPaths(),
@@ -107,7 +107,7 @@ public class LogProcessEulerScheme
 
 		for(int timeIndex = 0; timeIndex < getNumberOfTimeSteps()+1; timeIndex++)
 		{
-			double[] newRealization = new double[numberOfPaths];
+			final double[] newRealization = new double[numberOfPaths];
 
 			// Generate process at timeIndex
 			if(timeIndex == 0)
@@ -121,31 +121,31 @@ public class LogProcessEulerScheme
 			else
 			{
 				// The numerical scheme
-				RandomVariable previouseRealization	= discreteProcess[timeIndex-1];
-				RandomVariable deltaW					= brownianMotion.getBrownianIncrement(timeIndex-1, 0);
+				final RandomVariable previouseRealization	= discreteProcess[timeIndex-1];
+				final RandomVariable deltaW					= brownianMotion.getBrownianIncrement(timeIndex-1, 0);
 
 				// Generate values
 				for (int iPath = 0; iPath < numberOfPaths; iPath++ )
 				{
 					// Drift
-					double drift = 0;
+					final double drift = 0;
 
 					// Diffusion
-					double diffusion = sigma * deltaW.get(iPath);
+					final double diffusion = sigma * deltaW.get(iPath);
 
 					// Previous value
-					double previousValue = previouseRealization.get(iPath);
+					final double previousValue = previouseRealization.get(iPath);
 
 					// Numerical scheme
-					double newValue = previousValue + previousValue * drift * deltaT + previousValue * diffusion;
+					final double newValue = previousValue + previousValue * drift * deltaT + previousValue * diffusion;
 
 					// Store new value
 					newRealization[iPath] = newValue;
-				};
+				}
 			}
 
 			// Store values
-			discreteProcess[timeIndex] = new RandomVariableFromDoubleArray((double)timeIndex, newRealization);
+			discreteProcess[timeIndex] = new RandomVariableFromDoubleArray(timeIndex, newRealization);
 		}
 	}
 
@@ -188,17 +188,17 @@ public class LogProcessEulerScheme
 
 	public static void main(String[] args)
 	{
-		double initialValue = 1.0;
-		double sigma		= 0.5;		// Note: Try different sigmas: 0.2, 0.5, 0.7, 0.9
-		int numberOfPath	= 10000;
+		final double initialValue = 1.0;
+		final double sigma		= 0.5;		// Note: Try different sigmas: 0.2, 0.5, 0.7, 0.9
+		final int numberOfPath	= 10000;
 
 		for(int numberOfTimeSteps=20; numberOfTimeSteps<=202; numberOfTimeSteps+=20)
 		{
-			double lastTime = 10.0;
-			double deltaT = lastTime/(numberOfTimeSteps-1);
+			final double lastTime = 10.0;
+			final double deltaT = lastTime/(numberOfTimeSteps-1);
 
 			// Create an instance of the euler scheme class
-			LogProcessEulerScheme eulerScheme = new LogProcessEulerScheme(
+			final LogProcessEulerScheme eulerScheme = new LogProcessEulerScheme(
 					numberOfTimeSteps,	// numberOfTimeSteps
 					deltaT,				// deltaT
 					numberOfPath,		// numberOfPaths
@@ -206,26 +206,26 @@ public class LogProcessEulerScheme
 					sigma);				// sigma
 
 			// Get start time of calculation
-			double startMillis = System.currentTimeMillis();
+			final double startMillis = System.currentTimeMillis();
 
-			int		lastTimeIndex	= eulerScheme.getNumberOfTimeSteps()-1;
+			final int		lastTimeIndex	= eulerScheme.getNumberOfTimeSteps()-1;
 
-			double	averageNumerical	= eulerScheme.getAverageOfLog( lastTimeIndex );
-			double	averageAnalytic		= Math.log(initialValue)-(0.5 * sigma * sigma * (lastTimeIndex * deltaT) );
+			final double	averageNumerical	= eulerScheme.getAverageOfLog( lastTimeIndex );
+			final double	averageAnalytic		= Math.log(initialValue)-(0.5 * sigma * sigma * (lastTimeIndex * deltaT) );
 
-			double	varianceNumerical	= eulerScheme.getVarianceOfLog( lastTimeIndex );
-			double	varianceAnalytic	= sigma * sigma * (lastTimeIndex * deltaT);
+			final double	varianceNumerical	= eulerScheme.getVarianceOfLog( lastTimeIndex );
+			final double	varianceAnalytic	= sigma * sigma * (lastTimeIndex * deltaT);
 
 			// Get end time of calculation
-			double endMillis = System.currentTimeMillis();
+			final double endMillis = System.currentTimeMillis();
 
-			double calculationTimeInSeconds = ((float)( endMillis - startMillis )) / 1000.0;
+			final double calculationTimeInSeconds = ((float)( endMillis - startMillis )) / 1000.0;
 
 			// Print result
-			DecimalFormat decimalFormatPercent = new DecimalFormat("0.000%");
-			DecimalFormat decimalFormatInteger = new DecimalFormat("000");
-			double errorAverage     = Math.abs(averageNumerical    - averageAnalytic);
-			double errorVariance    = Math.abs(varianceNumerical   - varianceAnalytic);
+			final DecimalFormat decimalFormatPercent = new DecimalFormat("0.000%");
+			final DecimalFormat decimalFormatInteger = new DecimalFormat("000");
+			final double errorAverage     = Math.abs(averageNumerical    - averageAnalytic);
+			final double errorVariance    = Math.abs(varianceNumerical   - varianceAnalytic);
 
 			System.out.print("Number of Path=" + numberOfPath);
 			System.out.print("\tSteps=" + decimalFormatInteger.format(numberOfTimeSteps));

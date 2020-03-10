@@ -20,10 +20,10 @@ import net.finmath.stochastic.RandomVariableAccumulator;
  */
 public class EuropeanOptionRhoLikelihood extends AbstractAssetMonteCarloProduct {
 
-	private double	maturity;
-	private double	strike;
+	private final double	maturity;
+	private final double	strike;
 
-	private boolean	isLikelihoodByFiniteDifference = true;
+	private final boolean	isLikelihoodByFiniteDifference = true;
 
 	/**
 	 * Construct a product representing an European option on an asset S (where S the asset with index 0 from the model - single asset case).
@@ -50,16 +50,16 @@ public class EuropeanOptionRhoLikelihood extends AbstractAssetMonteCarloProduct 
 		try {
 			blackScholesModel = (MonteCarloBlackScholesModel)model;
 		}
-		catch(Exception e) {
+		catch(final Exception e) {
 			throw new ClassCastException("This method requires a Black-Scholes type model (MonteCarloBlackScholesModel).");
 		}
 
 		// Get underlying and numeraire
-		RandomVariable underlyingAtMaturity	= model.getAssetValue(maturity,0);
-		RandomVariable numeraireAtMaturity		= model.getNumeraire(maturity);
-		RandomVariable underlyingAtToday		= model.getAssetValue(0.0,0);
-		RandomVariable numeraireAtToday		= model.getNumeraire(0);
-		RandomVariable monteCarloWeights		= model.getMonteCarloWeights(maturity);
+		final RandomVariable underlyingAtMaturity	= model.getAssetValue(maturity,0);
+		final RandomVariable numeraireAtMaturity		= model.getNumeraire(maturity);
+		final RandomVariable underlyingAtToday		= model.getAssetValue(0.0,0);
+		final RandomVariable numeraireAtToday		= model.getNumeraire(0);
+		final RandomVariable monteCarloWeights		= model.getMonteCarloWeights(maturity);
 
 		/*
 		 *  The following way of calculating the expected value (average) is discouraged since it makes too strong
@@ -72,35 +72,35 @@ public class EuropeanOptionRhoLikelihood extends AbstractAssetMonteCarloProduct 
 			if(underlyingAtMaturity.get(path) > strike)
 			{
 				// Get some model parameters
-				double T		= maturity;
-				double S0		= underlyingAtToday.get(path);
-				double r		= blackScholesModel.getModel().getRiskFreeRate().doubleValue();
-				double sigma	= blackScholesModel.getModel().getVolatility().doubleValue();
+				final double T		= maturity;
+				final double S0		= underlyingAtToday.get(path);
+				final double r		= blackScholesModel.getModel().getRiskFreeRate().doubleValue();
+				final double sigma	= blackScholesModel.getModel().getVolatility().doubleValue();
 
-				double ST		= underlyingAtMaturity.get(path);
+				final double ST		= underlyingAtMaturity.get(path);
 
-				double x		= 1.0 / (sigma * Math.sqrt(T)) * (Math.log(ST) - (r * T - 0.5 * sigma*sigma * T + Math.log(S0)));
+				final double x		= 1.0 / (sigma * Math.sqrt(T)) * (Math.log(ST) - (r * T - 0.5 * sigma*sigma * T + Math.log(S0)));
 
 				double lr;
 				if(isLikelihoodByFiniteDifference) {
-					double h		= 1E-6;
+					final double h		= 1E-6;
 
-					double x1		= 1.0 / (sigma * Math.sqrt(T)) * (Math.log(ST) - (r     * T - 0.5 * sigma*sigma * T + Math.log(S0)));
-					double logPhi1	= Math.log(1.0/Math.sqrt(2 * Math.PI) * Math.exp(-x1*x1/2.0) / (ST * sigma * Math.sqrt(T)) );
+					final double x1		= 1.0 / (sigma * Math.sqrt(T)) * (Math.log(ST) - (r     * T - 0.5 * sigma*sigma * T + Math.log(S0)));
+					final double logPhi1	= Math.log(1.0/Math.sqrt(2 * Math.PI) * Math.exp(-x1*x1/2.0) / (ST * sigma * Math.sqrt(T)) );
 
-					double x2		= 1.0 / (sigma * Math.sqrt(T)) * (Math.log(ST) - ((r+h) * T - 0.5 * sigma*sigma * T + Math.log(S0)));
-					double logPhi2	= Math.log(1.0/Math.sqrt(2 * Math.PI) * Math.exp(-x2*x2/2.0) / (ST * sigma * Math.sqrt(T)) );
+					final double x2		= 1.0 / (sigma * Math.sqrt(T)) * (Math.log(ST) - ((r+h) * T - 0.5 * sigma*sigma * T + Math.log(S0)));
+					final double logPhi2	= Math.log(1.0/Math.sqrt(2 * Math.PI) * Math.exp(-x2*x2/2.0) / (ST * sigma * Math.sqrt(T)) );
 
 					lr		= (logPhi2 - logPhi1) / h;
 				}
 				else {
-					double dxdr = -1.0 / (sigma * Math.sqrt(T));
+					final double dxdr = -1.0 / (sigma * Math.sqrt(T));
 
 					lr		= - x * dxdr;
 				}
 
-				double payOff			= (underlyingAtMaturity.get(path) - strike);
-				double modifiedPayoff	= payOff * (lr-T);
+				final double payOff			= (underlyingAtMaturity.get(path) - strike);
+				final double modifiedPayoff	= payOff * (lr-T);
 
 				average += modifiedPayoff / numeraireAtMaturity.get(path) * monteCarloWeights.get(path) * numeraireAtToday.get(path);
 			}

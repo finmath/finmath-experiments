@@ -24,7 +24,7 @@ package net.finmath.experiments.montecarlo.randomnumbers;
  */
 public class HaltonSequence {
 
-	private int[] baseVector;
+	private final int[] baseVector;
 
 	/**
 	 * Construct a Halton sequence with d = base.length dimensions where the i-th component
@@ -34,8 +34,10 @@ public class HaltonSequence {
 	 */
 	public HaltonSequence(int[] baseVector) {
 		// Check base
-		for(int base : baseVector) {
-			if(base < 2) throw new RuntimeException("Cannot create Halton sequence with base less than two.");
+		for(final int base : baseVector) {
+			if(base < 2) {
+				throw new RuntimeException("Cannot create Halton sequence with base less than two.");
+			}
 		}
 
 		this.baseVector = baseVector;
@@ -48,7 +50,9 @@ public class HaltonSequence {
 	 */
 	public HaltonSequence(int base) {
 		// Check base
-		if(base < 2) throw new RuntimeException("Cannot create Halton sequence with base less than two.");
+		if(base < 2) {
+			throw new RuntimeException("Cannot create Halton sequence with base less than two.");
+		}
 
 		this.baseVector = new int[] { base };
 	}
@@ -72,7 +76,7 @@ public class HaltonSequence {
 	 * @return Halton number (vector).
 	 */
 	public double[] getHaltonNumber(long index) {
-		double[] x = new double[baseVector.length];
+		final double[] x = new double[baseVector.length];
 		for(int baseIndex=0; baseIndex < baseVector.length; baseIndex++) {
 			x[baseIndex] = getHaltonNumber(index, baseVector[baseIndex]);
 		}
@@ -88,8 +92,12 @@ public class HaltonSequence {
 	 */
 	public static double getHaltonNumber(long index, int base) {
 		// Check base
-		if(base < 2) throw new RuntimeException("Cannot create Halton number with base less than two.");
-		if(index < 0) throw new RuntimeException("Cannot create Halton number with index less than zero.");
+		if(base < 2) {
+			throw new RuntimeException("Cannot create Halton number with base less than two.");
+		}
+		if(index < 0) {
+			throw new RuntimeException("Cannot create Halton number with index less than zero.");
+		}
 
 		// Index shift: counting of the function starts at 0, algorithm below starts at 1.
 		index++;

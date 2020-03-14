@@ -63,3 +63,5 @@ Here are a few remarks in case you like to create and contribute a web page with
 
 -	Check you page on a mobile device (iPhone, iPad). Long package names or class names can lead to layout issues.
 
+-	If you create plots, the best quality can be achieved by saving the plot as SVG. Use `plot.saveAsSVG(new File(filename), 800, 450))`
+

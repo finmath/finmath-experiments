@@ -44,36 +44,6 @@
 				});
 		</script>
 
-		<style>
-			body {
-				font-family: "Arial";
-				line-height: 22pt;
-				font-size: 14pt;
-			}
-			.codeinline {
-				font-size: 12pt;
-			}
-			.codebox {
-				background: gainsboro;
-				border: solid 1px;
-				margin-top: 10px;
-				margin-bottom: 10px;
-				font-size: 11pt;
-			}
-			pre {
-				margin-top: 0px;
-				background: white;
-			}
-			pre > code {
-				margin-top: 0px;
-				background: white;
-				font-family: "Lucida Console";
-			}
-			.btn {
-				font-family: "Arial";
-				font-size: 14pt;
-			}
-		</style>
 		<header>
 			<span class="logo-white">finMath</span><span class="logo-red">.net</span>
 		</header>
@@ -136,8 +106,11 @@
 		</p>
 		
 		<div class="codebox">
+			<div>
 			JShell: 
 			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment2">Copy to clipboard</button></span>
+			</div>
+			<div style="clear: both;">
 			<pre class="prettyprint"><code class="language-java" id="experiment2">
 				import net.finmath.functions.AnalyticFormulas;
 				import net.finmath.plots.Plot2D;
@@ -152,10 +125,11 @@
 				plot.setXAxisLabel("strike").setYAxisLabel("frequency");
 				plot.show();
 			</code></pre>
+			</div>
 		</div>
 
 		<center>
-			<img src="experiment-02.svg"/>
+			<img width="100%" src="experiment-02.svg"/>
 		</center>
 		
 		<h2>Summary (Experiments 1-2)</h2>

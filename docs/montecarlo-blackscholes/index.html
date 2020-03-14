@@ -107,7 +107,8 @@
 
 		<h2>Experiment 0</h2>
 
-		The following will create an object of type <code>net.finmath.time.TimeDiscretizationFromArray</code> and then print the object (using the <code>toString()</code>-method). The time discretization starts in 0.0 and has 100 time steps of size 0.1.
+		The following will create an object of type <code>TimeDiscretizationFromArray</code> (from the package <code>net.finmath.time</code>)
+		and then print the object (using the <code>toString()</code>-method). The time discretization starts in 0.0 and has 100 time steps of size 0.1.
 
 		<div class="codebox">
 			JShell: 
@@ -118,12 +119,14 @@
 			</code></pre>
 		</div>
 
-		We may shorten the name of object by importing a classes from the package or all classes from the packages (like name-spaces), e.g. here from <code>net.finmath.time</code> via <code>import net.finmath.time.*;</code>.
+		We may shorten the name of object by importing a classes from the package or all classes from the packages (like name-spaces), e.g. here
+		from <code>net.finmath.time</code> via <code>import net.finmath.time.*;</code>.
 
 		<h2>Experiment 1</h2>
 
 		<p>
-			In the following experiment we create a class of type <code>net.finmath.montecarlo.BrownianMotionLazyInit</code> which represent samples of a set of (independent) normal distributed random variables \( \Delta W(t_{i}) \) (the so called Brownian increments). The arguments of <code>BrownianMotionLazyInit</code> are <code>(timeDiscretization, numberOfFactors, numberOfPaths, seed)</code>, where numberOfFactors refers to the vector dimension of \( \Delta W(t_{i}) \). In the following we create a one factorial (one dimensional) Brownian motion:
+			In the following experiment we create a class of type <code>BrownianMotionLazyInit</code> (from the package <code>net.finmath.montecarlo</code>)
+			which represent samples of a set of (independent) normal distributed random variables \( \Delta W(t_{i}) \) (the so called Brownian increments). The arguments of <code>BrownianMotionLazyInit</code> are <code>(timeDiscretization, numberOfFactors, numberOfPaths, seed)</code>, where numberOfFactors refers to the vector dimension of \( \Delta W(t_{i}) \). In the following we create a one factorial (one dimensional) Brownian motion:
 		</p>
 		
 		<div class="codebox">

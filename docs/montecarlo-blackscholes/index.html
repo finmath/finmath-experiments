@@ -96,7 +96,9 @@
 
 		<p>
 			In the following experiment we create a class of type <code>BrownianMotionLazyInit</code> (from the package <code>net.finmath.montecarlo</code>)
-			which represent samples of a set of (independent) normal distributed random variables \( \Delta W(t_{i}) \) (the so called Brownian increments). The arguments of <code>BrownianMotionLazyInit</code> are <code>(timeDiscretization, numberOfFactors, numberOfPaths, seed)</code>, where numberOfFactors refers to the vector dimension of \( \Delta W(t_{i}) \). In the following we create a one factorial (one dimensional) Brownian motion:
+			which represent samples of a set of (independent) normal distributed random variables \( \Delta W(t_{i}) \) (the so called Brownian increments).
+			The arguments of <code>BrownianMotionLazyInit</code> are <code>(timeDiscretization, numberOfFactors, numberOfPaths, seed)</code>, where numberOfFactors refers to the vector dimension of \( \Delta W(t_{i}) \).
+			In the following we create a one factor (i.e., one dimensional) Brownian motion:
 		</p>
 		
 		<div class="codeboxwithheader">
@@ -143,7 +145,16 @@
 
 		<h2>Experiment 2</h2>
 
-		Given a Brownian motion, we create a model (here a BlackScholesModel) and from that a simulation of this model using an Euler scheme (via EulerSchemeFromProcessModel).
+		Given a Brownian motion providing the Brownian increments \( \Delta W(t_{i}) \),
+		we create a model (here a <code>BlackScholesModel</code>) and from that a simulation
+		of this model using an Euler scheme (via EulerSchemeFromProcessModel).
+		
+		The model is \( \mathrm{d}S(t) = r S(t) \mathrm{d} + \sigma(t) S(t) \mathrm{d}W(t) ; \quad S(t_{0}) = S_{0} \),
+		where
+		\( S(t_{0}) \) is the <code>modelInitialValue</code>, 
+		\( r \) is the <code>modelRiskFreeRate</code>,
+		\( \sigma \) is the <code>modelVolatility</code>.
+		
 		<div class="codeboxwithheader">
 			JShell: 
 			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment2">Copy to clipboard</button></span>

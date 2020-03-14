@@ -60,14 +60,14 @@
 			<li>Next, clone (i.e. download) the repository (<code>git</code>), change to the cloned directory (<code>cd</code>) and start jshell via Maven (<code>mvn</code>) by typing the following three commands:</li>
 		</ol>
         
-		<div class="codebox">
+		<div class="codeboxwithheader">
 			Terminal Window
 			<span style="float: right;"><button class="btn" data-clipboard-target="#setup1">Copy to clipboard</button></span>
-			<pre class="prettyprint"><code class="language-sh" id="setup1">
+			<div class="codebox"><pre class="prettyprint"><code class="language-sh" id="setup1">
 				git clone https://github.com/finmath/finmath-experiments        
 				cd finmath-experiments
 				mvn clean compile jshell:run
-			</code></pre>
+			</code></pre></div>
 		</div>
 
 		<h1>Experiment 1-2: Risk neutral density/h1>
@@ -80,13 +80,13 @@
 		That is \( V(0) = E^{\mathbb{Q}}\left( V(T,K) \frac{N(0)}{N(T)}\right) \) where \( V(T,K) = \max(S(T)-K,0) \) is the payoff function
 		and \( N(T) = \exp(r T) \) is a numeraire.
 
-		<div class="codebox">
+		<div class="codeboxwithheader">
 			JShell: 
 			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment1">Copy to clipboard</button></span>
-			<pre class="prettyprint"><code class="language-java" id="experiment1">
+			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment1">
 				DoubleUnaryOperator value = strike -> net.finmath.functions.AnalyticFormulas.blackScholesOptionValue(100.0, 0.05, 0.20, 2.0, strike);
 				(new net.finmath.plots.Plot2D(0.0, 300.0, 100, value)).show();
-			</code></pre>
+			</code></pre></div>
 		</div>
 
 		<center>
@@ -105,13 +105,11 @@
 			\]
 		</p>
 		
-		<div class="codebox">
-			<div>
+		<div class="codeboxwithheader">
 			JShell: 
 			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment2">Copy to clipboard</button></span>
-			</div>
 			<div style="clear: both;">
-			<pre class="prettyprint"><code class="language-java" id="experiment2">
+			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment2">
 				import net.finmath.functions.AnalyticFormulas;
 				import net.finmath.plots.Plot2D;
 				
@@ -124,7 +122,7 @@
 				plot.setYAxisNumberFormat(new java.text.DecimalFormat("0.0E00"));
 				plot.setXAxisLabel("strike").setYAxisLabel("frequency");
 				plot.show();
-			</code></pre>
+			</code></pre></div>
 			</div>
 		</div>
 

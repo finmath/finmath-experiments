@@ -60,14 +60,14 @@
 			<li>Next, clone (i.e. download) the repository (<code>git</code>), change to the cloned directory (<code>cd</code>) and start jshell via Maven (<code>mvn</code>) by typing the following three commands:</li>
 		</ol>
         
-		<div class="codebox">
+		<div class="codeboxwithheader">
 			Terminal Window
 			<span style="float: right;"><button class="btn" data-clipboard-target="#setup1">Copy to clipboard</button></span>
-			<pre class="prettyprint"><code class="language-sh" id="setup1">
+			<div class="codebox"><pre class="prettyprint"><code class="language-sh" id="setup1">
 				git clone https://github.com/finmath/finmath-experiments        
 				cd finmath-experiments
 				mvn clean compile jshell:run
-			</code></pre>
+			</code></pre></div>
 		</div>
 
 		<h1>Experiment 0: Monte-Carlo Simulation and Valuation (Recap)</h1>
@@ -83,10 +83,10 @@
 		<p>
 			Create the model and its simulation:
 		</p>
-		<div class="codebox">
+		<div class="codeboxwithheader">
 			JShell: 
 			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment2">Copy to clipboard</button></span>
-			<pre class="prettyprint"><code class="language-java" id="experiment2">
+			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment2">
 				import net.finmath.montecarlo.*;
 				import net.finmath.montecarlo.assetderivativevaluation.*;
 				import net.finmath.montecarlo.assetderivativevaluation.models.*;
@@ -111,23 +111,23 @@
 				
 				// Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
 				var simulation = new MonteCarloAssetModel(model, process);
-			</code></pre>
+			</code></pre></div>
 		</div>
 		
 		<p>
 			Create the product:
 		</p>
-		<div class="codebox">
+		<div class="codeboxwithheader">
 			JShell:
 			<span style="float: right;"><button class="btn" data-clipboard-target="#createProduct">Copy to clipboard</button></span>
-			<pre class="prettyprint"><code class="language-java" id="createProduct">
+			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="createProduct">
 				import net.finmath.montecarlo.assetderivativevaluation.products.*;
 				
 				double maturity = 3.0;
 				double strike = 106.0;
 				
 				var europeanOption = new EuropeanOption(maturity, strike);
-			</code></pre>
+			</code></pre></div>
 		</div>
 
 		<h2>Experiment 1 - Dynamic delta hedge using algorithmic differentiation (requires run of "Initial Setup")</h2>
@@ -140,10 +140,10 @@
 			<b style="color: red;">Important: We will first conduct an experiment which will (likely) give wrong results. We will then fix the issue.</b>
 		</p>
 
-		<div class="codebox">
+		<div class="codeboxwithheader">
 			JShell: (continued)
 			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment4">Copy to clipboard</button></span>
-			<pre class="prettyprint"><code class="language-java" id="experiment4">
+			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment4">
 				import net.finmath.plots.*;
 
 				var hedge = new DeltaHedgedPortfolioWithAAD(europeanOption);
@@ -153,7 +153,7 @@
 				var plot = Plots.createPlotScatter(underlyingAtMaturity, hedgeValue, 50.0, 110.0);
 				plot.setTitle("Hedge Portfolio").setXAxisLabel("underlying").setYAxisLabel("portfolio value");
 				plot.show();
-			</code></pre>
+			</code></pre></div>
 		</div>
 
 		<p>
@@ -165,10 +165,10 @@ We can change this by passing a property to the RandomVariableDifferentiableAADF
 		<p>
 			Re-create the model and its simulation (with the modified <code>RandomVariableDifferentiableAADFactory</code>):
 		</p>
-		<div class="codebox">
+		<div class="codeboxwithheader">
 			JShell: 
 			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment5">Copy to clipboard</button></span>
-			<pre class="prettyprint"><code class="language-java" id="experiment5">
+			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment5">
 				import net.finmath.montecarlo.*;
 				import net.finmath.montecarlo.automaticdifferentiation.*;
 				import net.finmath.montecarlo.automaticdifferentiation.backward.*;
@@ -186,14 +186,14 @@ We can change this by passing a property to the RandomVariableDifferentiableAADF
 				
 				// Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
 				var simulation = new MonteCarloAssetModel(model, process);
-			</code></pre>
+			</code></pre></div>
 		</div>
 
 		Now perform the hedge simulation on the newly created simulation.
-		<div class="codebox">
+		<div class="codeboxwithheader">
 			JShell: (continued)
 			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment6">Copy to clipboard</button></span>
-			<pre class="prettyprint"><code class="language-java" id="experiment6">
+			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment6">
 				import net.finmath.plots.*;
 
 				var hedge = new DeltaHedgedPortfolioWithAAD(europeanOption);
@@ -203,7 +203,7 @@ We can change this by passing a property to the RandomVariableDifferentiableAADF
 				var plot = Plots.createPlotScatter(underlyingAtMaturity, hedgeValue, 50.0, 110.0);
 				plot.setTitle("Hedge Portfolio").setXAxisLabel("underlying").setYAxisLabel("portfolio value");
 				plot.show();
-			</code></pre>
+			</code></pre></div>
 		</div>
 
 	</body>

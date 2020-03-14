@@ -50,3 +50,16 @@ The code of "finmath lib" and "finmath experiments" (packages
   [finmath lib API documentation]: http://www.finmath.net/java/finmath-lib/doc/
   [finmath.net special topics]: http://www.finmath.net/topics
   [Apache License version 2.0]: http://www.apache.org/licenses/LICENSE-2.0.html
+
+
+Instruction for Contributors for Experiments
+-------
+
+Here are a few remarks in case you like to create and contribute a web page with experiments, similar to the ones in the `docs` folder of this repo.
+
+-	Used the same HTML header as in the example on Monte-Carlo simulation, see <a href="montecarlo-blackscholes">montecarlo-blackscholes</a> (adjusting title and description).
+
+-	Use the correct HTML tags for code blocks, i.e. the tag `<div class="codeboxwithheader">` and everything that is inside. Just change the title text and the code inside.
+
+-	Check you page on a mobile device (iPhone, iPad). Long package names or class names can lead to layout issues.
+

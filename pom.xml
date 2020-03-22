@@ -16,7 +16,7 @@
 		<kotlin.version>1.2.0</kotlin.version>
 		<junit.version>4.12</junit.version>
 		<finmath-lib.version>4.1.7</finmath-lib.version>
-		<finmath-plot.version>0.3.2</finmath-plot.version>
+		<finmath-plot.version>0.3.3</finmath-plot.version>
 		<finmath-cuda.version>4.1.2</finmath-cuda.version>
 		<finmath-cuda.classifier></finmath-cuda.classifier>
 		<!-- maven plugins -->
@@ -153,7 +153,7 @@
 			<id>experimental</id>
 			<properties>
 				<envClassifier>experimental</envClassifier>
-				<finmath-lib.version>4.1.1</finmath-lib.version>
+				<finmath-lib.version>4.1.7</finmath-lib.version>
 				<finmath-plot.version>0.3.2-SNAPSHOT</finmath-plot.version>
 				<finmath-cuda.version>4.1.1</finmath-cuda.version>
 			</properties>
@@ -202,14 +202,14 @@
 			<artifactId>finmath-lib-plot-extensions</artifactId>
 			<version>${finmath-plot.version}</version>
 		</dependency>
-
+<!--
 		<dependency>
 			<groupId>net.finmath</groupId>
 			<artifactId>finmath-lib-cuda-extensions</artifactId>
 			<version>${finmath-cuda.version}</version>
 			<classifier>${finmath-cuda.classifier}</classifier>
 		</dependency>
-
+-->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>

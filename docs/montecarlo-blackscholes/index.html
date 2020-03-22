@@ -147,7 +147,7 @@
 
 		Given a Brownian motion providing the Brownian increments \( \Delta W(t_{i}) \),
 		we create a model (here a <code>BlackScholesModel</code>) and from that a simulation
-		of this model using an Euler scheme (via EulerSchemeFromProcessModel).
+		of this model using an Euler scheme (via <code>EulerSchemeFromProcessModel</code>).
 		
 		The model is \( \mathrm{d}S(t) = r S(t) \mathrm{d} + \sigma(t) S(t) \mathrm{d}W(t) ; \quad S(t_{0}) = S_{0} \),
 		where
@@ -174,16 +174,13 @@
 				// Create a model
 				var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility);
 				
-				// Create a corresponding MC process
+				// Create a corresponding MC process from the model
 				var td = new TimeDiscretizationFromArray(0.0, 300, 0.01);
 				var brownianMotion = new BrownianMotionLazyInit(td, 1, 10000, 3231);
-				var process = new EulerSchemeFromProcessModel(brownianMotion);
-				
-				// Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
-				var simulation = new MonteCarloAssetModel(model, process);
+				var process = new EulerSchemeFromProcessModel(model, brownianMotion);
 				
 				// Create a function, plotting paths t -> S(t)
-				DoubleToRandomVariableFunction paths = time -> simulation.getAssetValue(time, 0 /* assetIndex */);
+				DoubleToRandomVariableFunction paths = time -> process.getProcessValue(td.getTimeIndex(time), 0 /* assetIndex */);
 				
 				// Plot 100 of paths against the given time discretization.
 				var plot = new PlotProcess2D(td, paths, 100);
@@ -212,12 +209,16 @@
 			</code></pre></div>
 		</div>
 
-		Given that the objects <code>simulation</code> and <code>europeanOption</code> have been initialized, we can value the product against the simulation:
+		Given that the objects <code>process</code> and <code>europeanOption</code> have been initialized, we can value the product against the simulation:
 
 		<div class="codeboxwithheader">
 			JShell: (continued)
 			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment3-1">Copy to clipboard</button></span>
 			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment3-1">
+				// Using the process (Euler scheme) and provide methods like getAssetValue and getNumeraire
+				var simulation = new MonteCarloAssetModel(process);
+
+				// Use the simulation to value the product				
 				var valueOfEuropeanOption = europeanOption.getValue(0.0, simulation);
 				var value = valueOfEuropeanOption.average().doubleValue();
 			</code></pre></div>
@@ -249,7 +250,15 @@
 			</code></pre></div>
 		</div>
 
-		We may compare the value obtained from the Monte-Carlo simulation with the analytic solution using Black-Scholes formula:
+		<center>
+			<img width="100%" src="experiment-03.svg"/>
+		</center>
+
+		<h3>Analytic Benchmark</h3>
+
+		<p>
+			We may compare the value obtained from the Monte-Carlo simulation with the analytic solution using Black-Scholes formula:
+		</p>
 
 		<div class="codeboxwithheader">
 			JShell: (continued)
@@ -262,10 +271,6 @@
 		</div>
 
 		The value reported is 17.984... .
-
-		<center>
-			<img width="100%" src="experiment-03.svg"/>
-		</center>
 
 		<h2>Summary (Experiments 1-3)</h2>
 		

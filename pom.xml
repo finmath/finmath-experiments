@@ -15,10 +15,20 @@
 		<src.test.kotlin.dir>src/test/kotlin</src.test.kotlin.dir>
 		<kotlin.version>1.2.0</kotlin.version>
 		<junit.version>4.12</junit.version>
-		<finmath-lib.version>4.1.4</finmath-lib.version>
+		<finmath-lib.version>4.1.7</finmath-lib.version>
 		<finmath-plot.version>0.3.2</finmath-plot.version>
 		<finmath-cuda.version>4.1.2</finmath-cuda.version>
 		<finmath-cuda.classifier></finmath-cuda.classifier>
+		<!-- maven plugins -->
+		<compiler-plugin.version>3.8.1</compiler-plugin.version>
+		<surefire-plugin.version>3.0.0-M4</surefire-plugin.version>
+		<surefire-report-plugin.version>3.0.0-M4</surefire-report-plugin.version>
+		<javadoc-plugin.version>3.1.1</javadoc-plugin.version>
+		<jar-plugin.version>3.2.0</jar-plugin.version>
+		<source-plugin.version>3.2.1</source-plugin.version>
+		<site-plugin.version>3.8.2</site-plugin.version>
+		<checkstyle-plugin.version>3.1.1</checkstyle-plugin.version>
+		<clover-plugin.version>4.4.1</clover-plugin.version>
 	</properties>
 
 	<licenses>
@@ -60,7 +70,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
+				<version>${compiler-plugin.version}</version>
 				<configuration>
 					<release>11</release>
 					<source>11</source>
@@ -71,7 +81,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.21.0</version>
+				<version>${surefire-plugin.version}</version>
 				<configuration>
 					<argLine>-mx5G</argLine>
 				</configuration>
@@ -79,7 +89,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>${checkstyle-plugin.version}</version>
 				<configuration>
 					<configLocation>finmath-checkstyle.xml</configLocation>
 				</configuration>
@@ -87,12 +97,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
-				<version>3.7.1</version>
+				<version>${site-plugin.version}</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.1.1</version>
+				<version>${javadoc-plugin.version}</version>
 			</plugin>
 
 			<plugin>

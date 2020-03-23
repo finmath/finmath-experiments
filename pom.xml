@@ -10,14 +10,14 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<src.main.java.dir>src/main/java</src.main.java.dir>
-		<src.test.java.dir>src/main/java</src.test.java.dir>
+		<src.test.java.dir>src/test/java</src.test.java.dir>
 		<src.main.kotlin.dir>src/main/kotlin</src.main.kotlin.dir>
 		<src.test.kotlin.dir>src/test/kotlin</src.test.kotlin.dir>
 		<kotlin.version>1.2.0</kotlin.version>
 		<junit.version>4.12</junit.version>
 		<finmath-lib.version>4.1.7</finmath-lib.version>
 		<finmath-plot.version>0.3.3</finmath-plot.version>
-		<finmath-cuda.version>4.1.2</finmath-cuda.version>
+		<finmath-cuda.version>4.1.7</finmath-cuda.version>
 		<finmath-cuda.classifier></finmath-cuda.classifier>
 		<!-- maven plugins -->
 		<compiler-plugin.version>3.8.1</compiler-plugin.version>
@@ -154,8 +154,8 @@
 			<properties>
 				<envClassifier>experimental</envClassifier>
 				<finmath-lib.version>4.1.7</finmath-lib.version>
-				<finmath-plot.version>0.3.2-SNAPSHOT</finmath-plot.version>
-				<finmath-cuda.version>4.1.1</finmath-cuda.version>
+				<finmath-plot.version>0.3.8-SNAPSHOT</finmath-plot.version>
+				<finmath-cuda.version>4.1.7</finmath-cuda.version>
 			</properties>
 		</profile>
 		<profile>
@@ -202,14 +202,14 @@
 			<artifactId>finmath-lib-plot-extensions</artifactId>
 			<version>${finmath-plot.version}</version>
 		</dependency>
-<!--
+
 		<dependency>
 			<groupId>net.finmath</groupId>
 			<artifactId>finmath-lib-cuda-extensions</artifactId>
 			<version>${finmath-cuda.version}</version>
 			<classifier>${finmath-cuda.classifier}</classifier>
 		</dependency>
--->
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>

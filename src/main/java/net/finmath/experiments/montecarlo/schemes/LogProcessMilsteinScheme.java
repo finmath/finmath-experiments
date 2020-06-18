@@ -6,7 +6,7 @@
 package net.finmath.experiments.montecarlo.schemes;
 
 import net.finmath.montecarlo.BrownianMotion;
-import net.finmath.montecarlo.BrownianMotionLazyInit;
+import net.finmath.montecarlo.BrownianMotionFromMersenneRandomNumbers;
 import net.finmath.montecarlo.RandomVariableFromDoubleArray;
 import net.finmath.stochastic.RandomVariable;
 import net.finmath.time.TimeDiscretizationFromArray;
@@ -90,7 +90,7 @@ public class LogProcessMilsteinScheme
 	 */
 	private void doPrecalculateProcess() {
 
-		final BrownianMotion	brownianMotion	= new BrownianMotionLazyInit(
+		final BrownianMotion	brownianMotion	= new BrownianMotionFromMersenneRandomNumbers(
 				new TimeDiscretizationFromArray(0.0, getNumberOfTimeSteps(), getDeltaT()),
 				1,						// numberOfFactors
 				getNumberOfPaths(),
@@ -151,21 +151,21 @@ public class LogProcessMilsteinScheme
 	}
 
 	/**
-	 * @return Returns the initialValue.
+	 * @return Returns the initial value.
 	 */
 	public double getInitialValue() {
 		return initialValue;
 	}
 
 	/**
-	 * @return Returns the nPaths.
+	 * @return Returns the number of paths.
 	 */
 	public int getNumberOfPaths() {
 		return numberOfPaths;
 	}
 
 	/**
-	 * @return Returns the numberOfTimeSteps.
+	 * @return Returns the number of time steps.
 	 */
 	public int getNumberOfTimeSteps() {
 		return numberOfTimeSteps;
@@ -177,5 +177,4 @@ public class LogProcessMilsteinScheme
 	public double getSigma() {
 		return sigma;
 	}
-
 }

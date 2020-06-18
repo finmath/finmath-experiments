@@ -8,6 +8,7 @@ package net.finmath.experiments.montecarlo.schemes;
 import java.text.DecimalFormat;
 
 import net.finmath.montecarlo.BrownianMotion;
+import net.finmath.montecarlo.BrownianMotionFromMersenneRandomNumbers;
 import net.finmath.montecarlo.BrownianMotionLazyInit;
 import net.finmath.montecarlo.RandomVariableFromDoubleArray;
 import net.finmath.stochastic.RandomVariable;
@@ -95,7 +96,7 @@ public class LogProcessEulerScheme
 	 */
 	private void doPrecalculateProcess() {
 
-		final BrownianMotion	brownianMotion	= new BrownianMotionLazyInit(
+		final BrownianMotion	brownianMotion	= new BrownianMotionFromMersenneRandomNumbers(
 				new TimeDiscretizationFromArray(0.0, getNumberOfTimeSteps(), getDeltaT()),
 				1,						// numberOfFactors
 				getNumberOfPaths(),

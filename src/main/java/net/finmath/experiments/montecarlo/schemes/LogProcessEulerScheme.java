@@ -9,7 +9,6 @@ import java.text.DecimalFormat;
 
 import net.finmath.montecarlo.BrownianMotion;
 import net.finmath.montecarlo.BrownianMotionFromMersenneRandomNumbers;
-import net.finmath.montecarlo.BrownianMotionLazyInit;
 import net.finmath.montecarlo.RandomVariableFromDoubleArray;
 import net.finmath.stochastic.RandomVariable;
 import net.finmath.time.TimeDiscretizationFromArray;

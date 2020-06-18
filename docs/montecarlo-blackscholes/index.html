@@ -38,10 +38,10 @@
 
 		<script type="text/javascript">
 			Prism.plugins.NormalizeWhitespace.setDefaults({
-				'remove-trailing': true,
+				'remove-trailing': false,
 				'remove-indent': true,
 				'left-trim': true,
-				'right-trim': true
+				'right-trim': false
 				});
 		</script>
 
@@ -112,7 +112,6 @@
 				var td = new TimeDiscretizationFromArray(0.0, 100, 0.1);
 				var bm = new BrownianMotionLazyInit(td, 1, 10000, 3213);   // change number of paths
 				var x = bm.getBrownianIncrement(0,0);
-				
 			</code></pre></div>
 		</div>
 

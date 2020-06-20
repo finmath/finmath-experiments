@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>finMath.net: Experiments: Random Numbers - Inversion of the Distribution Function</title>
+		<link rel="stylesheet" type="text/css" href="../finmathnet-style.css"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="keywords" content="mathematical finance finmath java monte-carlo black-sholes"/>
+		<meta name="description" content="Monte-Carlo simulation of a Black Scholes model using Java JShell."/>
+		<meta name="robots" content="index, follow"/>
+		<meta name="language" content="en"/>
+		<meta http-equiv="Content-Language" content="en"/>
+		<meta name="viewport" content="width=device-width"/>
+	</head>
+	<body>
+		<!--
+		<script type="text/javascript">
+			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+		<script type="text/javascript">
+			var pageTracker = _gat._getTracker("UA-849152-2");
+			pageTracker._trackPageview();
+		</script>
+		-->
+		<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+		<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+		<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+		<script>new ClipboardJS('.btn');</script>
+
+	
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.css" rel="stylesheet" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/components/prism-core.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/plugins/autoloader/prism-autoloader.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/plugins/normalize-whitespace/prism-normalize-whitespace.js"></script>
+
+		<script type="text/javascript">
+			Prism.plugins.NormalizeWhitespace.setDefaults({
+				'remove-trailing': false,
+				'remove-indent': true,
+				'left-trim': true,
+				'right-trim': false
+				});
+		</script>
+
+		<header>
+			<span class="logo-white">finMath</span><span class="logo-red">.net</span>
+		</header>
+
+		<h1>Random Numbers - Inversion of the Distribution Function</h1>
+
+		<b>Getting Started</b>
+
+		<p>
+			Checkout finmath-experiments from git and run maven (<code>mvn</code> or <code>mvnw</code>) from its directory.
+			See <a href="../getting-started">Getting Started</a> for details.
+		</p>
+		
+		<h1>Experiment 1-2: Random Numbers - Inversion of the Distribution Function</h1>
+
+		Run the following experiment from your JShell (which was launched from finmath-experiments).
+
+		<h2>Experiment 1</h2>
+
+		<p>
+		The following will create an array of uniform distributed random numbers using a
+		quasi random number generator (van-der-Corput Sequence or Halton sequence with base 2).
+		</p>
+
+		<p>
+		It then applied the inverse of the cummulated distribution function of the normal distribution
+		to it, to generate normal distributed (quasi) random numbers.
+		</p>
+		
+		<div class="codeboxwithheader">
+			JShell: 
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment1">Copy to clipboard</button></span>
+			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment1">
+				import net.finmath.plots.Plots;
+		
+				var uniformSequence = new net.finmath.randomnumbers.VanDerCorputSequence(2);
+		
+				List&lt;Double&gt; valuesNormal = new ArrayList<>();
+				List&lt;Double&gt; valuesUniform = new ArrayList<>();
+				for(int i = 0; i<100000; i++) {
+					double uniform = uniformSequence.getAsDouble();
+		
+					double normal = net.finmath.functions.NormalDistribution.inverseCumulativeDistribution(uniform);
+		
+					valuesUniform.add(uniform);
+					valuesNormal.add(normal);
+				}
+		
+				Plots.createHistogram(valuesUniform, 100, 4.0).setTitle("Uniform from VanDerCorput").show();
+		
+				Plots.createHistogram(valuesNormal, 100, 4.0).setTitle("Normal via ICDF from VanDerCorput").show();
+			</code></pre></div>
+		</div>
+
+		<center>
+			<img width="45%" src="experiment-01a.svg"/>
+			<img width="45%" src="experiment-01b.svg"/>
+		</center>
+
+		<h2>Experiment 2</h2>
+
+		<p>
+		The following will create an array of uniform distributed random numbers using a
+		pseudo random number generator (Mersenne Twister).
+		</p>
+
+		<p>
+		It then applied the inverse of the cummulated distribution function of the normal distribution
+		to it, to generate normal distributed (pseudo) random numbers.
+		</p>
+		
+		<div class="codeboxwithheader">
+			JShell: 
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment2">Copy to clipboard</button></span>
+			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment2">
+				import net.finmath.plots.Plots;
+		
+				var uniformSequence = new net.finmath.randomnumbers.MersenneTwister(3216);
+		
+				List&lt;Double&gt; valuesNormal = new ArrayList<>();
+				List&lt;Double&gt; valuesUniform = new ArrayList<>();
+				for(int i = 0; i<100000; i++) {
+					double uniform = uniformSequence.getAsDouble();
+		
+					double normal = net.finmath.functions.NormalDistribution.inverseCumulativeDistribution(uniform);
+		
+					valuesUniform.add(uniform);
+					valuesNormal.add(normal);
+				}
+		
+				Plots.createHistogram(valuesUniform, 100, 4.0).setTitle("Uniform from MersenneTwister").show();
+		
+				Plots.createHistogram(valuesNormal, 100, 4.0).setTitle("Normal via ICDF from MersenneTwister").show();
+			</code></pre></div>
+		</div>
+
+		<center>
+			<img width="45%" src="experiment-02a.svg"/>
+			<img width="45%" src="experiment-02b.svg"/>
+		</center>
+
+		<h2>Summary (Experiments 1-3)</h2>
+		
+		We have created a simulation, calculated the value of a European option.
+
+		<h2>Where to continue</h2>
+		
+		You may continue with
+		<ul>
+			<li>
+				<a href="../algorithmicdifferentiation-dependencyinjection">Algorithmic Differentiation and Dependency Injection</a>
+			</li>
+		</ul>
+		
+	</body>
+</html>

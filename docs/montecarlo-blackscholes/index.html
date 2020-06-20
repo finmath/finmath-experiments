@@ -51,25 +51,12 @@
 
 		<h1>Monte-Carlo Simulation of a Black Scholes Model</h1>
 
-		<h1>Getting started</h1>
+		<b>Getting Started</b>
 
-		The experiments below use Java JShell started from a Maven project as a starting point (if you already started JShell from <code>finmath-experiments</code> you may continue in that shell, although it is safer to <code>/exit</code> that shell and restart a new one).
-		<ol>
-			<li>Open a command shell</li>
-			<li>Type <code>mkdir git</code> (to create a folder <code>git</code>, if you do not have one)</li>
-			<li>Type <code>cd git</code> (to enter your  <code>git</code> folder)</li>
-			<li>Next, clone (i.e. download) the repository (<code>git</code>), change to the cloned directory (<code>cd</code>) and start jshell via Maven (<code>mvn</code>) by typing the following three commands:</li>
-		</ol>
-        
-		<div class="codeboxwithheader">
-			Terminal Window
-			<span style="float: right;"><button class="btn" data-clipboard-target="#setup1">Copy to clipboard</button></span>
-			<div class="codebox"><pre class="prettyprint"><code class="language-sh" id="setup1">
-				git clone https://github.com/finmath/finmath-experiments        
-				cd finmath-experiments
-				mvn clean compile jshell:run
-			</code></pre></div>
-		</div>
+		<p>
+			Checkout finmath-experiments from git and run maven (<code>mvn</code> or <code>mvnw</code>) from its directory.
+			See <a href="../getting-started">Getting Started</a> for details.
+		</p>
 
 		<h1>Experiment 0-4: Monte-Carlo Simulation and Valuation</h1>
 
@@ -95,9 +82,9 @@
 		<h2>Experiment 1</h2>
 
 		<p>
-			In the following experiment we create a class of type <code>BrownianMotionLazyInit</code> (from the package <code>net.finmath.montecarlo</code>)
+			In the following experiment we create a class of type <code>BrownianMotionFromMersenneRandomNumbers</code> (from the package <code>net.finmath.montecarlo</code>)
 			which represent samples of a set of (independent) normal distributed random variables \( \Delta W(t_{i}) \) (the so called Brownian increments).
-			The arguments of <code>BrownianMotionLazyInit</code> are <code>(timeDiscretization, numberOfFactors, numberOfPaths, seed)</code>, where numberOfFactors refers to the vector dimension of \( \Delta W(t_{i}) \).
+			The arguments of <code>BrownianMotionFromMersenneRandomNumbers</code> are <code>(timeDiscretization, numberOfFactors, numberOfPaths, seed)</code>, where numberOfFactors refers to the vector dimension of \( \Delta W(t_{i}) \).
 			In the following we create a one factor (i.e., one dimensional) Brownian motion:
 		</p>
 		
@@ -134,7 +121,7 @@
 			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment1-3">
 				for(int i=2; i<100; i+=1) {
 					int numberOfPaths = i*i*Math.max(i/10,1);
-					Plots.updateHistogram(plot, (new BrownianMotionLazyInit(td, 1, numberOfPaths, 3213)).getBrownianIncrement(0,0), 100, 5.0);
+					Plots.updateHistogram(plot, (new BrownianMotionFromMersenneRandomNumbers(td, 1, numberOfPaths, 3213)).getBrownianIncrement(0,0), 100, 5.0);
 					Thread.sleep(100);
 				}
 			</code></pre></div>

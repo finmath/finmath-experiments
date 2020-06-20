@@ -59,9 +59,16 @@ Here are a few remarks in case you like to create and contribute a web page with
 
 -	Used the same HTML header as in the example on Monte-Carlo simulation, see <a href="montecarlo-blackscholes">montecarlo-blackscholes</a> (adjusting title and description).
 
--	Use the correct HTML tags for code blocks, i.e. the tag `<div class="codeboxwithheader">` and everything that is inside. Just change the title text and the code inside.
+-	Use the correct HTML tags for code blocks, i.e. the tag `<div class="codeboxwithheader">` and everything that is inside. Just change the title text, the id and the code inside.
 
--	Check you page on a mobile device (iPhone, iPad). Long package names or class names can lead to layout issues.
+-	If you like to use the <i>Copy to clipboard</i> button, make sure that value in <tt>data-clipboard-target</tt> corresponds to the id in the <tt>pre</tt>-tag. Like <tt>experiment1</tt> in this example:
+
+		<span style="float: right;"><button class="btn" data-clipboard-target="#experiment1">Copy to clipboard</button></span>
+			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment1">
+
+			</code></pre></div>
+
+-	Check your page on a mobile device (iPhone, iPad). Long package names or class names can lead to layout issues.
 
 -	If you create plots, the best quality can be achieved by saving the plot as SVG. Use `plot.saveAsSVG(new File(filename), 800, 450))`
 

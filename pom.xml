@@ -15,8 +15,8 @@
 		<src.test.kotlin.dir>src/test/kotlin</src.test.kotlin.dir>
 		<kotlin.version>1.2.0</kotlin.version>
 		<junit.version>4.12</junit.version>
-		<finmath-lib.version>4.1.7</finmath-lib.version>
-		<finmath-plot.version>0.3.3</finmath-plot.version>
+		<finmath-lib.version>5.0.2</finmath-lib.version>
+		<finmath-plot.version>0.3.9</finmath-plot.version>
 		<finmath-cuda.version>4.1.7</finmath-cuda.version>
 		<finmath-cuda.classifier></finmath-cuda.classifier>
 		<!-- maven plugins -->
@@ -55,7 +55,7 @@
 	</developers>
 
 	<build>
-		<defaultGoal>clean install</defaultGoal>
+		<defaultGoal>clean install jshell:run</defaultGoal>
 		<finalName>${project.artifactId}-${project.version}</finalName>
 		<sourceDirectory>${src.main.java.dir}</sourceDirectory>
 		<testSourceDirectory>${src.test.java.dir}</testSourceDirectory>
@@ -218,7 +218,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.8.1</version>
+			<version>3.10</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

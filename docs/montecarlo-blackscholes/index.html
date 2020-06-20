@@ -110,7 +110,7 @@
 				import net.finmath.time.*;
 				
 				var td = new TimeDiscretizationFromArray(0.0, 100, 0.1);
-				var bm = new BrownianMotionLazyInit(td, 1, 10000, 3213);   // change number of paths
+				var bm = new BrownianMotionFromMersenneRandomNumbers(td, 1, 10000, 3213);   // change number of paths
 				var x = bm.getBrownianIncrement(0,0);
 			</code></pre></div>
 		</div>
@@ -120,7 +120,7 @@
 			JShell: 
 			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment1-2">Copy to clipboard</button></span>
 			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment1-2">
-				var plot = Plots.createPlotOfHistogram(x, 100, 5.0);
+				var plot = Plots.createHistogram(x, 100, 5.0);
 				plot.setTitle("Histogram").setXAxisLabel("value").setYAxisLabel("frequency");
 				plot.show();
 				
@@ -134,7 +134,7 @@
 			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment1-3">
 				for(int i=2; i<100; i+=1) {
 					int numberOfPaths = i*i*Math.max(i/10,1);
-					Plots.updatePlotOfHistogram(plot, (new BrownianMotionLazyInit(td, 1, numberOfPaths, 3213)).getBrownianIncrement(0,0), 100, 5.0);
+					Plots.updateHistogram(plot, (new BrownianMotionLazyInit(td, 1, numberOfPaths, 3213)).getBrownianIncrement(0,0), 100, 5.0);
 					Thread.sleep(100);
 				}
 			</code></pre></div>
@@ -177,7 +177,7 @@
 				
 				// Create a corresponding MC process from the model
 				var td = new TimeDiscretizationFromArray(0.0, 300, 0.01);
-				var brownianMotion = new BrownianMotionLazyInit(td, 1, 10000, 3231);
+				var brownianMotion = new BrownianMotionFromMersenneRandomNumbers(td, 1, 10000, 3231);
 				var process = new EulerSchemeFromProcessModel(model, brownianMotion);
 				
 				// Create a function, plotting paths t -> S(t)
@@ -245,7 +245,7 @@
 			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment3-3">
 				var underlying = simulation.getAssetValue(maturity, 0 /* assetIndex */);
 				
-				var plot = Plots.createPlotOfHistogramBehindValues(underlying, valueOfEuropeanOption, 100 /* bins */, 5.0 /* stddev */);
+				var plot = Plots.createHistogramBehindValues(underlying, valueOfEuropeanOption, 100 /* bins */, 5.0 /* stddev */);
 				plot.setTitle("European option value and distribution of underlying").setXAxisLabel("underlying").setYAxisLabel("value");
 				plot.show();
 			</code></pre></div>

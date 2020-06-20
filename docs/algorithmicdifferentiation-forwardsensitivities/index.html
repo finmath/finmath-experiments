@@ -106,11 +106,11 @@
 				
 				// Create a corresponding MC process
 				var td = new TimeDiscretizationFromArray(0.0, 300, 0.01);
-				var brownianMotion = new BrownianMotionLazyInit(td, 1, 10000, 3231);
-				var process = new EulerSchemeFromProcessModel(brownianMotion);
+				var brownianMotion = new BrownianMotionFromMersenneRandomNumbers(td, 1, 10000, 3231);
+				var process = new EulerSchemeFromProcessModel(model, brownianMotion);
 				
 				// Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
-				var simulation = new MonteCarloAssetModel(model, process);
+				var simulation = new MonteCarloAssetModel(process);
 			</code></pre></div>
 		</div>
 		
@@ -150,7 +150,7 @@
 				var underlyingAtMaturity = simulation.getAssetValue(maturity, 0);
 				var hedgeValue = hedge.getValue(maturity, simulation);
 
-				var plot = Plots.createPlotScatter(underlyingAtMaturity, hedgeValue, 50.0, 110.0);
+				var plot = Plots.createScatter(underlyingAtMaturity, hedgeValue, 50.0, 110.0);
 				plot.setTitle("Hedge Portfolio").setXAxisLabel("underlying").setYAxisLabel("portfolio value");
 				plot.show();
 			</code></pre></div>
@@ -181,11 +181,11 @@ We can change this by passing a property to the RandomVariableDifferentiableAADF
 				
 				// Create a corresponding MC process
 				var td = new TimeDiscretizationFromArray(0.0, 300, 0.01);
-				var brownianMotion = new BrownianMotionLazyInit(td, 1, 10000, 3231);
-				var process = new EulerSchemeFromProcessModel(brownianMotion);
+				var brownianMotion = new BrownianMotionFromMersenneRandomNumbers(td, 1, 10000, 3231);
+				var process = new EulerSchemeFromProcessModel(model, brownianMotion);
 				
 				// Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
-				var simulation = new MonteCarloAssetModel(model, process);
+				var simulation = new MonteCarloAssetModel(process);
 			</code></pre></div>
 		</div>
 

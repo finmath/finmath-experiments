@@ -5,6 +5,7 @@ package net.finmath.experiments.hedgesimulator;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -60,7 +61,7 @@ public class HedgeSimulatorPanel extends JPanel implements ActionListener, Runna
 	/**
 	 * Model parameters
 	 */
-	private int				numberOfPaths			= 1000;
+	private int				numberOfPaths			= 4000;
 	private JTextField		numberOfPathsTextField	= new JTextField();
 	private JNumberField	initialValueTextField	= new JNumberField(1.0,	 new DecimalFormat("0.00"), this);
 	private JNumberField	riskFreeRateTextField	= new JNumberField(0.05,	 new DecimalFormat("0.00"), this);
@@ -76,13 +77,13 @@ public class HedgeSimulatorPanel extends JPanel implements ActionListener, Runna
 	 * Option parameters
 	 */
 	private JNumberField		optionMaturityTextField		= new JNumberField(2.0,	 new DecimalFormat("0.00"), this);
-	private JNumberField		optionStrikeTextField			= new JNumberField(1.0,	 new DecimalFormat("0.00"), this);
+	private JNumberField		optionStrikeTextField		= new JNumberField(1.0,	 new DecimalFormat("0.00"), this);
 
 	/**
 	 * Hedge parameters
 	 */
-	private JNumberField		hedgeRiskFreeRateTextField	= new JNumberField(0.05,	 new DecimalFormat("0.00"), this);
-	private JNumberField		hedgeVolatilityTextField		= new JNumberField(0.5,	 new DecimalFormat("0.00"), this);
+	private JNumberField		hedgeRiskFreeRateTextField	= new JNumberField(0.05, new DecimalFormat("0.00"), this);
+	private JNumberField		hedgeVolatilityTextField	= new JNumberField(0.5,	 new DecimalFormat("0.00"), this);
 
 	private JComboBox<String> 		comboBoxHedgeStrategy;
 
@@ -216,13 +217,11 @@ public class HedgeSimulatorPanel extends JPanel implements ActionListener, Runna
 				chart,
 				320, 320,	// size
 				320, 320,	// minimum size
-				1024, 1024,	// maximum size
+				2048, 2048,	// maximum size
 				false, true, true, true, true, false		// useBuffer, properties, save, print, zoom, tooltips
 				));
 
-		//		StandardXYItemRenderer areaRenderer = new StandardXYItemRenderer(StandardXYItemRenderer.LINES);
 		final XYAreaRenderer areaRenderer = new XYAreaRenderer(XYAreaRenderer.AREA);
-
 		xAxis = new NumberAxis("Hedge error");
 		yAxis = new NumberAxis("Occurence");
 		xAxis.setNumberFormatOverride(new DecimalFormat("0.0"));
@@ -232,7 +231,6 @@ public class HedgeSimulatorPanel extends JPanel implements ActionListener, Runna
 		xAxis.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 12));
 		yAxis.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 12));
 		xAxis.setRange(-0.5,0.5);
-		//		yAxis.setRange(0.0,1.0);
 
 		final XYPlot plot2 = new XYPlot(datasetHistogram, xAxis, yAxis, areaRenderer);
 		plot.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
@@ -244,7 +242,7 @@ public class HedgeSimulatorPanel extends JPanel implements ActionListener, Runna
 				chart2,
 				320, 320,	// size
 				320, 320,	// minimum size
-				1024, 1024,	// maximum size
+				2048, 2048,	// maximum size
 				false, true, true, true, true, false	// useBuffer, properties, save, print, zoom, tooltips
 				));
 
@@ -272,12 +270,15 @@ public class HedgeSimulatorPanel extends JPanel implements ActionListener, Runna
 		final Container cp = this;
 		cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
 
+		inputPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
+		chartPanel.setPreferredSize(new Dimension(900, 200));
+		bottomLinePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
 		cp.add(Box.createVerticalStrut(10));
-		cp.add(Box.createVerticalGlue());
+		//		cp.add(Box.createVerticalGlue());
 		cp.add(inputPanel);
-		cp.add(Box.createVerticalGlue());
+		//		cp.add(Box.createVerticalGlue());
 		cp.add(chartPanel);
-		cp.add(Box.createVerticalGlue());
+		//		cp.add(Box.createVerticalGlue());
 		cp.add(bottomLinePanel);
 		this.setSize(900,600);
 
@@ -481,7 +482,7 @@ public class HedgeSimulatorPanel extends JPanel implements ActionListener, Runna
 			datasetPayoff.addSeries(seriesPortfolio);
 
 			// Create binning for histogram
-			final int			numberOfErrorBins	= 32;
+			final int			numberOfErrorBins	= 64;
 			final XYSeries		seriesError			= new XYSeries("Error");
 			final int errorCount[] = new int[numberOfErrorBins];
 			java.util.Arrays.fill(errorCount,0);

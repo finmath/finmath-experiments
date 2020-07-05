@@ -1,7 +1,5 @@
 package net.finmath.experiments.hedgesimulator;
 
-import javax.swing.SwingUtilities;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingNode;
@@ -23,7 +21,7 @@ public class HedgeSimulatorApp extends Application {
 		Scene scene = new Scene(pane, 1200, 800);
 
 		stage.setScene(scene);
-//		stage.setFullScreen(true);
+		//		stage.setFullScreen(true);
 		stage.show();
 	}
 
@@ -32,7 +30,6 @@ public class HedgeSimulatorApp extends Application {
 	}
 
 	private void createAndSetSwingContent(final SwingNode swingNode) {
-		//SwingUtilities.invokeLater(new Runnable() {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
@@ -44,7 +41,6 @@ public class HedgeSimulatorApp extends Application {
 
 	public static void main(String[] args) {
 		launch(args);
-//		System.exit(0); // Not very graceful, but currently a workaround for runing in jshell.
 	}
 
 	public static  void launch() {

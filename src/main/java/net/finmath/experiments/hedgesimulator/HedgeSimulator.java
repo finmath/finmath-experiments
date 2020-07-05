@@ -8,6 +8,7 @@ public class HedgeSimulator {
 
 	public static void main(String[] args) {
 		System.out.println("Starting HedgeSimulator...");
+		run();
 	}
 	
 	public static void run() {

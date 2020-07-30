@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>finMath.net: Experiments: Bermudan Option Valuation in a Monte-Carlo Simulation of Black-Scholes Model</title>
+		<link rel="stylesheet" type="text/css" href="../finmathnet-style.css"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="keywords" content="mathematical finance finmath java monte-carlo black-sholes"/>
+		<meta name="description" content="Monte-Carlo simulation of a Black Scholes model using Java JShell."/>
+		<meta name="robots" content="index, follow"/>
+		<meta name="language" content="en"/>
+		<meta http-equiv="Content-Language" content="en"/>
+		<meta name="viewport" content="width=device-width"/>
+	</head>
+	<body>
+		<!--
+		<script type="text/javascript">
+			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+		<script type="text/javascript">
+			var pageTracker = _gat._getTracker("UA-849152-2");
+			pageTracker._trackPageview();
+		</script>
+		-->
+		<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+		<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+		<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+		<script>new ClipboardJS('.btn');</script>
+
+	
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.css" rel="stylesheet" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/components/prism-core.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/plugins/autoloader/prism-autoloader.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/plugins/normalize-whitespace/prism-normalize-whitespace.js"></script>
+
+		<script type="text/javascript">
+			Prism.plugins.NormalizeWhitespace.setDefaults({
+				'remove-trailing': false,
+				'remove-indent': true,
+				'left-trim': true,
+				'right-trim': false
+				});
+		</script>
+
+		<header>
+			<span class="logo-white">finMath</span><span class="logo-red">.net</span>
+		</header>
+
+		<h1>Bermudan Option Valuation in a Monte-Carlo Simulation of Black-Scholes Model</h1>
+
+		<b>Getting Started</b>
+
+		<p>
+			Checkout finmath-experiments from git and run maven (<code>mvn</code> or <code>mvnw</code>) from
+			its directory. This will start a JShell.
+			See <a href="../getting-started">Getting Started</a> for details.
+		</p>
+
+		<h1>Experiment 1-3: Monte-Carlo Valuation of a Bermudan Option: Optimal Exercise and Foresight</h1>
+
+		Run the following experiment from your JShell (which was launched from finmath-experiments).
+
+		<h2>Experiment 1</h2>
+
+		<p>
+			The following will value a Bermudan option with
+			two exercise dates \( T_{1} \) and \( T_{2} \),
+			with the right to receive either
+			\( S(T_{1})-K_{1} \) in \( T_{1} \) or
+			\( S(T_{2})-K_{2} \) in \( T_{2} \) or nothing.
+		</p>
+		<p>
+			Since we assume a Black-Scholes model, the second option can be valued
+			analytically using the Black-Scholes formula, and hence, the exercise
+			criteria for the first exercise date is known analytically.
+		</p>
+
+		<p>
+			We calculate the numeraire relative Bermudan exercise value \( U(T)/N(T) \)
+			where \( T \) is the optimal exercise time - a stochastic time being either 
+			\( T_{1} \) or \( T_{2} \). And \( U(T)[\omega] \) is given by
+			<ul>
+				<li>
+					\( U(T_{1},\omega) = \max(S(T_{1},\omega)-K_{1},0) \) if \( U(T_{1},\omega) > V_{2}(T_{1},\omega) \)
+				</li>
+				<li>
+					\( U(T_{2},\omega) = \max(S(T_{2},\omega)-K_{2},0) \) else,
+				</li>
+			</ul>
+			where \( V_{2}(T_{1}) \) is the time \( T_{1} \) value of the time \( T_{2} \) option
+			\( \max(S(T_{2},\omega)-K_{2},0) \) (which - in this special example - can be calculated
+			analytically).
+		</p>
+
+		<p>
+			Form this, the Bermudan value is given by the unconditional expectation
+			\[
+				N(0) \mathrm{E}\Big( \frac{U(T)}{N(T)} \Big) \text{.}
+			\]			
+		</p>
+
+		<p>
+			In addition, we value the super-optimal exercise using 'perfect foresight'
+			where the super-optimal exercise criteria uses the future on-path value.
+			This strategy is wrong. We consider it for illustration.
+		</p>
+
+		<div class="codeboxwithheader">
+			JShell: 
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment1">Copy to clipboard</button></span>
+			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment1">
+
+				import java.awt.Color;
+				import java.awt.Rectangle;
+				import java.util.List;
+				
+				import net.finmath.functions.AnalyticFormulas;
+				import net.finmath.montecarlo.BrownianMotion;
+				import net.finmath.montecarlo.BrownianMotionFromMersenneRandomNumbers;
+				import net.finmath.montecarlo.assetderivativevaluation.MonteCarloAssetModel;
+				import net.finmath.montecarlo.assetderivativevaluation.models.BlackScholesModel;
+				import net.finmath.montecarlo.process.EulerSchemeFromProcessModel;
+				import net.finmath.montecarlo.process.MonteCarloProcess;
+				import net.finmath.plots.GraphStyle;
+				import net.finmath.plots.Plot;
+				import net.finmath.plots.Plot2D;
+				import net.finmath.plots.Plotable2D;
+				import net.finmath.plots.PlotablePoints2D;
+				import net.finmath.stochastic.RandomVariable;
+				import net.finmath.time.TimeDiscretizationFromArray;
+		
+				double initialValue = 100.0;
+				double riskFreeRate = 0.05;
+				double volatility = 0.30;
+		
+				double initialTime = 0.0;
+				double timeHorizon = 2.0;
+				double dt = 1.0;
+		
+				int numberOfPaths = 5000;
+				int seed = 3141;
+		
+				double maturity1 = 1.0;
+				double strike1 = 120.0;
+		
+				double maturity2 = 2.0;
+				double strike2 = 140.0;
+		
+				BlackScholesModel blackScholesModel = new BlackScholesModel(initialValue, riskFreeRate, volatility);
+				BrownianMotion bm = new BrownianMotionFromMersenneRandomNumbers(new TimeDiscretizationFromArray(initialTime, (int)Math.round(timeHorizon/dt), dt), 1, numberOfPaths, seed);
+				MonteCarloProcess process = new EulerSchemeFromProcessModel(blackScholesModel, bm);
+				MonteCarloAssetModel model = new MonteCarloAssetModel(process);
+		
+				RandomVariable stockInT2 = model.getAssetValue(maturity2, 0);		// S(T2)
+				RandomVariable stockInT1 = model.getAssetValue(maturity1, 0);		// S(T1)
+		
+				RandomVariable valueOption2InT2 = stockInT2.sub(strike2).floor(0.0);	// max(S(T2)-K,0)
+				RandomVariable valueOption1InT1 = stockInT1.sub(strike1).floor(0.0);	// max(S(T1)-K,0)
+				RandomVariable valueOption2InT1 = AnalyticFormulas.blackScholesOptionValue(stockInT1, riskFreeRate, volatility, maturity2-maturity1, strike2);
+		
+				// Convert all time T-values to numeraire relative values by dividing by N(T)
+				RandomVariable valueRelativeOption2InT2 = valueOption2InT2.div(model.getNumeraire(maturity2));
+				RandomVariable valueRelativeOption1InT1 = valueOption1InT1.div(model.getNumeraire(maturity1));
+				RandomVariable valueRelativeOption2InT1 = valueOption2InT1.div(model.getNumeraire(maturity1));
+				
+				RandomVariable bermudanPathwiseValueAdmissible = valueRelativeOption2InT1.sub(valueRelativeOption1InT1)
+						.choose(valueRelativeOption2InT2, valueRelativeOption1InT1);
+		
+				RandomVariable bermudanPathwiseValueForesight = valueRelativeOption2InT2.sub(valueRelativeOption1InT1)
+						.choose(valueRelativeOption2InT2, valueRelativeOption1InT1);
+		
+				var bermudanValueWithForsight = bermudanPathwiseValueForesight.mult(model.getNumeraire(0.0)).getAverage();
+				var bermudanValue = bermudanPathwiseValueAdmissible.mult(model.getNumeraire(0.0)).getAverage();
+			</code></pre></div>
+		</div>
+		
+
+		<h2>Experiment 2</h2>
+
+		<p>
+			The following code has to be run after Experiment 1 since it requires
+			initialization of variables from there.
+		</p>
+			
+		<p>
+			The following code will create a scatter plot illustrating the optimal exercise of a
+			Bermudan option with two exercise dates \( T_{1} \) and \( T_{2} \),
+			with the right to receive either
+			\( S(T_{1})-K_{1} \) in \( T_{1} \) or
+			\( S(T_{2})-K_{2} \) in \( T_{2} \) or nothing.
+		</p>
+		
+		<div class="codeboxwithheader">
+			JShell: 
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment2">Copy to clipboard</button></span>
+			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment2">
+
+				import java.awt.Color;
+				import java.awt.Rectangle;
+				import java.util.List;
+				
+				import net.finmath.plots.GraphStyle;
+				import net.finmath.plots.Plot;
+				import net.finmath.plots.Plot2D;
+				import net.finmath.plots.Plotable2D;
+				import net.finmath.plots.PlotablePoints2D;
+				import net.finmath.stochastic.RandomVariable;
+				import net.finmath.time.TimeDiscretizationFromArray;
+		
+				/*
+				 * Plot the stuff
+				 */
+				Plotable2D continuationValues = PlotablePoints2D.of("Continuation Value max(S(T\u2082)-K\u2082, 0)", stockInT1, valueRelativeOption2InT2, new GraphStyle(new Rectangle(-1,-1,2,2), null, Color.RED));
+				Plotable2D exerciseValues = PlotablePoints2D.of("Underlying 1 (S(T\u2081)-K\u2081)", stockInT1, valueRelativeOption1InT1, new GraphStyle(new Rectangle(-3,-3,5,5), null, Color.GREEN));
+				Plotable2D expectedContinuationValue = PlotablePoints2D.of("Black Scholes Value of Option on S(T\u2082)-K\u2082", stockInT1, valueRelativeOption2InT1, new GraphStyle(new Rectangle(-3,-3,5,5),null, Color.BLUE));
+				Plotable2D bermudanPathwiseValueAdmissiblePlot = PlotablePoints2D.of("Bermudan exercise value", stockInT1, bermudanPathwiseValueAdmissible, new GraphStyle(new Rectangle(-1,-1,2,2), null, new Color(0.0f, 0.66f, 0.0f)));
+				Plotable2D bermudanPathwiseValueForesightPlot = PlotablePoints2D.of("Exercise value with foresight", stockInT1, bermudanPathwiseValueForesight, new GraphStyle(new Rectangle(-1,-1,2,2), null, new Color(0.50f, 0.50f, 0.0f)));
+		
+				Plot plotBermudanExercise = new Plot2D(
+						List.of(
+								bermudanPathwiseValueAdmissiblePlot,
+								continuationValues,
+								exerciseValues,
+								expectedContinuationValue)
+						)
+				.setYRange(-5, 150)
+				.setIsLegendVisible(true)
+				.setXAxisLabel("S(T\u2081)")
+				.setYAxisLabel("V\u2081(T\u2081), V\u2082(T\u2081), V\u2082(T\u2082)")
+				.setTitle("Time T\u2081 and T\u2082 values related to a Bermudan option with exercises in T\u2081 and T\u2082.");
+				plotBermudanExercise.show();
+			</code></pre></div>
+		</div>
+
+		The code will bring up the following plot:
+		<center>
+			<img width="100%" src="BermudanExerciseAdmissible.svg"/>
+		</center>
+		
+		<p>
+			The plot shows simulations points for different simulation paths (scenarios) &omega;
+			of the following points
+			<ul>
+				<li>
+					<b>light green:</b> \( (S(T_{1},\omega), \max(S(T_{1},\omega)-K_{1},0)) \): the exercise value in \( T_{1} \) as a function of \( S(T_{1},\omega) \)
+				</li>
+				<li>
+					<b>red:</b> \( (S(T_{1},\omega), \max(S(T_{2},\omega)-K_{2},0)) \): the exercise value in \( T_{2} \) as a 'function' of \( S(T_{1},\omega) \)
+				</li>
+				<li>
+					<b>blue:</b> \( (S(T_{1},\omega), V_{2}(T_{1},\omega)) \): the conditional expectation of the \(T_{2}\)-exercise value, conditional to \( T_{1} \) as a function of \( S(T_{1},\omega) \), given by the Black-Scholes formula.
+				</li>
+				<li>
+					<b>dark green:</b> \( (S(T_{1},\omega), U(T)[\omega]) \): the Bermudan optimal exercise value as a function of \( S(T_{1},\omega) \), where the optimal exercise value
+					\( U(T)[\omega] \) is given by
+					\( U(T_{1},\omega) = \max(S(T_{1},\omega)-K_{1},0) \) if \( U(T_{1},\omega) > V_{2}(T_{1},\omega) \)
+					\( U(T_{2},\omega) = \max(S(T_{2},\omega)-K_{2},0) \) else.
+				</li>
+			</ul>
+		</p>
+
+		<h2>Experiment 3</h2>
+
+		<p>
+		The following code creates a similar plot as in the previous Experiment 2,
+		but uses 'perfect foresight' for the exercise decision, by 'looking into the future'.
+		This strategy is wrong. We plot it for illustration.
+		</p>
+
+		<p>
+			The code just differs in a single line, that we plot 
+			<code>bermudanPathwiseValueForesightPlot</code> instead of
+			<code>bermudanPathwiseValueAdmissiblePlot</code>.
+		</p>
+		
+		<div class="codeboxwithheader">
+			JShell: 
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment3">Copy to clipboard</button></span>
+			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment3">
+
+				import java.awt.Color;
+				import java.awt.Rectangle;
+				import java.util.List;
+				
+				import net.finmath.plots.GraphStyle;
+				import net.finmath.plots.Plot;
+				import net.finmath.plots.Plot2D;
+				import net.finmath.plots.Plotable2D;
+				import net.finmath.plots.PlotablePoints2D;
+				import net.finmath.stochastic.RandomVariable;
+				import net.finmath.time.TimeDiscretizationFromArray;
+		
+				/*
+				 * Plot the stuff
+				 */
+				Plotable2D continuationValues = PlotablePoints2D.of("Continuation Value max(S(T\u2082)-K\u2082, 0)", stockInT1, valueRelativeOption2InT2, new GraphStyle(new Rectangle(-1,-1,2,2), null, Color.RED));
+				Plotable2D exerciseValues = PlotablePoints2D.of("Underlying 1 (S(T\u2081)-K\u2081)", stockInT1, valueRelativeOption1InT1, new GraphStyle(new Rectangle(-3,-3,5,5), null, Color.GREEN));
+				Plotable2D expectedContinuationValue = PlotablePoints2D.of("Black Scholes Value of Option on S(T\u2082)-K\u2082", stockInT1, valueRelativeOption2InT1, new GraphStyle(new Rectangle(-3,-3,5,5),null, Color.BLUE));
+				Plotable2D bermudanPathwiseValueAdmissiblePlot = PlotablePoints2D.of("Bermudan exercise value", stockInT1, bermudanPathwiseValueAdmissible, new GraphStyle(new Rectangle(-1,-1,2,2), null, new Color(0.0f, 0.66f, 0.0f)));
+				Plotable2D bermudanPathwiseValueForesightPlot = PlotablePoints2D.of("Exercise value with foresight", stockInT1, bermudanPathwiseValueForesight, new GraphStyle(new Rectangle(-1,-1,2,2), null, new Color(0.50f, 0.50f, 0.0f)));
+
+				Plot plotBermudanExerciseWithForesight = new Plot2D(
+						List.of(
+								bermudanPathwiseValueForesightPlot,
+								continuationValues,
+								exerciseValues,
+								expectedContinuationValue)
+						)
+				.setYRange(-5, 150)
+				.setIsLegendVisible(true)
+				.setXAxisLabel("S(T\u2081)")
+				.setYAxisLabel("V\u2081(T\u2081), V\u2082(T\u2081), V\u2082(T\u2082)")
+				.setTitle("Time T\u2081 and T\u2082 values related to a Bermudan option with exercises in T\u2081 and T\u2082.");
+				plotBermudanExerciseWithForesight.show();
+				plotBermudanExerciseWithForesight.saveAsSVG(new File("BermudanExerciseForesight.svg"),900,600);
+			</code></pre></div>
+		</div>
+
+		The code will bring up the following plot:
+		<center>
+			<img width="100%" src="BermudanExerciseForesight.svg"/>
+		</center>
+		
+		<p>
+			The plot shows simulations points for different simulation paths (scenarios) &omega;
+			of the following points
+			<ul>
+				<li>
+					<b>light green:</b> \( (S(T_{1},\omega), \max(S(T_{1},\omega)-K_{1},0)) \): the exercise value in \( T_{1} \) as a function of \( S(T_{1},\omega) \)
+				</li>
+				<li>
+					<b>red:</b> \( (S(T_{1},\omega), \max(S(T_{2},\omega)-K_{2},0)) \): the exercise value in \( T_{2} \) as a 'function' of \( S(T_{1},\omega) \)
+				</li>
+				<li>
+					<b>blue:</b> \( (S(T_{1},\omega), V_{2}(T_{1},\omega)) \): the conditional expectation of the \(T_{2}\)-exercise value, conditional to \( T_{1} \) as a function of \( S(T_{1},\omega) \), given by the Black-Scholes formula.
+				</li>
+				<li>
+					<b>brown:</b> \( (S(T_{1},\omega), \max(\max(S(T_{1},\omega)-K_{1},0), \max(S(T_{2},\omega)-K_{2},0))) \): the Bermudan super-optimal exercise value by maximizing on every path,
+					which is not an admissible strategy, since the decision is not \( \mathcal{F}_{T_{1}} \)-measurable.
+				</li>
+			</ul>
+		</p>
+
+		<h2>Summary (Experiments 1-3)</h2>
+
+		<p>		
+			We have created a valuation of a Bermudan option in a Black-Scholes model and illustrated
+			the effect of using a wrong exercise strategy using perfect foresight.
+		</p>
+
+		<p>		
+			In this example, the admissible exercise strategy was known analytically, since the
+			Bermuan had only two exercise dates and the model allowed for an analytic valuation
+			of the European option.
+		</p>
+
+		<h2>Where to continue</h2>
+		
+		You may continue with
+		<ul>
+			<li>
+				<a href="../algorithmicdifferentiation-dependencyinjection">Algorithmic Differentiation and Dependency Injection</a>
+			</li>
+		</ul>
+		
+	</body>
+</html>

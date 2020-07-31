@@ -177,11 +177,20 @@
 			</code></pre></div>
 		</div>
 		
+		<p>
+			Run in JShell, this prints out the values
+			<pre class="prettyprint"><code class="language-java" id="output1">
+				bermudanValueWithForsight ==> 11.904281948764233
+				bermudanValue ==> 9.209824685660006
+			</code></pre>
+			That is, the value of the Bermudan option is &approx; 9.21. Performing super-optimal exercise
+			with an non-admissible strategy results in a value of &approx; 11.9.
+		</p>
 
 		<h2>Experiment 2</h2>
 
 		<p>
-			The following code has to be run after Experiment 1 since it requires
+			The following code has to be run after Experiment 1 in the same JShell, since it requires
 			initialization of variables from there.
 		</p>
 			
@@ -265,17 +274,22 @@
 		<h2>Experiment 3</h2>
 
 		<p>
-		The following code creates a similar plot as in the previous Experiment 2,
-		but uses 'perfect foresight' for the exercise decision, by 'looking into the future'.
-		This strategy is wrong. We plot it for illustration.
+			The following code creates a similar plot as in the previous Experiment 2,
+			but uses 'perfect foresight' for the exercise decision, by 'looking into the future'.
+			This strategy is wrong. We plot it for illustration.
 		</p>
-
+		
 		<p>
 			The code just differs in a single line, that we plot 
 			<code>bermudanPathwiseValueForesightPlot</code> instead of
 			<code>bermudanPathwiseValueAdmissiblePlot</code>.
 		</p>
 		
+		<p>
+			The code has to be run after Experiment 1 or 2 in the same JShell, since it requires
+			initialization of variables from there.
+		</p>
+
 		<div class="codeboxwithheader">
 			JShell: 
 			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment3">Copy to clipboard</button></span>

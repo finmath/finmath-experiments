@@ -14,7 +14,7 @@
 		<src.test.kotlin.dir>src/test/kotlin</src.test.kotlin.dir>
 		<kotlin.version>1.2.0</kotlin.version>
 		<junit.version>4.12</junit.version>
-		<finmath-lib.version>5.0.6</finmath-lib.version>
+		<finmath-lib.version>5.0.9</finmath-lib.version>
 		<finmath-plot.version>0.3.10</finmath-plot.version>
 		<finmath-cuda.version>4.1.7</finmath-cuda.version>
 		<finmath-cuda.classifier></finmath-cuda.classifier>

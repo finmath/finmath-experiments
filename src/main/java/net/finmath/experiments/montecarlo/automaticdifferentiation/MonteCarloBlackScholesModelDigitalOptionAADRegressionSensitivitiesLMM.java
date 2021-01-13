@@ -21,8 +21,6 @@ import java.util.stream.Stream;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.ArrayUtils;
-import org.junit.Assert;
-import org.junit.Test;
 
 import net.finmath.exception.CalculationException;
 import net.finmath.functions.AnalyticFormulas;
@@ -34,10 +32,6 @@ import net.finmath.montecarlo.BrownianMotionFromMersenneRandomNumbers;
 import net.finmath.montecarlo.RandomVariableFactory;
 import net.finmath.montecarlo.RandomVariableFromArrayFactory;
 import net.finmath.montecarlo.RandomVariableFromDoubleArray;
-import net.finmath.montecarlo.assetderivativevaluation.MonteCarloAssetModel;
-import net.finmath.montecarlo.assetderivativevaluation.models.BlackScholesModel;
-import net.finmath.montecarlo.assetderivativevaluation.products.DigitalOption;
-import net.finmath.montecarlo.assetderivativevaluation.products.DigitalOptionDeltaLikelihood;
 import net.finmath.montecarlo.automaticdifferentiation.RandomVariableDifferentiable;
 import net.finmath.montecarlo.automaticdifferentiation.backward.RandomVariableDifferentiableAADFactory;
 import net.finmath.montecarlo.automaticdifferentiation.backward.RandomVariableDifferentiableAADFactory.DiracDeltaApproximationMethod;
@@ -54,9 +48,7 @@ import net.finmath.montecarlo.interestrate.models.covariance.LIBORVolatilityMode
 import net.finmath.montecarlo.interestrate.models.covariance.LIBORVolatilityModelFourParameterExponentialForm;
 import net.finmath.montecarlo.interestrate.products.AbstractLIBORMonteCarloProduct;
 import net.finmath.montecarlo.interestrate.products.DigitalCaplet;
-import net.finmath.montecarlo.model.AbstractProcessModel;
 import net.finmath.montecarlo.process.EulerSchemeFromProcessModel;
-import net.finmath.montecarlo.process.MonteCarloProcessFromProcessModel;
 import net.finmath.stochastic.RandomVariable;
 import net.finmath.stochastic.Scalar;
 import net.finmath.time.TimeDiscretization;
@@ -73,19 +65,19 @@ import net.finmath.time.TimeDiscretizationFromArray;
  */
 public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesLMM {
 
-	private static String filenamePrefix = "aad-indicator-analysis-";
+	private static String filenamePrefix = "aad-indicator-analysis-202011-1";
 
 	private static DecimalFormat formatterReal4 = new DecimalFormat("0.0000");
 
 	private static final Function<RandomVariable, String> print = rv -> "\t" + formatterReal4.format(rv.getAverage()) + "\t" + formatterReal4.format(rv.getStandardDeviation());
 	private static final BiFunction<RandomVariable, Double, Stream<Double>> printError = (rv,x) -> List.of((rv.sub(x).getAverage()), (rv.sub(x).average().abs().doubleValue()), (rv.getStandardError()), (rv.sub(x).average().abs().doubleValue() + rv.getStandardError())).stream();
 
-	private static final int numberOfFactors = 5;
+	private static final int numberOfFactors = 1;
 	private static final double correlationDecayParam = 0.01;
 
-	private static final String measure = LIBORMarketModelFromCovarianceModel.Measure.SPOT.name();
+	private static final String measure = LIBORMarketModelFromCovarianceModel.Measure.TERMINAL.name();
 
-	private static final String stateSpace = LIBORMarketModelFromCovarianceModel.StateSpace.LOGNORMAL.name();
+	private static final String stateSpace = LIBORMarketModelFromCovarianceModel.StateSpace.NORMAL.name();
 
 	// Model properties
 	private final double	modelVolatility     = 0.30;
@@ -106,8 +98,8 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 	private final double	periodStart = 9.0;
 	private final double	periodEnd = 10.0;
 
-	//	private DiracDeltaApproximationMethod diracDeltaApproximationMethod = DiracDeltaApproximationMethod.REGRESSION_ON_DENSITY;
-	private DiracDeltaApproximationMethod diracDeltaApproximationMethod = DiracDeltaApproximationMethod.REGRESSION_ON_DISTRIBUITON;
+	private DiracDeltaApproximationMethod diracDeltaApproximationMethod = DiracDeltaApproximationMethod.REGRESSION_ON_DENSITY;
+//	private DiracDeltaApproximationMethod diracDeltaApproximationMethod = DiracDeltaApproximationMethod.REGRESSION_ON_DISTRIBUITON;
 
 
 	public static void main(String[] args) throws CalculationException, CloneNotSupportedException, IOException {

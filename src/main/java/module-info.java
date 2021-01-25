@@ -19,6 +19,7 @@ module net.finmath.experiments {
 	
 	requires java.logging;
 	requires java.management;
+	requires java.sql;
 	requires commons.csv;
 	requires org.apache.commons.lang3;
 }

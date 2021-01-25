@@ -5,6 +5,7 @@ module net.finmath.experiments {
 	exports net.finmath.experiments.montecarlo.assetderivativevaluation;
 	exports net.finmath.experiments.montecarlo.automaticdifferentiation;
 	exports net.finmath.experiments.montecarlo.interestrates;
+	exports net.finmath.experiments.reproduction;
 	
 	requires transitive net.finmath.lib;
 	requires net.finmath.plots;

@@ -57,7 +57,7 @@ public class BackProjectionTest {
 		plot.show();
 
 			try {
-				Thread.sleep(20000);
+				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

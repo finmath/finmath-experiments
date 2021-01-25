@@ -91,6 +91,7 @@
 				<version>${checkstyle-plugin.version}</version>
 				<configuration>
 					<configLocation>finmath-checkstyle.xml</configLocation>
+					<excludes>**/module-info.java</excludes>
 				</configuration>
 			</plugin>
 			<plugin>

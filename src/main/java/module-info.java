@@ -4,6 +4,7 @@ module net.finmath.experiments {
 	exports net.finmath.experiments.shortrate;
 	exports net.finmath.experiments.montecarlo.assetderivativevaluation;
 	exports net.finmath.experiments.montecarlo.automaticdifferentiation;
+	exports net.finmath.experiments.montecarlo.interestrates;
 	
 	requires transitive net.finmath.lib;
 	requires net.finmath.plots;

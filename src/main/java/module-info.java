@@ -6,7 +6,7 @@ module net.finmath.experiments {
 	exports net.finmath.experiments.montecarlo.automaticdifferentiation;
 	exports net.finmath.experiments.montecarlo.interestrates;
 	exports net.finmath.experiments.reproduction;
-	
+
 	requires transitive net.finmath.lib;
 	requires net.finmath.plots;
 
@@ -18,7 +18,7 @@ module net.finmath.experiments {
 	requires javafx.base;
 	requires transitive javafx.graphics;
 	requires javafx.swing;
-	
+
 	requires java.logging;
 	requires java.management;
 	requires java.sql;

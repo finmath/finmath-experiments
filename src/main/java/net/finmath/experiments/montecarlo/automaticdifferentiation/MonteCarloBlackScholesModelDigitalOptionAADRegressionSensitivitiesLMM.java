@@ -56,7 +56,7 @@ import net.finmath.time.TimeDiscretizationFromArray;
 
 /**
  * This program generates data to analyze the calculation of delta of a digital option in a discrete forward rate model (LIBOR market model).
- * 
+ *
  * Among the methods is the calculation via AAD with regression,
  * see Stochastic Algorithmic Differentiation of (Expectations of) Discontinuous Functions (Indicator Functions).
  * https://ssrn.com/abstract=3282667
@@ -99,7 +99,7 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 	private final double	periodEnd = 10.0;
 
 	private DiracDeltaApproximationMethod diracDeltaApproximationMethod = DiracDeltaApproximationMethod.REGRESSION_ON_DENSITY;
-//	private DiracDeltaApproximationMethod diracDeltaApproximationMethod = DiracDeltaApproximationMethod.REGRESSION_ON_DISTRIBUITON;
+	//	private DiracDeltaApproximationMethod diracDeltaApproximationMethod = DiracDeltaApproximationMethod.REGRESSION_ON_DISTRIBUITON;
 
 
 	public static void main(String[] args) throws CalculationException, CloneNotSupportedException, IOException {

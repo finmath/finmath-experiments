@@ -1,8 +1,6 @@
 package net.finmath.experiments.reproduction;
 
-import net.finmath.experiments.reproduction.ReproductionSimulationExperiment.StateProbabilities;
 import net.finmath.functions.NormalDistribution;
-import net.finmath.optimizer.GoldenSectionSearch;
 import net.finmath.optimizer.LevenbergMarquardt;
 import net.finmath.optimizer.SolverException;
 
@@ -49,7 +47,7 @@ public class DiscretizedLognormalDistribution {
 		try {
 			lm.run();
 		} catch (SolverException e) {}
-		
+
 		double[] parameters = lm.getBestFitParameters();
 
 		return getDiscretizedDistribution(numberOfSamples, parameters[0], parameters[1]);

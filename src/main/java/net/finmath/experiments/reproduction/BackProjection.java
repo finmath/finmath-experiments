@@ -2,18 +2,17 @@ package net.finmath.experiments.reproduction;
 
 import java.util.Arrays;
 import java.util.stream.DoubleStream;
-import java.util.stream.Stream;
 
 import org.apache.commons.math3.util.CombinatoricsUtils;
 
 /**
  * Implementation of an inverse convolution (aka BackProjection) using a given
  * distribution kernel (which can be interpreted as distribution of incubation times).
- * 
+ *
  * @author Christian Fries
  */
 public class BackProjection {
-	
+
 	private final double[] distribution;
 	private final int smoothingIntervalStart;
 	private final int smoothingIntervalEnd;
@@ -27,7 +26,7 @@ public class BackProjection {
 	}
 
 	double[] getInfections(double[] observations) {
-		
+
 		boolean converged = false;
 
 		double averageObservataion = DoubleStream.of(observations).average().orElse(1.0);
@@ -40,7 +39,7 @@ public class BackProjection {
 
 		while(!converged) {
 			double squaredDeviation = 0.0;
-			
+
 			for(int k=0; k<observations.length-(distribution.length-1); k++) {
 				double sum = 0.0;
 				double infection = infections[k];
@@ -50,12 +49,12 @@ public class BackProjection {
 						observationProjected += infections[Math.max(k+i-j,0)] * distribution[j];
 					}
 					sum += observations[k+i] * distribution[i] / observationProjected;
-					
+
 				}
 				sum *= infection;
 				infectionsNew[k] = sum;
 			}
-			
+
 			// Smoothing step
 			for(int i=0; i<infectionsNew.length; i++) {
 				double infectionPrev = infections[i];
@@ -71,11 +70,11 @@ public class BackProjection {
 
 				squaredDeviation += Math.pow(infections[i]-infectionPrev, 2);
 			}
-			
+
 			System.out.println(squaredDeviation);
 			converged = squaredDeviation < 1E-12;
 		}
-		
+
 		return infections;
 	}
 }

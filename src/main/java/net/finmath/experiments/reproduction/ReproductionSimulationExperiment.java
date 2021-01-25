@@ -7,20 +7,16 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
-import net.finmath.experiments.reproduction.ReproductionSimulationExperiment.StateProbabilities;
 import net.finmath.experiments.reproduction.ReproductionSimulationExperiment.StateProbabilities.State;
 import net.finmath.plots.GraphStyle;
 import net.finmath.plots.Plot2D;
 import net.finmath.plots.Plotable2D;
 import net.finmath.plots.PlotablePoints2D;
-import net.finmath.plots.Plots;
 import net.finmath.plots.Point2D;
 import net.finmath.rootfinder.BisectionSearch;
 import net.finmath.rootfinder.RootFinder;
@@ -72,7 +68,7 @@ public class ReproductionSimulationExperiment {
 			List<Double> rates = getCalculatedRates(getInfected(sim), 50, 100, 5);
 			double rateMeasured = rates.get(rates.size()-10);
 			System.out.println(rateMeasured);
-			rf.setValue(1.0+rateMeasured-rateTarget);			
+			rf.setValue(1.0+rateMeasured-rateTarget);
 		}
 
 		return rf.getBestPoint();
@@ -84,11 +80,11 @@ public class ReproductionSimulationExperiment {
 		for(int j=start; j<end; j++) {
 			double sum1 = 0.0;
 			for(int k=averagePeriod; k<2*averagePeriod; k++) {
-				sum1 += (infected.get(j-k)-infected.get(j-k-1)); 
+				sum1 += (infected.get(j-k)-infected.get(j-k-1));
 			}
 			double sum2 = 0.0;
 			for(int k=0; k<averagePeriod; k++) {
-				sum2 += (infected.get(j-k)-infected.get(j-k-1)); 
+				sum2 += (infected.get(j-k)-infected.get(j-k-1));
 			}
 			rate.add((sum2-sum1)/sum1/averagePeriod);
 		}
@@ -96,13 +92,13 @@ public class ReproductionSimulationExperiment {
 	}
 
 	public static void main(String[] args) throws IOException {
-		
+
 		createPlot("ConstantIncubationTimeOfMeasurement.pdf", 5.0, 0.01, 1, false);
 		createPlot("ConstantIncubationTimeOfInfection.pdf", 5.0, 0.01, 1, true);
 
 		createPlot("StochasticIncubationTimeOfMeasurement.pdf", 5.0, 4.0, 3, false);
 		createPlot("StochasticIncubationTimeOfInfection.pdf", 5.0, 4.0, 3, true);
-		
+
 	}
 
 	private static void createPlot(String filename, double incubationMean, double incubationStdDev, int timeInfectious, boolean useTimeOfInfection) throws IOException {
@@ -110,21 +106,21 @@ public class ReproductionSimulationExperiment {
 
 		double rate1 = getCalibrateRate(1.04, incubationMean, incubationStdDev, timeInfectious);
 		double rate2 = getCalibrateRate(1.02, incubationMean, incubationStdDev, timeInfectious);
-		
+
 		System.out.println(rate1);
 		System.out.println(rate2);
-		
+
 		for(int i=0; i<500; i++) {
 			if(i < 100) {
 				StateProbabilities prob = sim.evolve(rate1, incubationMean, incubationStdDev);
 			}
 			else {
-				StateProbabilities prob = sim.evolve(rate2, incubationMean, incubationStdDev);				
+				StateProbabilities prob = sim.evolve(rate2, incubationMean, incubationStdDev);
 			}
 		}
 
 		List<Double> infected = getInfected(sim);
-		
+
 		int plotStart = 50;
 		int plotEnd = 150;
 		int average = 5;
@@ -175,7 +171,7 @@ public class ReproductionSimulationExperiment {
 		this.timeInfectious = timeInfectious;
 
 		double seed = 1E-12;
-		
+
 		// Seed the simulation
 		stateProbabilitiyEvolution.add(new StateProbabilities(0.0, seed, 0.0));
 		stateProbabilitiyEvolution.add(new StateProbabilities(0.0, seed, 0.0));
@@ -183,7 +179,7 @@ public class ReproductionSimulationExperiment {
 		stateProbabilitiyEvolution.add(new StateProbabilities(0.0, seed, 0.0));
 		stateProbabilitiyEvolution.add(new StateProbabilities(0.0, seed, 0.0));
 		stateProbabilitiyEvolution.add(new StateProbabilities(0.0, 0.0, seed));
-	}	
+	}
 
 	StateProbabilities evolve(double rate, double mean, double stddev) {
 
@@ -263,7 +259,7 @@ public class ReproductionSimulationExperiment {
 					rateEff += (rate-1.0) * distribution[i] / n / (i+j+1);
 				}
 			}
-			rf.setValue(rateEff-rateTarget);			
+			rf.setValue(rateEff-rateTarget);
 		}
 
 		double rateGeom = rf.getBestPoint()/n;

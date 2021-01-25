@@ -92,7 +92,7 @@ public class MonteCarloSchemeTests {
 			System.out.println("\t(Time=" + calculationTimeInSeconds + " sec)." );
 		}
 	}
-	
+
 	/*
 	 * Small helper to create nice output string.
 	 */

@@ -12,19 +12,19 @@ import net.finmath.plots.Plot2D;
 /**
  * Plot the shape of the implied log-normal volatility of values created from
  * displaced log-normal models.
- * 
+ *
  * @author Christian Fries
  */
 public class DisplaceLognormalImpliedVolExperiment {
 
 	public static void main(String[] args) throws Exception {
-		
+
 		double forward = 0.02;
 		double optionMaturity = 5.0;
 		double lognormalVolatility = 0.212;
 
 		double payoffUnit = 1.0;		// does not matter in this conversion
-				
+
 		DoubleBinaryOperator volCurveForDisplacement = (optionStrike, displacement) -> {
 			double optionValue = AnalyticFormulas.blackScholesGeneralizedOptionValue(
 					forward+displacement, lognormalVolatility, optionMaturity, optionStrike+displacement, payoffUnit);

@@ -46,7 +46,7 @@ public class BackProjectionAnalysis {
 
 		double[] distributionTrue = DiscretizedLognormalDistribution.getDistribution(50, distrTrueMean, distrTrueStdev);
 		double[] distributionEstm = DiscretizedLognormalDistribution.getDistribution(50, distrEstmMean, distrEstmStdev);
-		
+
 		double[] infections = new double[200];
 		for(int i = 0; i<200; i++) {
 			if(i<100) infections[i] = 2;
@@ -87,8 +87,8 @@ public class BackProjectionAnalysis {
 		plot.setTitle("Estimation via Backprojection (Inverse Convolution)\n"+description);
 		plot.setIsLegendVisible(true);
 		plot.show();
-//		plot.saveAsPDF(new File(filename + ".pdf"), 800, 450);
-//		plot.saveAsPNG(new File(filename + ".png"), 800, 450);
+		//		plot.saveAsPDF(new File(filename + ".pdf"), 800, 450);
+		//		plot.saveAsPNG(new File(filename + ".png"), 800, 450);
 		plot.saveAsSVG(new File(filename + ".svg"), 800, 450);
 
 		System.out.println(Arrays.toString(infections));

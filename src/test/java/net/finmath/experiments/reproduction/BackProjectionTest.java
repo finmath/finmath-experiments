@@ -1,19 +1,14 @@
 package net.finmath.experiments.reproduction;
 
-import static org.junit.Assert.*;
-
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.DoubleStream;
 
 import org.junit.Test;
 
-import javafx.scene.shape.Circle;
 import net.finmath.plots.GraphStyle;
 import net.finmath.plots.Plot2D;
-import net.finmath.plots.Plotable2D;
 import net.finmath.plots.PlotablePoints2D;
 import net.finmath.plots.Point2D;
 import net.finmath.plots.axis.NumberAxis;
@@ -24,13 +19,13 @@ public class BackProjectionTest {
 	public void test() {
 		double[] distribution = DiscretizedLognormalDistribution.getDistribution(10, 5, 3);
 		double[] distribution2 = DiscretizedLognormalDistribution.getDistribution(10, 10, 6);
-		
+
 		double[] infections = new double[200];
 		for(int i = 0; i<200; i++) {
 			if(i<100) infections[i] = 2;
 			else infections[i] = 1;
 		}
-		
+
 		double[] observations = new double[200-(distribution.length-1)];
 		double[] infectionsExpected = new double[200-(distribution.length-1)];
 		for(int i=0; i<observations.length; i++) {
@@ -39,7 +34,7 @@ public class BackProjectionTest {
 				observations[i] += infections[i+(distribution.length-1)-j] * distribution[j];
 			}
 		}
-		
+
 		double[] infectionsProjected = (new BackProjection(distribution2, -2, 2)).getInfections(observations);
 
 		List<Point2D> series1 = new ArrayList<Point2D>();
@@ -56,12 +51,12 @@ public class BackProjectionTest {
 		plot.setIsLegendVisible(true);
 		plot.show();
 
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.println(Arrays.toString(infections));
 		System.out.println(Arrays.toString(infectionsProjected));
 	}

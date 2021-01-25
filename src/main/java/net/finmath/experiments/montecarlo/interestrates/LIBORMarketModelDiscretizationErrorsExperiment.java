@@ -56,7 +56,7 @@ import net.finmath.time.TimeDiscretizationFromArray;
  *
  * @author Christian Fries
  */
-public class LIBORMarketModelCalpletSmileExperiment {
+public class LIBORMarketModelDiscretizationErrorsExperiment {
 
 	private static DecimalFormat formatterParam		= new DecimalFormat(" #0.000000;-#0.000000", new DecimalFormatSymbols(Locale.ENGLISH));
 
@@ -71,14 +71,14 @@ public class LIBORMarketModelCalpletSmileExperiment {
 
 
 	public static void main(String args[]) throws CalculationException {
-		(new LIBORMarketModelCalpletSmileExperiment()).testBondUnderMeasure();
-		(new LIBORMarketModelCalpletSmileExperiment()).testCapletATMImpliedVol();
-		(new LIBORMarketModelCalpletSmileExperiment()).testCapletSmile();
-		(new LIBORMarketModelCalpletSmileExperiment()).testCapletSmiles();
+		(new LIBORMarketModelDiscretizationErrorsExperiment()).testBondUnderMeasure();
+		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletATMImpliedVol();
+		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmile();
+		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmiles();
 
 	}
 
-	public LIBORMarketModelCalpletSmileExperiment() throws CalculationException {}
+	public LIBORMarketModelDiscretizationErrorsExperiment() throws CalculationException {}
 
 	public static LIBORModelMonteCarloSimulationModel createLIBORMarketModel(
 			RandomVariableFactory randomVariableFactory,

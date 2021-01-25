@@ -174,7 +174,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 	public void testBondUnderMeasure() throws CalculationException {
 		final RandomVariableFactory randomVariableFactory = new RandomVariableFromArrayFactory();
 
-		String simulationTimeInterpolationMethod = "largest_leq";
+		String simulationTimeInterpolationMethod = "round_down";
 		boolean useDiscountCurve = false;
 
 		for(String measure : new String[] { "terminal", "spot"}) {
@@ -221,7 +221,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 		String measure = "spot";
 		boolean useDiscountCurve = false;
 
-		for(String simulationTimeInterpolationMethod : new String[] { "largest_leq", "nearest" }) {
+		for(String simulationTimeInterpolationMethod : new String[] { "round_down", "round_nearest" }) {
 			final TermStructureMonteCarloSimulationModel lmm = createLIBORMarketModel(
 					randomVariableFactory,
 					measure,
@@ -266,7 +266,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 
 		final RandomVariableFactory randomVariableFactory = new RandomVariableFromArrayFactory();
 
-		String simulationTimeInterpolationMethod = "largest_leq";
+		String simulationTimeInterpolationMethod = "round_down";
 		boolean useDiscountCurve = false;
 
 		for(String measure : new String[] { "terminal", "spot"}) {
@@ -313,7 +313,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 
 		final RandomVariableFactory randomVariableFactory = new RandomVariableFromArrayFactory();
 
-		String simulationTimeInterpolationMethod = "largest_leq";
+		String simulationTimeInterpolationMethod = "round_down";
 		boolean useDiscountCurve = false;
 
 		for(String measure : new String[] { "terminal", "spot"}) {

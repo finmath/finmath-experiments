@@ -42,11 +42,12 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 	private final static int	seed			= 3141;
 
 	public static void main(String args[]) throws Exception {
-//		(new LIBORMarketModelDiscretizationErrorsExperiment()).testBondUnderMeasure();
-//		(new LIBORMarketModelDiscretizationErrorsExperiment()).testForwardRateUnderMeasure();
+		(new LIBORMarketModelDiscretizationErrorsExperiment()).testBondUnderMeasure();
+		(new LIBORMarketModelDiscretizationErrorsExperiment()).testForwardRateUnderMeasure();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletATMImpliedVol();
-//		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmile();
-//		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmiles();
+		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletATMImpliedVolInterpolation();
+		//		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmile();
+		//		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmiles();
 
 	}
 
@@ -86,68 +87,123 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 			}
 
 			Plot plot = Plots.createScatter(maturities, errors, 0.0, 0.2, 5)
-			.setTitle("Zero bond error when using " + measure + " measure" + (useDiscountCurve ? " and numeraire control variate." : "."))
-			.setXAxisLabel("maturity")
-			.setYAxisLabel("error")
-			.setYAxisNumberFormat(new DecimalFormat("0.0E00"));
+					.setTitle("Zero bond error when using " + measure + " measure" + (useDiscountCurve ? " and numeraire control variate." : "."))
+					.setXAxisLabel("maturity")
+					.setYAxisLabel("error")
+					.setYAxisNumberFormat(new DecimalFormat("0.0E00"));
 
 			String filename = "BondDiscretizationError-measure-" + measure + (useDiscountCurve ? "-with-control" : "");
-			plot.saveAsPDF(new File(filename + ".pdf"), 900, 400);
 			plot.saveAsSVG(new File(filename + ".svg"), 900, 400);
-			
+
 			plot.show();
 		}
 	}
 
 	private void testForwardRateUnderMeasure() throws Exception {
-			final RandomVariableFactory randomVariableFactory = new RandomVariableFromArrayFactory();
+		final RandomVariableFactory randomVariableFactory = new RandomVariableFromArrayFactory();
 
-			double forwardRate = 0.05;
-			double periodLength = 0.5;
-			boolean useDiscountCurve = true;
+		double forwardRate = 0.05;
+		double periodLength = 0.5;
+		boolean useDiscountCurve = true;
 
-			for(String measure : new String[] { "terminal", "spot"}) {
-				final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createLIBORMarketModel(
-						randomVariableFactory,
-						measure,
-						forwardRate,
-						periodLength,
-						useDiscountCurve,
-						0.30, 0.0, 0.0,
-						numberOfFactors,
-						numberOfPaths, seed);
+		for(String measure : new String[] { "terminal", "spot"}) {
+			final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createLIBORMarketModel(
+					randomVariableFactory,
+					measure,
+					forwardRate,
+					periodLength,
+					useDiscountCurve,
+					0.30, 0.0, 0.0,
+					numberOfFactors,
+					numberOfPaths, seed);
 
-				List<Double> maturities = new ArrayList<Double>();
-				List<Double> errors = new ArrayList<Double>();
+			List<Double> maturities = new ArrayList<Double>();
+			List<Double> errors = new ArrayList<Double>();
 
-				for(double fixing = 0.5; fixing < 20; fixing += 0.5) {
-					final TermStructureMonteCarloProduct productForwardRate = new ForwardRate(fixing, fixing, fixing+periodLength, fixing+periodLength, periodLength);
-					final TermStructureMonteCarloProduct productBond = new Bond(fixing+periodLength);
+			for(double fixing = 0.5; fixing < 20; fixing += 0.5) {
+				final TermStructureMonteCarloProduct productForwardRate = new ForwardRate(fixing, fixing, fixing+periodLength, fixing+periodLength, periodLength);
+				final TermStructureMonteCarloProduct productBond = new Bond(fixing+periodLength);
 
-					final double valueBondAnalytic = 1.0/Math.pow((1+forwardRate*periodLength), (fixing+periodLength)/periodLength);
-					final double value = productForwardRate.getValue(lmm) / valueBondAnalytic;
+				final double valueBondAnalytic = 1.0/Math.pow((1+forwardRate*periodLength), (fixing+periodLength)/periodLength);
+				final double value = productForwardRate.getValue(lmm) / valueBondAnalytic;
 
-					final double valueAnalytic = forwardRate * periodLength;
+				final double valueAnalytic = forwardRate * periodLength;
 
-					maturities.add(fixing);
-					errors.add(value-valueAnalytic);
-				}
-
-				Plot plot = Plots.createScatter(maturities, errors, 0.0, 0.2, 5)
-				.setTitle("Forward rate error when using " + measure + " measure" + (useDiscountCurve ? " and numeraire control variate." : "."))
-				.setXAxisLabel("fixing")
-				.setYAxisLabel("error")
-				.setYAxisNumberFormat(new DecimalFormat("0.0E00"));
-
-				String filename = "ForwardRateDiscretizationError-measure-" + measure + (useDiscountCurve ? "-with-control" : "");
-				plot.saveAsPDF(new File(filename + ".pdf"), 900, 400);
-				plot.saveAsSVG(new File(filename + ".svg"), 900, 400);
-				
-				plot.show();
+				maturities.add(fixing);
+				errors.add(value-valueAnalytic);
 			}
+
+			Plot plot = Plots.createScatter(maturities, errors, 0.0, 0.2, 5)
+					.setTitle("Forward rate error when using " + measure + " measure" + (useDiscountCurve ? " and numeraire control variate." : "."))
+					.setXAxisLabel("fixing")
+					.setYAxisLabel("error")
+					.setYAxisNumberFormat(new DecimalFormat("0.0E00"));
+
+			String filename = "ForwardRateDiscretizationError-measure-" + measure + (useDiscountCurve ? "-with-control" : "");
+			plot.saveAsSVG(new File(filename + ".svg"), 900, 400);
+
+			plot.show();
+		}
+	}
+
+	public void testCapletATMImpliedVol() throws Exception {
+
+		final RandomVariableFactory randomVariableFactory = new RandomVariableFromArrayFactory();
+
+		String measure = "spot";
+		String simulationTimeInterpolationMethod = "round_down";
+		double forwardRate = 0.05;
+		double periodLength = 0.5;
+		boolean useDiscountCurve = false;
+
+		double volatility = 0.30;
+
+		final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createLIBORMarketModel(
+				randomVariableFactory,
+				measure,
+				simulationTimeInterpolationMethod,
+				forwardRate,
+				periodLength,
+				useDiscountCurve,
+				volatility, 0.0, 0.0,
+				numberOfFactors,
+				numberOfPaths, seed);
+
+		List<Double> maturities = new ArrayList<Double>();
+		List<Double> impliedVolatilities = new ArrayList<Double>();
+
+		double strike = forwardRate;
+		for(double maturity = 0.5; maturity <= 19.5; maturity += 0.01) {
+			final TermStructureMonteCarloProduct product = new Caplet(maturity, periodLength, strike);
+			final double value = product.getValue(lmm);
+
+			// Determine the zero bond at payment (numerically)
+			final TermStructureMonteCarloProduct bondAtPayment = new Bond(maturity+periodLength);
+			double discountFactor = bondAtPayment.getValue(lmm);
+
+			// Determine the forward rate at fixing (numerically)
+			final TermStructureMonteCarloProduct forwardRateProduct = new ForwardRate(maturity, periodLength, periodLength);
+			double forward = forwardRateProduct.getValue(lmm) / discountFactor / periodLength;
+
+			final double impliedVol = AnalyticFormulas.blackModelCapletImpliedVolatility(forward, maturity, strike, periodLength, discountFactor, value);
+
+			maturities.add(maturity);
+			impliedVolatilities.add(impliedVol);
 		}
 
-	public void testCapletATMImpliedVol() throws CalculationException {
+		Plot plot = Plots.createScatter(maturities, impliedVolatilities, 0.0, 0.2, 5)
+				.setTitle("Caplet implied volatility")
+				.setXAxisLabel("maturity")
+				.setYAxisLabel("implied volatility")
+				.setYRange(0.1, 0.5)
+				.setYAxisNumberFormat(new DecimalFormat("0.0%"));
+		plot.show();
+
+		String filename = "Caplet-Impliled-Vol" + measure + (useDiscountCurve ? "-with-control" : "");
+		plot.saveAsSVG(new File(filename + ".svg"), 900, 400);
+	}
+
+	public void testCapletATMImpliedVolInterpolation() throws Exception {
 
 		final RandomVariableFactory randomVariableFactory = new RandomVariableFromArrayFactory();
 
@@ -156,8 +212,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 		double periodLength = 0.5;
 		boolean useDiscountCurve = false;
 
-//		for(String simulationTimeInterpolationMethod : new String[] { "round_down", "round_nearest" }) {
-		for(String simulationTimeInterpolationMethod : new String[] { "round_down" }) {
+		for(String simulationTimeInterpolationMethod : new String[] { "round_down", "round_nearest" }) {
 			final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createLIBORMarketModel(
 					randomVariableFactory,
 					measure,
@@ -173,7 +228,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 			List<Double> impliedVolatilities = new ArrayList<Double>();
 
 			double strike = forwardRate;
-			for(double maturity = 0.5; maturity <= 19.5; maturity += 0.5) {
+			for(double maturity = 0.5; maturity <= 19.5; maturity += 0.01) {
 				final TermStructureMonteCarloProduct product = new Caplet(maturity, periodLength, strike);
 				final double value = product.getValue(lmm);
 
@@ -191,13 +246,16 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 				impliedVolatilities.add(impliedVol);
 			}
 
-			Plots.createScatter(maturities, impliedVolatilities, 0.0, 0.2, 5)
-			.setTitle("Caplet implied volatility using simulation time interpolation " + simulationTimeInterpolationMethod + ".")
-			.setTitle("Caplet implied volatility")
-			.setXAxisLabel("maturity")
-			.setYAxisLabel("implied volatility")
-			.setYRange(0, 0.5)
-			.setYAxisNumberFormat(new DecimalFormat("0.0%")).show();
+			Plot plot = Plots.createScatter(maturities, impliedVolatilities, 0.0, 0.2, 5)
+					.setTitle("Caplet implied volatility using simulation time interpolation " + simulationTimeInterpolationMethod + ".")
+					.setXAxisLabel("maturity")
+					.setYAxisLabel("implied volatility")
+					.setYRange(0.1, 0.5)
+					.setYAxisNumberFormat(new DecimalFormat("0.0%"));
+			plot.show();
+
+			String filename = "Caplet-Impliled-Vol-" + simulationTimeInterpolationMethod;
+			plot.saveAsSVG(new File(filename + ".svg"), 900, 400);
 		}
 	}
 

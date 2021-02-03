@@ -46,9 +46,8 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testForwardRateUnderMeasure();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletATMImpliedVol();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletATMImpliedVolInterpolation();
-		//		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmile();
-		//		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmiles();
-
+		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmile();
+		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmiles();
 	}
 
 	public LIBORMarketModelDiscretizationErrorsExperiment() throws CalculationException {}
@@ -308,6 +307,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 			.setTitle("Caplet implied volatility using " + measure + " measure.")
 			.setXAxisLabel("strike")
 			.setYAxisLabel("implied volatility")
+			.setYRange(0.1, 0.5)
 			.setYAxisNumberFormat(new DecimalFormat("0.0%")).show();
 		}
 	}
@@ -324,7 +324,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 		for(String measure : new String[] { "terminal", "spot"}) {
 			List<Double> strikes = new ArrayList<Double>();
 			Map<String, List<Double>> impliedVolCurves = new HashMap();
-			for(double lognormality = 0.0; lognormality <= 1.0; lognormality += 0.1) {
+			for(double normality = 0.0; normality <= 1.0; normality += 0.1) {
 				final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createLIBORMarketModel(
 						randomVariableFactory,
 						measure,
@@ -332,7 +332,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 						forwardRate,
 						periodLength,
 						useDiscountCurve,
-						0.30, 0.0, 0.0,
+						0.30, normality, 0.0,
 						numberOfFactors,
 						numberOfPaths, seed);
 
@@ -357,7 +357,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 
 					System.out.println(impliedVol + "\t" + vol3);
 				}
-				impliedVolCurves.putIfAbsent(String.valueOf(lognormality), impliedVolatilities);
+				impliedVolCurves.putIfAbsent(String.valueOf(normality), impliedVolatilities);
 
 			}
 			Plots.createScatter(strikes, impliedVolCurves, 0.0, 0.2, 5)

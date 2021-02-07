@@ -168,11 +168,23 @@ var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVol
 // Create a corresponding MC process
 int numberOfPaths = 5000000;
 var td = new TimeDiscretizationFromArray(0.0, 30, 0.1);
+<<<<<<< HEAD
 var brownianMotion = new BrownianMotionLazyInit(td, 1, numberOfPaths, 3231);
+=======
+var brownianMotion = new BrownianMotionLazyInit(td, 1, 50000, 3231);
+>>>>>>> branch 'master' of https://github.com/finmath/finmath-experiments.git
 var process = new EulerSchemeFromProcessModel(model, brownianMotion);
 
 // Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
 var simulation = new MonteCarloAssetModel(process);
+<<<<<<< HEAD
+=======
+
+double maturity = 3.0;
+double strike = 106.0;
+
+var europeanOption = new EuropeanOption(maturity, strike);
+>>>>>>> branch 'master' of https://github.com/finmath/finmath-experiments.git
 
 double maturity = 3.0;
 double strike = 106.0;

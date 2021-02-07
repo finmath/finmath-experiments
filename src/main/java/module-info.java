@@ -24,4 +24,5 @@ module net.finmath.experiments {
 	requires java.sql;
 	requires commons.csv;
 	requires org.apache.commons.lang3;
+	requires net.finmath.gpu;
 }

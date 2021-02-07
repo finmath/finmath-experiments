@@ -25,6 +25,7 @@ import net.finmath.montecarlo.interestrate.products.Bond;
 import net.finmath.montecarlo.interestrate.products.Caplet;
 import net.finmath.montecarlo.interestrate.products.Caplet.ValueUnit;
 import net.finmath.montecarlo.interestrate.products.TermStructureMonteCarloProduct;
+import net.finmath.opencl.montecarlo.RandomVariableOpenCLFactory;
 import net.finmath.plots.Plot;
 import net.finmath.plots.Plots;
 
@@ -378,7 +379,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 		boolean useDiscountCurve = false;
 		int		numberOfPaths	= 1000000;
 
-		for(RandomVariableFactory randomVariableFactory : List.of(new RandomVariableFromArrayFactory(), new RandomVariableCudaFactory())) {
+		for(RandomVariableFactory randomVariableFactory : List.of(new RandomVariableFromArrayFactory(), new RandomVariableCudaFactory(), new RandomVariableOpenCLFactory())) {
 			long timeStart = System.currentTimeMillis();
 
 			List<Double> strikes = new ArrayList<Double>();

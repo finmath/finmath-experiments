@@ -43,12 +43,15 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 	private final static int	seed			= 3141;
 
 	public static void main(String args[]) throws Exception {
+		/*
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testBondUnderMeasure();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testForwardRateUnderMeasure();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletATMImpliedVol();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletATMImpliedVolInterpolation();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmile();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmiles();
+		 */
+		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmilesOnGPU();
 	}
 
 	public LIBORMarketModelDiscretizationErrorsExperiment() throws CalculationException {}
@@ -318,60 +321,55 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 		final RandomVariableFactory randomVariableFactory = new RandomVariableFromArrayFactory();
 
 		String simulationTimeInterpolationMethod = "round_down";
+		String measure = "spot";
 		double forwardRate = 0.05;
 		double periodLength = 0.5;
 		boolean useDiscountCurve = false;
 
-		for(String measure : new String[] { "terminal", "spot"}) {
-			List<Double> strikes = new ArrayList<Double>();
-			Map<String, List<Double>> impliedVolCurves = new HashMap();
-			for(double normality = 0.0; normality <= 1.0; normality += 0.1) {
-				final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createLIBORMarketModel(
-						randomVariableFactory,
-						measure,
-						simulationTimeInterpolationMethod,
-						forwardRate,
-						periodLength,
-						useDiscountCurve,
-						0.30, normality, 0.0,
-						numberOfFactors,
-						numberOfPaths, seed);
+		List<Double> strikes = new ArrayList<Double>();
+		Map<String, List<Double>> impliedVolCurves = new HashMap();
+		for(double normality = 0.0; normality <= 1.0; normality += 0.1) {
+			final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createLIBORMarketModel(
+					randomVariableFactory,
+					measure,
+					simulationTimeInterpolationMethod,
+					forwardRate,
+					periodLength,
+					useDiscountCurve,
+					0.30, normality, 0.0,
+					numberOfFactors,
+					numberOfPaths, seed);
 
-				List<Double> impliedVolatilities = new ArrayList<Double>();
-				for(double strike = 0.025; strike < 0.10; strike += 0.0025) {
-					final TermStructureMonteCarloProduct product = new Caplet(5.0, 0.5, strike);
-					final TermStructureMonteCarloProduct productVol = new Caplet(5.0, 0.5, strike, 0.5, false, ValueUnit.LOGNORMALVOLATILITY);
-					final double value = product.getValue(lmm);
-					final double vol3 = productVol.getValue(lmm);
-					double forward = 0.05;
-					double optionMaturity = 5.0;
-					final AbstractLIBORMonteCarloProduct bondAtPayment = new Bond(5.5);
-					double optionStrike = strike;
-					//			double payoffUnit = bondAtPayment.getValue(lmm);
-					double payoffUnit = 1.0/Math.pow(1+0.05*0.5, 5*2+1) * 0.5;
-					double optionValue = value;
-					final double impliedVol = AnalyticFormulas.blackScholesOptionImpliedVolatility(forward, optionMaturity, optionStrike, payoffUnit, optionValue);
-					//			final double impliedVol = AnalyticFormulas.blackModelCapletImpliedVolatility(forward, optionMaturity, optionStrike, 0.5, payoffUnit, optionValue*0.5);
+			List<Double> impliedVolatilities = new ArrayList<Double>();
+			for(double strike = 0.025; strike < 0.10; strike += 0.0025) {
+				final TermStructureMonteCarloProduct product = new Caplet(5.0, 0.5, strike);
+				final TermStructureMonteCarloProduct productVol = new Caplet(5.0, 0.5, strike, 0.5, false, ValueUnit.LOGNORMALVOLATILITY);
+				final double value = product.getValue(lmm);
+				final double vol3 = productVol.getValue(lmm);
+				double forward = 0.05;
+				double optionMaturity = 5.0;
+				final AbstractLIBORMonteCarloProduct bondAtPayment = new Bond(5.5);
+				double optionStrike = strike;
+				//			double payoffUnit = bondAtPayment.getValue(lmm);
+				double payoffUnit = 1.0/Math.pow(1+0.05*0.5, 5*2+1) * 0.5;
+				double optionValue = value;
+				final double impliedVol = AnalyticFormulas.blackScholesOptionImpliedVolatility(forward, optionMaturity, optionStrike, payoffUnit, optionValue);
+				//			final double impliedVol = AnalyticFormulas.blackModelCapletImpliedVolatility(forward, optionMaturity, optionStrike, 0.5, payoffUnit, optionValue*0.5);
 
-					strikes.add(strike);
-					impliedVolatilities.add(vol3);
-
-					System.out.println(impliedVol + "\t" + vol3);
-				}
-				impliedVolCurves.putIfAbsent(String.valueOf(normality), impliedVolatilities);
-
+				strikes.add(strike);
+				impliedVolatilities.add(vol3);
 			}
-			Plots.createScatter(strikes, impliedVolCurves, 0.0, 0.2, 5)
-			.setTitle("Caplet implied volatility using " + measure + " measure.")
-			.setXAxisLabel("strike")
-			.setYAxisLabel("implied volatility")
-			.setYAxisNumberFormat(new DecimalFormat("0.0%")).show();
+			impliedVolCurves.putIfAbsent(String.valueOf(normality), impliedVolatilities);
+
 		}
+		Plots.createScatter(strikes, impliedVolCurves, 0.0, 0.2, 5)
+		.setTitle("Caplet implied volatility using " + measure + " measure.")
+		.setXAxisLabel("strike")
+		.setYAxisLabel("implied volatility")
+		.setYAxisNumberFormat(new DecimalFormat("0.0%")).show();
 	}
 
 	public void testCapletSmilesOnGPU() throws CalculationException {
-
-		final RandomVariableFactory randomVariableFactory = new RandomVariableCudaFactory();
 
 		String simulationTimeInterpolationMethod = "round_down";
 		String measure = "spot";
@@ -379,8 +377,9 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 		double periodLength = 0.5;
 		boolean useDiscountCurve = false;
 
-		long timeStart = System.currentTimeMillis();
-		
+		for(RandomVariableFactory randomVariableFactory : List.of(new RandomVariableFromArrayFactory(), new RandomVariableCudaFactory())) {
+			long timeStart = System.currentTimeMillis();
+
 			List<Double> strikes = new ArrayList<Double>();
 			Map<String, List<Double>> impliedVolCurves = new HashMap();
 			for(double normality = 0.0; normality <= 1.0; normality += 0.1) {
@@ -419,15 +418,16 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 				impliedVolCurves.putIfAbsent(String.valueOf(normality), impliedVolatilities);
 
 			}
-			
+
 			long timeEnd = System.currentTimeMillis();
 
-			System.out.println("Calculation time: "+ ((timeEnd-timeStart)/1000));
+			System.out.println("Calculation time: "+ ((timeEnd-timeStart)/1000) + " \t" + randomVariableFactory.getClass().getSimpleName());
 
 			Plots.createScatter(strikes, impliedVolCurves, 0.0, 0.2, 5)
 			.setTitle("Caplet implied volatility using " + measure + " measure.")
 			.setXAxisLabel("strike")
 			.setYAxisLabel("implied volatility")
 			.setYAxisNumberFormat(new DecimalFormat("0.0%")).show();
+		}
 	}
 }

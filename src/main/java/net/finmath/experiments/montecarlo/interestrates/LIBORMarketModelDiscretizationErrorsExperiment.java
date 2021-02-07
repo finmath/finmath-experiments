@@ -376,6 +376,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 		double forwardRate = 0.05;
 		double periodLength = 0.5;
 		boolean useDiscountCurve = false;
+		int		numberOfPaths	= 10000000;
 
 		for(RandomVariableFactory randomVariableFactory : List.of(new RandomVariableFromArrayFactory(), new RandomVariableCudaFactory())) {
 			long timeStart = System.currentTimeMillis();
@@ -412,8 +413,6 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 
 					strikes.add(strike);
 					impliedVolatilities.add(vol3);
-
-					System.out.println(impliedVol + "\t" + vol3);
 				}
 				impliedVolCurves.putIfAbsent(String.valueOf(normality), impliedVolatilities);
 

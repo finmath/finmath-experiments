@@ -143,8 +143,16 @@ var deltaValue = delta.doubleValue();
 
 // EXPERIMENT 6 - Dependency Injection of GPU Computing - Cuda or OpenCL
 
-import net.finmath.montecarlo.opencl.*;
-import net.finmath.montecarlo.cuda.*;
+import net.finmath.opencl.montecarlo.*;
+import net.finmath.cuda.montecarlo.*;
+import net.finmath.montecarlo.*;
+import net.finmath.montecarlo.process.*;
+import net.finmath.montecarlo.assetderivativevaluation.*;
+import net.finmath.montecarlo.assetderivativevaluation.models.*;
+import net.finmath.montecarlo.assetderivativevaluation.products.*;
+import net.finmath.stochastic.*;
+import net.finmath.time.*;
+import net.finmath.plots.*;
 
 // Use the Cuda factory to create GPU enabled random variables
 //RandomVariableFactory randomVariableFactory = new RandomVariableOpenCLFactory();
@@ -152,17 +160,30 @@ RandomVariableFactory randomVariableFactory = new RandomVariableCudaFactory();
 //RandomVariableFactory randomVariableFactory = new RandomVariableFromArrayFactory();
 
 // Create a model
+double modelInitialValue = 100.0;
+double modelRiskFreeRate = 0.05;
+double modelVolatility = 0.20;
 var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility, randomVariableFactory);
 
 // Create a corresponding MC process
+int numberOfPaths = 5000000;
 var td = new TimeDiscretizationFromArray(0.0, 30, 0.1);
-var brownianMotion = new BrownianMotionLazyInit(td, 1, 50000, 3231);
-var process = new EulerSchemeFromProcessModel(brownianMotion);
+var brownianMotion = new BrownianMotionLazyInit(td, 1, numberOfPaths, 3231);
+var process = new EulerSchemeFromProcessModel(model, brownianMotion);
 
 // Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
-var simulation = new MonteCarloAssetModel(model, process);
+var simulation = new MonteCarloAssetModel(process);
 
+double maturity = 3.0;
+double strike = 106.0;
+
+var europeanOption = new EuropeanOption(maturity, strike);
+
+var start = System.currentTimeMillis();
 var valueOfEuropeanOption = europeanOption.getValue(0.0, simulation).average();
+var end = System.currentTimeMillis();
+
+var time = (end-start)/1000.0;
 
 valueOfEuropeanOption.doubleValue();
 

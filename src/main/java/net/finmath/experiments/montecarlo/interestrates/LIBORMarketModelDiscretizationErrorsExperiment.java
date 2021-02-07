@@ -376,7 +376,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 		double forwardRate = 0.05;
 		double periodLength = 0.5;
 		boolean useDiscountCurve = false;
-		int		numberOfPaths	= 10000000;
+		int		numberOfPaths	= 1000000;
 
 		for(RandomVariableFactory randomVariableFactory : List.of(new RandomVariableFromArrayFactory(), new RandomVariableCudaFactory())) {
 			long timeStart = System.currentTimeMillis();

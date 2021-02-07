@@ -15,7 +15,7 @@
 		<junit.version>4.12</junit.version>
 		<finmath-lib.version>5.1.1</finmath-lib.version>
 		<finmath-plot.version>0.4.0</finmath-plot.version>
-		<finmath-cuda.version>4.1.7</finmath-cuda.version>
+		<finmath-cuda.version>5.0.5</finmath-cuda.version>
 		<finmath-cuda.classifier />
 		<!-- maven plugins -->
 		<compiler-plugin.version>3.8.1</compiler-plugin.version>
@@ -202,14 +202,12 @@
 			<version>${finmath-plot.version}</version>
 		</dependency>
 
-		<!-- 
 		<dependency>
 			<groupId>net.finmath</groupId>
 			<artifactId>finmath-lib-cuda-extensions</artifactId>
 			<version>${finmath-cuda.version}</version>
 			<classifier>${finmath-cuda.classifier}</classifier>
 		</dependency>
-		 -->
 
 		<!-- apache commons -->
 		<dependency>

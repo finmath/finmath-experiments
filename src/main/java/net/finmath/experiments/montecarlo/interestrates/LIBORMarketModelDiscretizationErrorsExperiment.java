@@ -44,14 +44,12 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 	private final static int	seed			= 3141;
 
 	public static void main(String args[]) throws Exception {
-		/*
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testBondUnderMeasure();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testForwardRateUnderMeasure();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletATMImpliedVol();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletATMImpliedVolInterpolation();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmile();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmiles();
-		 */
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmilesOnGPU();
 	}
 

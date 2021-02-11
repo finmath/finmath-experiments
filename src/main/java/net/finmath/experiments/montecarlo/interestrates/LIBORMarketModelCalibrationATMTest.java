@@ -293,7 +293,7 @@ public class LIBORMarketModelCalibrationATMTest {
 		// Set calibration properties (should use our brownianMotion for calibration - needed to have to right correlation).
 		final Double accuracy = 1E-7;	// Lower accuracy to reduce runtime of the unit test
 		final int maxIterations = 200;
-		final int numberOfThreads = 4;
+		final int numberOfThreads = 16;
 		final double lambda = 0.1;
 		final OptimizerFactory optimizerFactory = new OptimizerFactoryLevenbergMarquardt(
 				RegularizationMethod.LEVENBERG, lambda,

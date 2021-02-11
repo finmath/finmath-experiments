@@ -57,6 +57,7 @@ import net.finmath.montecarlo.interestrate.models.covariance.LIBORVolatilityMode
 import net.finmath.montecarlo.interestrate.products.AbstractLIBORMonteCarloProduct;
 import net.finmath.montecarlo.interestrate.products.SwaptionGeneralizedAnalyticApproximation;
 import net.finmath.montecarlo.interestrate.products.SwaptionSimple;
+import net.finmath.montecarlo.interestrate.products.TermStructureMonteCarloProduct;
 import net.finmath.montecarlo.process.EulerSchemeFromProcessModel;
 import net.finmath.optimizer.LevenbergMarquardt.RegularizationMethod;
 import net.finmath.optimizer.OptimizerFactory;
@@ -369,14 +370,14 @@ public class LIBORMarketModelCalibrationATMTest {
 		final EulerSchemeFromProcessModel processBenchmark = new EulerSchemeFromProcessModel(liborMarketModelBenchmark, brownianMotionBenchmark);
 		final LIBORModelMonteCarloSimulationModel simulationBenchmark = new LIBORMonteCarloSimulationFromLIBORModel(processBenchmark);
 
-		System.out.println("\nCalibration used the calibration product " + calibrationProductType + " and the calibration model with " + numberOfPaths + " paths");
+		System.out.println("\nCalibration using calibration product " + calibrationProductType + " and a calibration model with " + numberOfPaths + " paths");
 		double deviationCalibrationSum			= 0.0;
 		double deviationCalibrationSquaredSum	= 0.0;
 		double deviationValuationSum			= 0.0;
 		double deviationValuationSquaredSum	= 0.0;
 		for (int i = 0; i < calibrationProducts.size(); i++) {
-			final AbstractLIBORMonteCarloProduct calibrationProduct = calibrationProducts.get(i).getProduct();
-			final AbstractLIBORMonteCarloProduct calibrationBenchmark = calibrationBenchmarks.get(i).getProduct();
+			final TermStructureMonteCarloProduct calibrationProduct = calibrationProducts.get(i).getProduct();
+			final TermStructureMonteCarloProduct calibrationBenchmark = calibrationBenchmarks.get(i).getProduct();
 			try {
 				final double valueModel = calibrationProduct.getValue(simulationCalibrated);
 				final double valueBenchmarkModel = calibrationBenchmark.getValue(simulationBenchmark);

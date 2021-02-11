@@ -7,11 +7,9 @@ package net.finmath.experiments.montecarlo.interestrates;
 
 import java.io.File;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import net.finmath.cuda.montecarlo.RandomVariableCudaFactory;
@@ -37,7 +35,6 @@ import net.finmath.plots.Plots;
  * @author Christian Fries
  */
 public class LIBORMarketModelDiscretizationErrorsExperiment {
-
 
 	private final int			numberOfPaths	= 50000;
 	private final static int	numberOfFactors	= 1;

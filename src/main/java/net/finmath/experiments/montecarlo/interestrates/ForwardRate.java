@@ -6,7 +6,6 @@
 package net.finmath.experiments.montecarlo.interestrates;
 
 import net.finmath.exception.CalculationException;
-import net.finmath.functions.AnalyticFormulas;
 import net.finmath.montecarlo.interestrate.TermStructureMonteCarloSimulationModel;
 import net.finmath.montecarlo.interestrate.products.AbstractLIBORMonteCarloProduct;
 import net.finmath.stochastic.RandomVariable;

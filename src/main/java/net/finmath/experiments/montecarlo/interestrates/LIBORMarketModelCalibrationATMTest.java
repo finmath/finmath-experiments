@@ -96,24 +96,27 @@ public class LIBORMarketModelCalibrationATMTest {
 	private static DecimalFormat formatterDeviation	= new DecimalFormat(" 0.00000E00;-0.00000E00", new DecimalFormatSymbols(Locale.ENGLISH));
 
 	private final RandomVariableFactory randomVariableFactory = new RandomVariableFromArrayFactory();
-//	private final RandomVariableFactory randomVariableFactory = new RandomVariableOpenCLFactory();
-//	private final RandomVariableFactory randomVariableFactory = new RandomVariableCudaFactory();
+	//	private final RandomVariableFactory randomVariableFactory = new RandomVariableOpenCLFactory();
+	//	private final RandomVariableFactory randomVariableFactory = new RandomVariableCudaFactory();
 
 	private final LIBORMarketModelType modelType;
 	private final CalibrationProductType calibrationProductType;
+	private final int numberOfPathsCalibration;
+	private final int numberOfPathsBenchmark;
 
 	public static void main(String args[]) throws Exception {
-		
-		(new LIBORMarketModelCalibrationATMTest(LIBORMarketModelType.NORMAL, CalibrationProductType.ANALYTIC)).testATMSwaptionCalibration();
-		(new LIBORMarketModelCalibrationATMTest(LIBORMarketModelType.NORMAL, CalibrationProductType.MONTECARLO)).testATMSwaptionCalibration();
+
+		// Small number of path, to reduce runtime of the unit test. Calibration should use 10 to 100 times more.
+		(new LIBORMarketModelCalibrationATMTest(LIBORMarketModelType.NORMAL, CalibrationProductType.ANALYTIC, 1000 /* numberOfPathsCalibration */, 1000 /* numberOfPathBenchmark */)).testATMSwaptionCalibration();
 	}
 
-	public LIBORMarketModelCalibrationATMTest(LIBORMarketModelType modelType, CalibrationProductType calibrationProductType) {
+	public LIBORMarketModelCalibrationATMTest(LIBORMarketModelType modelType, CalibrationProductType calibrationProductType, int numberOfPathsCalibration, int numberOfPathBenchmark) {
 		super();
 		this.modelType = modelType;
 		this.calibrationProductType = calibrationProductType;
+		this.numberOfPathsCalibration = numberOfPathsCalibration;
+		this.numberOfPathsBenchmark = numberOfPathBenchmark;
 	}
-
 
 	/**
 	 * Calibration of swaptions - using Brute force Monte-Carlo or Analytic approximation - depending on the calibrationProductType.
@@ -123,18 +126,14 @@ public class LIBORMarketModelCalibrationATMTest {
 	 */
 	public void testATMSwaptionCalibration() throws CalculationException, SolverException {
 
-		// Small number of path, to reduce runtime of the unit test. Calibration should use 10 to 100 times more.
-		final int numberOfPaths				= 1000;
-		final int numberOfPathsBenchmark	= 1000;
-		
-		final int numberOfFactors	= 1;
-
 		/*
 		 * Calibration test
 		 */
 		System.out.println("Calibration to Swaptions:");
-		System.out.println("\tModel..................: " + modelType);
-		System.out.println("\tCalibration products...: " + calibrationProductType);
+		System.out.println("\tModel..........................: " + modelType);
+		System.out.println("\tCalibration products...........: " + calibrationProductType);
+		System.out.println("\tNumber of path (calibration)...: " + numberOfPathsCalibration);
+		System.out.println("\tNumber of path (benchmarking)..: " + numberOfPathsBenchmark);
 
 		/*
 		 * Calibration of rate curves
@@ -149,7 +148,7 @@ public class LIBORMarketModelCalibrationATMTest {
 		final DiscountCurve discountCurve = curveModel.getDiscountCurve("discountCurve-EUR");
 
 		final long millisCurvesEnd = System.currentTimeMillis();
-		System.out.println("done.");
+		System.out.println("done (" + (millisCurvesEnd-millisCurvesStart)/1000.0 + " sec).");
 
 		/*
 		 * Calibration of model volatilities
@@ -237,9 +236,7 @@ public class LIBORMarketModelCalibrationATMTest {
 
 			final double	moneyness			= 0.0;
 			final double	targetVolatility	= atmNormalVolatilities[i];
-
 			final String	targetVolatilityType = "VOLATILITYNORMAL";
-
 			final double	weight = 1.0;
 
 			calibrationItemNames.add(atmExpiries[i]+"\t"+atmTenors[i]);
@@ -249,32 +246,30 @@ public class LIBORMarketModelCalibrationATMTest {
 		}
 
 		/*
-		 * Create a simulation time discretization
+		 * Create a simulation time discretization and forward rate curve discretization
 		 */
-		// If simulation time is below libor time, exceptions will be hard to track.
 		final double lastTime	= 40.0;
 		final double dt		= 0.25;
-		final TimeDiscretizationFromArray timeDiscretization = new TimeDiscretizationFromArray(0.0, (int) (lastTime / dt), dt);
+		final TimeDiscretization timeDiscretization = new TimeDiscretizationFromArray(0.0, (int) (lastTime / dt), dt);
 		final TimeDiscretization liborPeriodDiscretization = timeDiscretization;
 
 		/*
-		 * Create Brownian motions
+		 * Create covariance model
 		 */
-		final BrownianMotion brownianMotion = new net.finmath.montecarlo.BrownianMotionFromMersenneRandomNumbers(timeDiscretization, numberOfFactors, numberOfPaths, 31415 /* seed */, randomVariableFactory);
-
+		final int numberOfFactors	= 1;
 		final LIBORVolatilityModel volatilityModel = new LIBORVolatilityModelPiecewiseConstant(timeDiscretization, liborPeriodDiscretization, new TimeDiscretizationFromArray(0.00, 1.0, 2.0, 5.0, 10.0, 20.0, 30.0, 40.0), new TimeDiscretizationFromArray(0.00, 1.0, 2.0, 5.0, 10.0, 20.0, 30.0, 40.0), 0.50 / 100);
 		final LIBORCorrelationModel correlationModel = new LIBORCorrelationModelExponentialDecay(timeDiscretization, liborPeriodDiscretization, numberOfFactors, 0.05, false);
 		// Create a covariance model
 		//AbstractLIBORCovarianceModelParametric covarianceModelParametric = new LIBORCovarianceModelExponentialForm5Param(timeDiscretizationFromArray, liborPeriodDiscretization, numberOfFactors, new double[] { 0.20/100.0, 0.05/100.0, 0.10, 0.05/100.0, 0.10} );
-		final AbstractLIBORCovarianceModelParametric covarianceModelParametric = new LIBORCovarianceModelFromVolatilityAndCorrelation(timeDiscretization, liborPeriodDiscretization, volatilityModel, correlationModel);
+		final AbstractLIBORCovarianceModelParametric covarianceModelFromVolAndCor = new LIBORCovarianceModelFromVolatilityAndCorrelation(timeDiscretization, liborPeriodDiscretization, volatilityModel, correlationModel);
 
 		// Create blended local volatility model with fixed parameter (0=lognormal, > 1 = almost a normal model).
-		final AbstractLIBORCovarianceModelParametric covarianceModelDisplaced = new DisplacedLocalVolatilityModel(covarianceModelParametric, 1.0/0.25, false /* isCalibrateable */);
+		final AbstractLIBORCovarianceModelParametric covarianceModelDisplaced = new DisplacedLocalVolatilityModel(covarianceModelFromVolAndCor, 1.0/0.25, false /* isCalibrateable */);
 
 		final AbstractLIBORCovarianceModelParametric covarianceModel;
 		switch(modelType) {
 		case NORMAL:
-			covarianceModel = covarianceModelParametric;
+			covarianceModel = covarianceModelFromVolAndCor;
 			break;
 		case DISPLACED:
 			covarianceModel = covarianceModelDisplaced;
@@ -282,40 +277,47 @@ public class LIBORMarketModelCalibrationATMTest {
 		default:
 			throw new IllegalArgumentException("Unknown " + modelType.getClass().getSimpleName() + ": " + modelType);
 		}
-		// Set model properties
-		final Map<String, Object> properties = new HashMap<>();
 
-		// Choose the simulation measure
-		properties.put("measure", LIBORMarketModelFromCovarianceModel.Measure.SPOT.name());
 
-		// Choose normal state space for the Euler scheme (the covariance model above carries a linear local volatility model, such that the resulting model is log-normal).
-		properties.put("stateSpace", LIBORMarketModelFromCovarianceModel.StateSpace.NORMAL.name());
+		/*
+		 * Create Brownian motion used for calibration
+		 */
+		final BrownianMotion brownianMotion = new net.finmath.montecarlo.BrownianMotionFromMersenneRandomNumbers(timeDiscretization, numberOfFactors, numberOfPathsCalibration, 31415 /* seed */, randomVariableFactory);
 
-		// Set calibration properties (should use our brownianMotion for calibration - needed to have to right correlation).
+		/*
+		 * Specify the optimizer used for calibration, set calibration properties (should use our brownianMotion for calibration).
+		 */
 		final Double accuracy = 1E-7;	// Lower accuracy to reduce runtime of the unit test
 		final int maxIterations = 200;
-		final int numberOfThreads = 16;
+		final int numberOfThreads = 1;
 		final double lambda = 0.1;
 		final OptimizerFactory optimizerFactory = new OptimizerFactoryLevenbergMarquardt(
 				RegularizationMethod.LEVENBERG, lambda,
 				maxIterations, accuracy, numberOfThreads);
 
-		final double[] parameterStandardDeviation = new double[covarianceModelParametric.getParameterAsDouble().length];
-		final double[] parameterLowerBound = new double[covarianceModelParametric.getParameterAsDouble().length];
-		final double[] parameterUpperBound = new double[covarianceModelParametric.getParameterAsDouble().length];
+		final double[] parameterStandardDeviation = new double[covarianceModelFromVolAndCor.getParameterAsDouble().length];
+		final double[] parameterLowerBound = new double[covarianceModelFromVolAndCor.getParameterAsDouble().length];
+		final double[] parameterUpperBound = new double[covarianceModelFromVolAndCor.getParameterAsDouble().length];
 		Arrays.fill(parameterStandardDeviation, 0.20/100.0);
 		Arrays.fill(parameterLowerBound, 0.0);
 		Arrays.fill(parameterUpperBound, Double.POSITIVE_INFINITY);
 
-		//		optimizerFactory = new OptimizerFactoryCMAES(accuracy, maxIterations, parameterLowerBound, parameterUpperBound, parameterStandardDeviation);
-
 		// Set calibration properties (should use our brownianMotion for calibration - needed to have to right correlation).
-		final Map<String, Object> calibrationParameters = new HashMap<>();
-		calibrationParameters.put("accuracy", accuracy);
-		calibrationParameters.put("brownianMotion", brownianMotion);
-		calibrationParameters.put("optimizerFactory", optimizerFactory);
-		calibrationParameters.put("parameterStep", 1E-4);
-		properties.put("calibrationParameters", calibrationParameters);
+		final Map<String, Object> calibrationParameters = Map.of(
+				"brownianMotion", brownianMotion,
+				"optimizerFactory", optimizerFactory,
+				"parameterStep", 1E-4);
+
+		/*
+		 *  Set model properties
+		 */
+		final Map<String, Object> properties = Map.of(
+				// Choose the simulation measure
+				"measure", LIBORMarketModelFromCovarianceModel.Measure.SPOT.name(),
+				// Choose normal state space for the Euler scheme (the covariance model above carries a linear local volatility model, such that the resulting model is log-normal).
+				"stateSpace", LIBORMarketModelFromCovarianceModel.StateSpace.NORMAL.name(),
+				// Calibration parameters (from above)
+				"calibrationParameters", calibrationParameters);
 
 
 		System.out.print("\nCalibration of model volatilities....");
@@ -324,10 +326,6 @@ public class LIBORMarketModelCalibrationATMTest {
 		/*
 		 * Create corresponding LIBOR Market Model
 		 */
-		final CalibrationProduct[] calibrationItemsLMM = new CalibrationProduct[calibrationItemNames.size()];
-		for(int i=0; i<calibrationItemNames.size(); i++) {
-			calibrationItemsLMM[i] = new CalibrationProduct(calibrationProducts.get(i).getProduct(),calibrationProducts.get(i).getTargetValue(),calibrationProducts.get(i).getWeight());
-		}
 		final LIBORMarketModel liborMarketModelCalibrated = LIBORMarketModelFromCovarianceModel.of(
 				liborPeriodDiscretization,
 				curveModel,
@@ -335,10 +333,11 @@ public class LIBORMarketModelCalibrationATMTest {
 				new DiscountCurveFromForwardCurve(forwardCurve),
 				randomVariableFactory,
 				covarianceModel,
-				calibrationItemsLMM, properties);
+				calibrationProducts.toArray(new CalibrationProduct[calibrationProducts.size()]),
+				properties);
 
 		final long millisCalibrationEnd = System.currentTimeMillis();
-		System.out.println("done.");
+		System.out.println("done (" + (millisCalibrationEnd-millisCalibrationStart)/1000.0 + " sec).");
 
 		if(isPrintResults) {
 			System.out.println("\nCalibrated parameters are:");
@@ -370,7 +369,7 @@ public class LIBORMarketModelCalibrationATMTest {
 		final EulerSchemeFromProcessModel processBenchmark = new EulerSchemeFromProcessModel(liborMarketModelBenchmark, brownianMotionBenchmark);
 		final LIBORModelMonteCarloSimulationModel simulationBenchmark = new LIBORMonteCarloSimulationFromLIBORModel(processBenchmark);
 
-		System.out.println("\nCalibration using calibration product " + calibrationProductType + " and a calibration model with " + numberOfPaths + " paths");
+		System.out.println("\nCalibration using calibration product " + calibrationProductType + " and a calibration model with " + numberOfPathsCalibration + " paths");
 		double deviationCalibrationSum			= 0.0;
 		double deviationCalibrationSquaredSum	= 0.0;
 		double deviationValuationSum			= 0.0;
@@ -405,7 +404,7 @@ public class LIBORMarketModelCalibrationATMTest {
 		}
 
 		final double averageCalibrationDeviation = deviationCalibrationSum/calibrationProducts.size();
-		System.out.println("\nValuation using the calibration product (" + calibrationProductType + ") and calibration model (paths=" + numberOfPaths + "):");
+		System.out.println("\nValuation using the calibration product (" + calibrationProductType + ") and calibration model (paths=" + numberOfPathsCalibration + "):");
 		System.out.println("\tCalibration Mean Deviation:" + formatterValue.format(averageCalibrationDeviation));
 		System.out.println("\tCalibration RMS Error.....:" + formatterValue.format(Math.sqrt(deviationCalibrationSquaredSum/calibrationProducts.size())));
 
@@ -415,9 +414,6 @@ public class LIBORMarketModelCalibrationATMTest {
 		System.out.println("\tValuation   RMS Error.....:" + formatterValue.format(Math.sqrt(deviationValuationSquaredSum/calibrationProducts.size())));
 
 		System.out.println();
-
-		System.out.println("Time required for calibration of curves.........: " + (millisCurvesEnd-millisCurvesStart)/1000.0 + " s.");
-		System.out.println("Time required for calibration of volatilities...: " + (millisCalibrationEnd-millisCalibrationStart)/1000.0 + " s.");
 
 		System.out.println("_".repeat(120) + "\n");
 	}

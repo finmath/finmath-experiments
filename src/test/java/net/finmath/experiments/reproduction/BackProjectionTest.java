@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import net.finmath.plots.GraphStyle;
@@ -15,6 +16,7 @@ import net.finmath.plots.axis.NumberAxis;
 
 public class BackProjectionTest {
 
+	@Ignore
 	@Test
 	public void test() {
 		double[] distribution = DiscretizedLognormalDistribution.getDistribution(10, 5, 3);

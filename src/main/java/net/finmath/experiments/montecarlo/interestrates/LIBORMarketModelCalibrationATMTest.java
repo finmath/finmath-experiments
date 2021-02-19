@@ -71,7 +71,7 @@ import net.finmath.time.businessdaycalendar.BusinessdayCalendarExcludingTARGETHo
 import net.finmath.time.daycount.DayCountConvention_ACT_365;
 
 /**
- * This class tests the LIBOR market model and products.
+ * This class does some experiments the LIBOR market model calibration.
  *
  * @author Christian Fries
  */
@@ -107,7 +107,7 @@ public class LIBORMarketModelCalibrationATMTest {
 	public static void main(String args[]) throws Exception {
 
 		// Small number of path, to reduce runtime of the unit test. Calibration should use 10 to 100 times more.
-		(new LIBORMarketModelCalibrationATMTest(LIBORMarketModelType.NORMAL, CalibrationProductType.ANALYTIC, 1000 /* numberOfPathsCalibration */, 1000 /* numberOfPathBenchmark */)).testATMSwaptionCalibration();
+		(new LIBORMarketModelCalibrationATMTest(LIBORMarketModelType.NORMAL, CalibrationProductType.ANALYTIC, 1000 /* numberOfPathsCalibration */, 50000 /* numberOfPathBenchmark */)).testATMSwaptionCalibration();
 	}
 
 	public LIBORMarketModelCalibrationATMTest(LIBORMarketModelType modelType, CalibrationProductType calibrationProductType, int numberOfPathsCalibration, int numberOfPathBenchmark) {

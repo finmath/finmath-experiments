@@ -28,7 +28,7 @@ import net.finmath.plots.Plot;
 import net.finmath.plots.Plots;
 
 /**
- * This class visualises some of the numerical errors associated with a Monte-Carlo simulation
+ * This class visualizes some of the numerical errors associated with a Monte-Carlo simulation
  * of an Euler scheme approximation of a discrete forward rate term structure model (LIBOR Market Model)
  * and its relation to the equivalent martingale measure.
  *
@@ -47,7 +47,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletATMImpliedVolInterpolation();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmile();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmiles();
-		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmilesOnGPU();
+//		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmilesOnGPU();
 	}
 
 	public LIBORMarketModelDiscretizationErrorsExperiment() throws CalculationException {}
@@ -57,44 +57,45 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 
 		double forwardRate = 0.05;
 		double periodLength = 0.5;
-		boolean useDiscountCurve = true;
 
-		for(String measure : new String[] { "terminal", "spot"}) {
-			final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createLIBORMarketModel(
-					randomVariableFactory,
-					measure,
-					forwardRate,
-					periodLength,
-					useDiscountCurve,
-					0.30, 0.0, 0.0,
-					numberOfFactors,
-					numberOfPaths, seed);
+		for(Boolean useDiscountCurve : new Boolean[] { false, true }) {
+			for(String measure : new String[] { "terminal", "spot"}) {
+				final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createLIBORMarketModel(
+						randomVariableFactory,
+						measure,
+						forwardRate,
+						periodLength,
+						useDiscountCurve,
+						0.30, 0.0, 0.0,
+						numberOfFactors,
+						numberOfPaths, seed);
 
-			List<Double> maturities = new ArrayList<Double>();
-			List<Double> errors = new ArrayList<Double>();
+				List<Double> maturities = new ArrayList<Double>();
+				List<Double> errors = new ArrayList<Double>();
 
-			for(double maturity = 0.5; maturity < 20; maturity += 0.5) {
-				final TermStructureMonteCarloProduct product = new Bond(maturity);
-				final double value = product.getValue(lmm);
-				final double yieldMonteCarlo = -Math.log(value)/maturity;
+				for(double maturity = 0.5; maturity < 20; maturity += 0.5) {
+					final TermStructureMonteCarloProduct product = new Bond(maturity);
+					final double value = product.getValue(lmm);
+					final double yieldMonteCarlo = -Math.log(value)/maturity;
 
-				final double valueAnalytic = 1.0/Math.pow((1+forwardRate*periodLength), maturity/periodLength);
-				final double yieldAnalytic = -Math.log(valueAnalytic)/maturity;
+					final double valueAnalytic = 1.0/Math.pow((1+forwardRate*periodLength), maturity/periodLength);
+					final double yieldAnalytic = -Math.log(valueAnalytic)/maturity;
 
-				maturities.add(maturity);
-				errors.add(yieldMonteCarlo-yieldAnalytic);
+					maturities.add(maturity);
+					errors.add(yieldMonteCarlo-yieldAnalytic);
+				}
+
+				Plot plot = Plots.createScatter(maturities, errors, 0.0, 0.2, 5)
+						.setTitle("Zero bond error when using " + measure + " measure" + (useDiscountCurve ? " and numeraire control variate." : "."))
+						.setXAxisLabel("maturity")
+						.setYAxisLabel("error")
+						.setYAxisNumberFormat(new DecimalFormat("0.0E00"));
+
+				String filename = "BondDiscretizationError-measure-" + measure + (useDiscountCurve ? "-with-control" : "");
+				plot.saveAsSVG(new File(filename + ".svg"), 900, 400);
+
+				plot.show();
 			}
-
-			Plot plot = Plots.createScatter(maturities, errors, 0.0, 0.2, 5)
-					.setTitle("Zero bond error when using " + measure + " measure" + (useDiscountCurve ? " and numeraire control variate." : "."))
-					.setXAxisLabel("maturity")
-					.setYAxisLabel("error")
-					.setYAxisNumberFormat(new DecimalFormat("0.0E00"));
-
-			String filename = "BondDiscretizationError-measure-" + measure + (useDiscountCurve ? "-with-control" : "");
-			plot.saveAsSVG(new File(filename + ".svg"), 900, 400);
-
-			plot.show();
 		}
 	}
 
@@ -284,23 +285,21 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 
 			for(double strike = 0.025; strike < 0.10; strike += 0.0025) {
 				final TermStructureMonteCarloProduct product = new Caplet(5.0, 0.5, strike);
-				final TermStructureMonteCarloProduct productVol = new Caplet(5.0, 0.5, strike, 0.5, false, ValueUnit.LOGNORMALVOLATILITY);
 				final double value = product.getValue(lmm);
-				final double vol3 = productVol.getValue(lmm);
+
+				/*
+				 * Conversion to implied volatility
+				 */
 				double forward = 0.05;
 				double optionMaturity = 5.0;
 				final AbstractLIBORMonteCarloProduct bondAtPayment = new Bond(5.5);
 				double optionStrike = strike;
-				//			double payoffUnit = bondAtPayment.getValue(lmm);
-				double payoffUnit = 1.0/Math.pow(1+0.05*0.5, 5*2+1) * 0.5;
+				double payoffUnit = bondAtPayment.getValue(lmm) * periodLength;
 				double optionValue = value;
 				final double impliedVol = AnalyticFormulas.blackScholesOptionImpliedVolatility(forward, optionMaturity, optionStrike, payoffUnit, optionValue);
-				//			final double impliedVol = AnalyticFormulas.blackModelCapletImpliedVolatility(forward, optionMaturity, optionStrike, 0.5, payoffUnit, optionValue*0.5);
 
 				strikes.add(strike);
-				impliedVolatilities.add(vol3);
-
-				System.out.println(impliedVol + "\t" + vol3);
+				impliedVolatilities.add(impliedVol);
 			}
 
 			Plots.createScatter(strikes, impliedVolatilities, 0.0, 0.2, 5)
@@ -372,7 +371,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 		double forwardRate = 0.05;
 		double periodLength = 0.5;
 		boolean useDiscountCurve = false;
-		int		numberOfPaths	= 1000000;
+		int		numberOfPaths	= 100000;
 
 		for(RandomVariableFactory randomVariableFactory : List.of(new RandomVariableFromArrayFactory(), new RandomVariableCudaFactory(), new RandomVariableOpenCLFactory())) {
 			long timeStart = System.currentTimeMillis();

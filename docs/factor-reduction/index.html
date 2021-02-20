@@ -51,24 +51,56 @@
 
 		<h1>Factor Reduction - Correlated Brownian Motions</h1>
 
-		<b>Getting Started</b>
-
-		<p>
-			Checkout finmath-experiments from git and run maven (<code>mvn</code> or <code>mvnw</code>) from
-			its directory. This will start a JShell.
-			See <a href="../getting-started">Getting Started</a> for details.
-		</p>
-		
-		<h1>Running the Factor Reduction (with JShell)</h1>
-
 		<p>
 			<i style="color:red;">
 				Note: due to a <a href="https://stackoverflow.com/questions/59788199/swingnode-shows-blank-window-on-macos-with-jdk-11-0-6-and-other-but-not-with-j">bug</a> in Java 11.0.7 for macOS, the simulator does not run
 				when launched with Java 11.0.7. Please use Java 11.0.8 or Java 14.0.1 or better.
 			</i>
 		</p>
+
+		<h2>Running the Factor Reduction (with Maven Exec)</h2>
+		
 		<p>
-			The <b>Factor Reduction Experiment</b> is a GUI application. To run it just type the following in JShell:
+			To launch the GUI directly from the terminal/console using Maven Exec, assuming you are within the finmath-experiments folder:
+		</p>
+		<div class="codeboxwithheader">
+			Terminal:
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment1b">Copy to clipboard</button></span>
+			<div class="codebox"><pre class="prettyprint"><code class="language-sh" id="experiment1b">
+				mvn install exec:java -Dexec.mainClass=net.finmath.experiments.factorreduction.FactorReduction
+			</code></pre></div>
+		</div>
+
+		<p>
+			If you have not yet checked out finmath-experiments, run the following in a terminal/console:
+		</p>
+
+		<div class="codeboxwithheader">
+			Terminal:
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment1c">Copy to clipboard</button></span>
+			<div class="codebox"><pre class="prettyprint"><code class="language-sh" id="experiment1c">
+				git clone https://github.com/finmath/finmath-experiments        
+				cd finmath-experiments
+				mvn install exec:java -Dexec.mainClass=net.finmath.experiments.factorreduction.FactorReduction
+			</code></pre></div>
+		</div>
+
+		<h2>Running the Factor Reduction (with JShell)</h2>
+
+		You may also start the app from a JShell that has been launched using maven from a checkout of finmath-experiments.
+		
+		<h3>Starting JShell from finmath-experiments</h3>
+
+		<p>
+			Checkout finmath-experiments from git and run maven (<code>mvn</code> or <code>mvnw</code>) from
+			its directory. This will start a JShell.
+			See <a href="../getting-started">Getting Started</a> for details.
+		</p>
+	
+		<h3>Starting Factor Reduction App from JShell</h3>
+
+		<p>
+			If you are in a JShell started via maven from the finmath-experiments repository: To run it just type the following in JShell:
 		</p>
 
 		<div class="codeboxwithheader">
@@ -79,18 +111,9 @@
 			</code></pre></div>
 		</div>
 
-		<h1>Running the Factor Reduction (with Maven Exec)</h1>
-		
-		<p>
-			Alternatively you can launch the GUI directly from the terminal/console using Maven Exec:
-		</p>
-		<div class="codeboxwithheader">
-			Terminal:
-			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment1b">Copy to clipboard</button></span>
-			<div class="codebox"><pre class="prettyprint"><code class="language-sh" id="experiment1b">
-				mvn install exec:java -Dexec.mainClass=net.finmath.experiments.factorreduction.FactorReduction
-			</code></pre></div>
-		</div>
+		<h2>Factor Reduction GUI Application</h2>
+
+		<p>Both ways - maven exec or maven jshell - should bring up the following GUI application:</p>
 
 		<center>
 			<img width="80%" src="experiment-01.png"/>

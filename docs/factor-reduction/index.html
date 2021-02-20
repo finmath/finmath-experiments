@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>finMath.net: Experiments: Factor Reduction - Correlated Brownian Motions</title>
+		<link rel="stylesheet" type="text/css" href="../finmathnet-style.css"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="keywords" content="mathematical finance finmath java monte-carlo black-sholes"/>
+		<meta name="description" content="Black-Scholes hedge simulator for a European call option."/>
+		<meta name="robots" content="index, follow"/>
+		<meta name="language" content="en"/>
+		<meta http-equiv="Content-Language" content="en"/>
+		<meta name="viewport" content="width=device-width"/>
+	</head>
+	<body>
+		<!--
+		<script type="text/javascript">
+			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+		<script type="text/javascript">
+			var pageTracker = _gat._getTracker("UA-849152-2");
+			pageTracker._trackPageview();
+		</script>
+		-->
+		<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+		<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+		<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+		<script>new ClipboardJS('.btn');</script>
+
+	
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.css" rel="stylesheet" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/components/prism-core.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/plugins/autoloader/prism-autoloader.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/plugins/normalize-whitespace/prism-normalize-whitespace.js"></script>
+
+		<script type="text/javascript">
+			Prism.plugins.NormalizeWhitespace.setDefaults({
+				'remove-trailing': false,
+				'remove-indent': true,
+				'left-trim': true,
+				'right-trim': false
+				});
+		</script>
+
+		<header>
+			<span class="logo-white">finMath</span><span class="logo-red">.net</span>
+		</header>
+
+		<h1>Factor Reduction - Correlated Brownian Motions</h1>
+
+		<b>Getting Started</b>
+
+		<p>
+			Checkout finmath-experiments from git and run maven (<code>mvn</code> or <code>mvnw</code>) from
+			its directory. This will start a JShell.
+			See <a href="../getting-started">Getting Started</a> for details.
+		</p>
+		
+		<h1>Running the Factor Reduction</h1>
+
+		<p>
+			<i style="color:red;">
+				Note: due to a <a href="https://stackoverflow.com/questions/59788199/swingnode-shows-blank-window-on-macos-with-jdk-11-0-6-and-other-but-not-with-j">bug</a> in Java 11.0.7 for macOS, the simulator does not run
+				when launched with Java 11.0.7. Please use Java 11.0.8 or Java 14.0.1 or better.
+			</i>
+		</p>
+		<p>
+			The Factor Reduction Experiment is a GUI application. To run it just type the following in JShell:
+		</p>
+
+		<div class="codeboxwithheader">
+			JShell: 
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment1">Copy to clipboard</button></span>
+			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment1">
+				net.finmath.experiments.factorredcution.FactorReduction.run();
+			</code></pre></div>
+		</div>
+
+		<center>
+			<img width="80%" src="experiment-01.png"/>
+		</center>
+
+		<h2>Where to continue</h2>
+		
+		You may continue with
+		<ul>
+			<li>
+				<a href="../montecarlo-blackscholes">Monte-Carlo Simulation</a>
+			</li>
+		</ul>
+		
+	</body>
+</html>

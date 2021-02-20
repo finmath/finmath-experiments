@@ -47,7 +47,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletATMImpliedVolInterpolation();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmile();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmiles();
-//		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmilesOnGPU();
+		//		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmilesOnGPU();
 	}
 
 	public LIBORMarketModelDiscretizationErrorsExperiment() throws CalculationException {}

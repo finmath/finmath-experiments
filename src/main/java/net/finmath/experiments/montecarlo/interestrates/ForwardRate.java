@@ -52,7 +52,7 @@ public class ForwardRate extends AbstractLIBORMonteCarloProduct {
 	 * where L denotes the forward rate.
 	 *
 	 * This constructor assumes that \( T^{f} = T_{1} \) and \( T^{p} = T_{2} \).
-	 * 
+	 *
 	 * @param fixingTime The fixing date \( T^{f} \) given as double.
 	 * @param periodLength The period length \( T_{2}-T_{1} \) of the forward rate period.
 	 * @param daycountFraction The daycount fraction used in the payout function.

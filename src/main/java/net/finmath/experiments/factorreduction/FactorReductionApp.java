@@ -47,4 +47,10 @@ public class FactorReductionApp extends Application {
 	public static  void launch() {
 		main(new String[0]);
 	}
+
+	public static void run() {
+		new JFXPanel();		// Hack to ensure that Java FX Platform is initialised
+		Platform.setImplicitExit(false);
+		Platform.runLater(() -> new FactorReductionApp().start(new Stage()));
+	}
 }

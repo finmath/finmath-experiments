@@ -11,7 +11,7 @@ module net.finmath.experiments {
 	requires transitive net.finmath.lib;
 	requires net.finmath.plots;
 
-	requires jfreechart;
+	requires org.jfree.jfreechart;
 	requires junit;
 	requires commons.math3;
 

@@ -8,7 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class FactorReductionApp extends Application {
+public class FactorReduction extends Application {
 
 	@Override
 	public void start(Stage stage) {
@@ -51,6 +51,6 @@ public class FactorReductionApp extends Application {
 	public static void run() {
 		new JFXPanel();		// Hack to ensure that Java FX Platform is initialised
 		Platform.setImplicitExit(false);
-		Platform.runLater(() -> new FactorReductionApp().start(new Stage()));
+		Platform.runLater(() -> new FactorReduction().start(new Stage()));
 	}
 }

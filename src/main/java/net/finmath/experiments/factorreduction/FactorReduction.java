@@ -8,12 +8,12 @@ public class FactorReduction {
 
 	public static void main(String[] args) {
 		System.out.println("Starting FactorReduction...");
-		run();
+		FactorReductionApp.main(args);
 	}
 
 	public static void run() {
-		new JFXPanel();		// Hack to ensure that Java FX Platform is initialized
-		Platform.runLater(() -> new FactorReductionApp().start(new Stage()));
+		new JFXPanel();		// Hack to ensure that Java FX Platform is initialised
 		Platform.setImplicitExit(false);
+		Platform.runLater(() -> new FactorReductionApp().start(new Stage()));
 	}
 }

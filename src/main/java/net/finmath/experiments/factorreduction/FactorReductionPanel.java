@@ -22,6 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.renderer.xy.XYBlockRenderer;
 import org.jfree.data.xy.DefaultXYZDataset;
@@ -159,16 +160,20 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		/*
 		 * Generate factor plot
 		 */
+		JFreeChart factorPlotFullChart = JFreeChartUtilities.getXYPlotChart(
+				null,
+				"component index",
+				" 0",
+				"factor weight",
+				" 0%",
+				datasetFactorsFull);
+		factorPlotFullChart.getXYPlot().getRangeAxis().setAutoRange(false);
+		factorPlotFullChart.getXYPlot().getRangeAxis().setRange(-1, 1);
+
 		JPanel factorPlotFullPanel = new JPanel();
 		factorPlotFullPanel.setLayout(new BoxLayout(factorPlotFullPanel, BoxLayout.X_AXIS));
 		factorPlotFullPanel.add(new ChartPanel(
-				net.finmath.plots.jfreechart.JFreeChartUtilities.getXYPlotChart(
-						null,
-						"component index",
-						" 0",
-						"factor weight",
-						" 0%",
-						datasetFactorsFull),
+				factorPlotFullChart,
 				320, 320,	// size
 				0, 0,	// minimum size
 				1024, 1024,	// maximum size
@@ -178,16 +183,20 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		/*
 		 * Generate factor plot
 		 */
-		JPanel factorPlotFullReduced = new JPanel();
-		factorPlotFullReduced.setLayout(new BoxLayout(factorPlotFullReduced, BoxLayout.X_AXIS));
-		factorPlotFullReduced.add(new ChartPanel(
-				JFreeChartUtilities.getXYPlotChart(
-						null,
-						"component index",
-						" 0",
-						"factor weight",
-						" 0%",
-						datasetFactorsReduced),
+		JFreeChart factorPlotReducedChart = JFreeChartUtilities.getXYPlotChart(
+				null,
+				"component index",
+				" 0",
+				"factor weight",
+				" 0%",
+				datasetFactorsReduced);
+		factorPlotReducedChart.getXYPlot().getRangeAxis().setAutoRange(false);
+		factorPlotReducedChart.getXYPlot().getRangeAxis().setRange(-1, 1);
+
+		JPanel factorPlotReduced = new JPanel();
+		factorPlotReduced.setLayout(new BoxLayout(factorPlotReduced, BoxLayout.X_AXIS));
+		factorPlotReduced.add(new ChartPanel(
+				factorPlotReducedChart,
 				320, 320,	// size
 				0, 0,	// minimum size
 				1024, 1024,	// maximum size
@@ -197,6 +206,8 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		/*
 		 * Generate correlation plot
 		 */
+		NumberAxis xAxis = new NumberAxis("column");
+		NumberAxis yAxis = new NumberAxis("row");
 		NumberAxis zAxis = new NumberAxis("correlation");
 		HuePaintScale paintScale = new HuePaintScale(-1.0,1.0);
 
@@ -207,8 +218,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 						datasetCorrelationsFull,
 						new XYBlockRenderer(),
 						paintScale,
-						new NumberAxis("column"),
-						new NumberAxis("row"),
+						xAxis, yAxis,
 						zAxis,
 						(int)Math.sqrt(datasetCorrelationsFull.getItemCount(0)),
 						(int)Math.sqrt(datasetCorrelationsFull.getItemCount(0))
@@ -229,8 +239,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 						datasetCorrelationsReduced,
 						new XYBlockRenderer(),
 						paintScale,
-						new NumberAxis("column"),
-						new NumberAxis("row"),
+						xAxis, yAxis,
 						zAxis,
 						(int)Math.sqrt(datasetCorrelationsReduced.getItemCount(0)),
 						(int)Math.sqrt(datasetCorrelationsReduced.getItemCount(0))
@@ -261,7 +270,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		correlationReducedPanel.setLayout(new BoxLayout(correlationReducedPanel, BoxLayout.X_AXIS));
 		correlationReducedPanel.setBorder(BorderFactory.createTitledBorder("Factor reduced correlation"));
 		correlationReducedPanel.add(correlationPlotReduced);
-		correlationReducedPanel.add(factorPlotFullReduced);
+		correlationReducedPanel.add(factorPlotReduced);
 
 		JPanel resultPanel = new JPanel();
 		resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
@@ -416,18 +425,12 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 				datasetCorrelationsFull,
 				new XYBlockRenderer(),
 				null, null, null, null,
-//				new NumberAxis("column"),
-//				new NumberAxis("row"),
-//				new NumberAxis("correlation"),
 				(int)Math.sqrt(datasetCorrelationsReduced.getItemCount(0)),
 				(int)Math.sqrt(datasetCorrelationsReduced.getItemCount(0)));
 		net.finmath.plots.jfreechart.JFreeChartUtilities.updateContourPlot(
 				datasetCorrelationsReduced,
 				new XYBlockRenderer(),
 				null, null, null, null,
-//				new NumberAxis("column"),
-//				new NumberAxis("row"),
-//				new NumberAxis("correlation"),
 				(int)Math.sqrt(datasetCorrelationsReduced.getItemCount(0)),
 				(int)Math.sqrt(datasetCorrelationsReduced.getItemCount(0)));
 

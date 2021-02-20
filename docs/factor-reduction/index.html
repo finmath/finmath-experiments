@@ -59,7 +59,7 @@
 			See <a href="../getting-started">Getting Started</a> for details.
 		</p>
 		
-		<h1>Running the Factor Reduction</h1>
+		<h1>Running the Factor Reduction (with JShell)</h1>
 
 		<p>
 			<i style="color:red;">
@@ -75,7 +75,20 @@
 			JShell: 
 			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment1">Copy to clipboard</button></span>
 			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment1">
-				net.finmath.experiments.factorredcution.FactorReduction.run();
+				net.finmath.experiments.factorreduction.FactorReduction.run();
+			</code></pre></div>
+		</div>
+
+		<h1>Running the Factor Reduction (with Maven Exec)</h1>
+		
+		<p>
+			Alternatively you can run the App directly from the terminal/console using Maven Exec:
+		</p>
+		<div class="codeboxwithheader">
+			Terminal: 
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment1b">Copy to clipboard</button></span>
+			<div class="codebox"><pre class="prettyprint"><code class="language-sh" id="experiment1b">
+				mvn install exec:java -Dexec.mainClass=net.finmath.experiments.factorreduction.FactorReduction
 			</code></pre></div>
 		</div>
 

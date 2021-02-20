@@ -168,7 +168,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 				" 0%",
 				datasetFactorsFull);
 		factorPlotFullChart.getXYPlot().getRangeAxis().setAutoRange(false);
-		factorPlotFullChart.getXYPlot().getRangeAxis().setRange(-1, 1);
+		factorPlotFullChart.getXYPlot().getRangeAxis().setRange(-1.05, 1.05);
 
 		JPanel factorPlotFullPanel = new JPanel();
 		factorPlotFullPanel.setLayout(new BoxLayout(factorPlotFullPanel, BoxLayout.X_AXIS));
@@ -191,7 +191,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 				" 0%",
 				datasetFactorsReduced);
 		factorPlotReducedChart.getXYPlot().getRangeAxis().setAutoRange(false);
-		factorPlotReducedChart.getXYPlot().getRangeAxis().setRange(-1, 1);
+		factorPlotReducedChart.getXYPlot().getRangeAxis().setRange(-1.05, 1.05);
 
 		JPanel factorPlotReduced = new JPanel();
 		factorPlotReduced.setLayout(new BoxLayout(factorPlotReduced, BoxLayout.X_AXIS));

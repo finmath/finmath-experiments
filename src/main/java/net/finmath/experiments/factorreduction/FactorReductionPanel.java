@@ -198,7 +198,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		 * Generate correlation plot
 		 */
 		NumberAxis zAxis = new NumberAxis("correlation");
-		zAxis.setRange(-1.0,1.0);
+		HuePaintScale paintScale = new HuePaintScale(-1.0,1.0);
 
 		JPanel correlationPlotFull = new JPanel();
 		correlationPlotFull.setLayout(new BoxLayout(correlationPlotFull, BoxLayout.X_AXIS));
@@ -206,7 +206,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 				JFreeChartUtilities.getContourPlot(
 						datasetCorrelationsFull,
 						new XYBlockRenderer(),
-						new HuePaintScale(-1.0,1.0),
+						paintScale,
 						new NumberAxis("column"),
 						new NumberAxis("row"),
 						zAxis,
@@ -228,7 +228,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 				JFreeChartUtilities.getContourPlot(
 						datasetCorrelationsReduced,
 						new XYBlockRenderer(),
-						new HuePaintScale(-1.0,1.0),
+						paintScale,
 						new NumberAxis("column"),
 						new NumberAxis("row"),
 						zAxis,
@@ -241,6 +241,9 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 				false, true, true, true, true, false	// useBuffer, properties, save, print, zoom, tooltips
 				));
 
+		paintScale.setLowerBound(-1.0);
+		paintScale.setUpperBound( 1.0);
+		zAxis.setRange(-1.0,1.0);
 
 		// Compose all interface elements in boxes
 		inputPanel = new JPanel();
@@ -412,19 +415,19 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		net.finmath.plots.jfreechart.JFreeChartUtilities.updateContourPlot(
 				datasetCorrelationsFull,
 				new XYBlockRenderer(),
-				null,
-				new NumberAxis("column"),
-				new NumberAxis("row"),
-				new NumberAxis("correlation"),
+				null, null, null, null,
+//				new NumberAxis("column"),
+//				new NumberAxis("row"),
+//				new NumberAxis("correlation"),
 				(int)Math.sqrt(datasetCorrelationsReduced.getItemCount(0)),
 				(int)Math.sqrt(datasetCorrelationsReduced.getItemCount(0)));
 		net.finmath.plots.jfreechart.JFreeChartUtilities.updateContourPlot(
 				datasetCorrelationsReduced,
 				new XYBlockRenderer(),
-				null,
-				new NumberAxis("column"),
-				new NumberAxis("row"),
-				new NumberAxis("correlation"),
+				null, null, null, null,
+//				new NumberAxis("column"),
+//				new NumberAxis("row"),
+//				new NumberAxis("correlation"),
 				(int)Math.sqrt(datasetCorrelationsReduced.getItemCount(0)),
 				(int)Math.sqrt(datasetCorrelationsReduced.getItemCount(0)));
 

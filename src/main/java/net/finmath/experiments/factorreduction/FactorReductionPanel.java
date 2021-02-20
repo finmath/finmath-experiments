@@ -31,7 +31,6 @@ import org.jfree.data.xy.XYSeriesCollection;
 import net.finmath.functions.LinearAlgebra;
 import net.finmath.plots.jfreechart.HuePaintScale;
 import net.finmath.plots.jfreechart.JFreeChartUtilities;
-import net.finmath.plots.jfreechart.StyleGuide;
 
 /**
  *
@@ -83,7 +82,6 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		this.setSize(900, 700);
 
 		// Create the GUI
-		StyleGuide style  = new StyleGuide(1.0);
 		updateData();
 
 		correlationParameterA.setColumns(5);

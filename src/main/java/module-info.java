@@ -1,6 +1,7 @@
 
 module net.finmath.experiments {
 	exports net.finmath.experiments.hedgesimulator;
+	exports net.finmath.experiments.factorreduction;
 	exports net.finmath.experiments.shortrate;
 	exports net.finmath.experiments.montecarlo.assetderivativevaluation;
 	exports net.finmath.experiments.montecarlo.automaticdifferentiation;

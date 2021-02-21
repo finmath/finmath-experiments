@@ -40,7 +40,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 	private static final int	numberOfFactors	= 1;
 	private static final int	seed			= 3141;
 
-	public static void main(String args[]) throws Exception {
+	public static void main(String[] args) throws Exception {
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testBondUnderMeasure();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testForwardRateUnderMeasure();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletATMImpliedVol();

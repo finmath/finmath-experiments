@@ -39,7 +39,7 @@ public class ForkJoinPoolTest {
 	private final int		concurrentExecusionsLimitInOuterLoop = 5;
 	private final int		concurrentExecutionsLimitForStreams = 10;
 
-	final Semaphore concurrentExecutions;
+	private final Semaphore concurrentExecutions;
 
 	public static void main(String[] args) {
 		(new ForkJoinPoolTest()).testNestedLoops();

@@ -34,6 +34,7 @@ import net.finmath.plots.jfreechart.HuePaintScale;
 import net.finmath.plots.jfreechart.JFreeChartUtilities;
 
 /**
+ * GUI Panel to explore the effect of a PCA of a correlation matrix and a factor reduction.
  *
  * @author Christian Fries
  */
@@ -463,23 +464,23 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 
 	/**
 	 * This method creates an instanteaneous correlation matrix according to the functional form
-	 *  rho(i,j) = exp(-a * abs(i-j) )
+	 *  \( rho(i,j) = exp(-a * abs(T_{i}-T_{j}) ) \).
 	 *
-	 * @param liborPeriodDiscretization The maturity discretization of the yield curve.
-	 * @param parameterA
+	 * @param tenorTimeDiscretization The maturity discretization of the yield curve.
+	 * @param parameterA The parameter a
 	 * @return The correlation matrix.
 	 */
 	public static double[][] createCorrelationMatirxFromFunctionalForm(
-			double[]    liborPeriodDiscretization,
+			double[]    tenorTimeDiscretization,
 			double      parameterA) {
 
-		double[][] liborCorrelation = new double[liborPeriodDiscretization.length][liborPeriodDiscretization.length];
-		for(int row=0; row<liborPeriodDiscretization.length; row++) {
-			for(int col=0; col<liborPeriodDiscretization.length; col++) {
+		double[][] correlation = new double[tenorTimeDiscretization.length][tenorTimeDiscretization.length];
+		for(int row=0; row<tenorTimeDiscretization.length; row++) {
+			for(int col=0; col<tenorTimeDiscretization.length; col++) {
 				// Exponentially decreasing instanteaneous correlation
-				liborCorrelation[row][col] = Math.exp(-parameterA * Math.abs(row-col));
+				correlation[row][col] = Math.exp(-parameterA * Math.abs(tenorTimeDiscretization[row]-tenorTimeDiscretization[col]));
 			}
 		}
-		return liborCorrelation;
+		return correlation;
 	}
 }

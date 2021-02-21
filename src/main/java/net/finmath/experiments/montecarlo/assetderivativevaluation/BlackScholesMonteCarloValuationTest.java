@@ -62,10 +62,9 @@ public class BlackScholesMonteCarloValuationTest {
 	 * This main method will test a Monte-Carlo simulation of a Black-Scholes model and some valuations
 	 * performed with this model.
 	 *
-	 * @throws net.finmath.exception.CalculationException Thrown if the valuation fails, specific cause may be available via the <code>cause()</code> method.
-	 * @throws InterruptedException
+	 * @param args Not used.
 	 */
-	public static void main(String[] args) throws IOException, CalculationException, InterruptedException
+	public static void main(String[] args)
 	{
 		final BlackScholesMonteCarloValuationTest pricingTest = new BlackScholesMonteCarloValuationTest();
 
@@ -78,44 +77,48 @@ public class BlackScholesMonteCarloValuationTest {
 
 		final long start = System.currentTimeMillis();
 
-		switch(testNumber) {
-		case 1:
-			// This test requires a MonteCarloBlackScholesModel and will not work with others models
-			pricingTest.testEuropeanCall();
-			break;
-		case 2:
-			pricingTest.testModelProperties();
-			break;
-		case 3:
-			pricingTest.testModelRandomVariable();
-			break;
-		case 4:
-			pricingTest.testEuropeanAsianBermudanOption();
-			break;
-		case 5:
-			pricingTest.testMultiThreaddedValuation();
-			break;
-		case 6:
-			// This test requires a MonteCarloBlackScholesModel and will not work with others models
-			pricingTest.testEuropeanCallDelta();
-			break;
-		case 7:
-			// This test requires a MonteCarloBlackScholesModel and will not work with others models
-			pricingTest.testEuropeanCallVega();
-			break;
-		case 8:
-			// This test requires a MonteCarloBlackScholesModel and will not work with others models
-			pricingTest.testEuropeanCallGamma();
-			break;
-		case 9:
-			// This test requires a MonteCarloBlackScholesModel and will not work with others models
-			//			pricingTest.testEuropeanCallTheta();
-			break;
+		try {
+			switch(testNumber) {
+			case 1:
+				// This test requires a MonteCarloBlackScholesModel and will not work with others models
+				pricingTest.testEuropeanCall();
+				break;
+			case 2:
+				pricingTest.testModelProperties();
+				break;
+			case 3:
+				pricingTest.testModelRandomVariable();
+				break;
+			case 4:
+				pricingTest.testEuropeanAsianBermudanOption();
+				break;
+			case 5:
+				pricingTest.testMultiThreaddedValuation();
+				break;
+			case 6:
+				// This test requires a MonteCarloBlackScholesModel and will not work with others models
+				pricingTest.testEuropeanCallDelta();
+				break;
+			case 7:
+				// This test requires a MonteCarloBlackScholesModel and will not work with others models
+				pricingTest.testEuropeanCallVega();
+				break;
+			case 8:
+				// This test requires a MonteCarloBlackScholesModel and will not work with others models
+				pricingTest.testEuropeanCallGamma();
+				break;
+			case 9:
+				// This test requires a MonteCarloBlackScholesModel and will not work with others models
+				//			pricingTest.testEuropeanCallTheta();
+				break;
+			}
+
+			final long end = System.currentTimeMillis();
+
+			System.out.println("\nCalculation time required: " + (end-start)/1000.0 + " seconds.");
+		} catch (CalculationException | InterruptedException e) {
+			System.out.println("\nFailed with exeception: " + e.getMessage());
 		}
-
-		final long end = System.currentTimeMillis();
-
-		System.out.println("\nCalculation time required: " + (end-start)/1000.0 + " seconds.");
 	}
 
 	public BlackScholesMonteCarloValuationTest() {

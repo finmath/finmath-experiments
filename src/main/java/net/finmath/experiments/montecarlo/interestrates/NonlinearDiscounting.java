@@ -540,7 +540,7 @@ public class NonlinearDiscounting {
 						SwapLegWithFundingProvider leg2 = new SwapLegWithFundingProvider(legSchedule, notionals, index, spreads, fundingCapacity);
 
 						double value = leg2.getValue(model);
-						// TODO:
+						// TODO Check for NaN
 						if(Double.isNaN(value)) value = 0.0;
 						optimizer2.setValue(value);
 					}

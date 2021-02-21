@@ -104,7 +104,7 @@ public class LIBORMarketModelCalibrationATMTest {
 	private final int numberOfPathsCalibration;
 	private final int numberOfPathsBenchmark;
 
-	public static void main(String args[]) throws Exception {
+	public static void main(String[] args) throws Exception {
 
 		// Small number of path, to reduce runtime of the unit test. Calibration should use 10 to 100 times more.
 		(new LIBORMarketModelCalibrationATMTest(LIBORMarketModelType.NORMAL, CalibrationProductType.ANALYTIC, 1000 /* numberOfPathsCalibration */, 10000 /* numberOfPathBenchmark */)).testATMSwaptionCalibration();

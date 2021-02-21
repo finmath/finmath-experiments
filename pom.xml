@@ -3,7 +3,7 @@
 
 	<groupId>net.finmath</groupId>
 	<artifactId>finmath-experiments</artifactId>
-	<version>0.2.1-SNAPSHOT</version>
+	<version>0.2.2-SNAPSHOT</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

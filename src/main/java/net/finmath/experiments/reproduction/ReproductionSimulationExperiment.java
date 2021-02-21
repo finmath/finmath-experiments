@@ -23,7 +23,7 @@ import net.finmath.rootfinder.RootFinder;
 
 public class ReproductionSimulationExperiment {
 
-	private final static int maxIncubation = 25;
+	private static final int maxIncubation = 25;
 
 	private final double incubationMean;
 	private final double incubationStdDev;
@@ -40,7 +40,7 @@ public class ReproductionSimulationExperiment {
 			IMMUNE
 		}
 
-		public Map<State, Double> probabilities;
+		private Map<State, Double> probabilities;
 
 		public StateProbabilities(double infectedNotInfectious, double infectedAndInfectious, double immune) {
 			probabilities = Map.of(
@@ -52,7 +52,7 @@ public class ReproductionSimulationExperiment {
 		}
 	}
 
-	public List<StateProbabilities> stateProbabilitiyEvolution = new ArrayList<StateProbabilities>();
+	private List<StateProbabilities> stateProbabilitiyEvolution = new ArrayList<StateProbabilities>();
 
 
 	public static double getCalibrateRate(double rateTarget, double incubationMean, double incubationStdDev, int timeInfectious) {

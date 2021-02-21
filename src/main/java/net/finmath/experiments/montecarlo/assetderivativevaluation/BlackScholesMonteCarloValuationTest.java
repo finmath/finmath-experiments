@@ -109,8 +109,10 @@ public class BlackScholesMonteCarloValuationTest {
 				break;
 			case 9:
 				// This test requires a MonteCarloBlackScholesModel and will not work with others models
-				//			pricingTest.testEuropeanCallTheta();
+				//pricingTest.testEuropeanCallTheta();
 				break;
+			default:
+				throw new IllegalArgumentException("Invalid selection.");
 			}
 
 			final long end = System.currentTimeMillis();

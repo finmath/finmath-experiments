@@ -52,7 +52,7 @@ public class LIBORMarketModelBermudanValuationTest {
 	private static DecimalFormat formatterDeviation	= new DecimalFormat(" 0.00000E00;-0.00000E00", new DecimalFormatSymbols(Locale.ENGLISH));
 
 
-	public static void main(String args[]) throws CalculationException, SolverException {
+	public static void main(String[] args) throws CalculationException, SolverException {
 		(new LIBORMarketModelBermudanValuationTest()).testBermudan();
 	}
 

@@ -36,9 +36,9 @@ import net.finmath.plots.Plots;
  */
 public class LIBORMarketModelDiscretizationErrorsExperiment {
 
-	private final int			numberOfPaths	= 50000;
-	private final static int	numberOfFactors	= 1;
-	private final static int	seed			= 3141;
+	private static final int	numberOfPaths	= 50000;
+	private static final int	numberOfFactors	= 1;
+	private static final int	seed			= 3141;
 
 	public static void main(String args[]) throws Exception {
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testBondUnderMeasure();

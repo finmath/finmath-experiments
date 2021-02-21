@@ -50,16 +50,16 @@ import java.util.stream.IntStream;
 public class NestedParallelForEachTest {
 
 	// The program uses 33 sec with this boolean to false and around 80+ with this boolean true:
-	final boolean isInnerStreamParallel		= true;
+	private final boolean isInnerStreamParallel		= true;
 
 	// Setup: Inner loop task 0.01 sec in worse case. Outer loop task: 10 sec + inner loop. This setup: (100 * 0.01 sec + 10 sec) * 24/8 = 33 sec.
-	final int		numberOfTasksInOuterLoop = 24;				// In real applications this can be a large number (e.g. > 1000).
-	final int		numberOfTasksInInnerLoop = 100;				// In real applications this can be a large number (e.g. > 1000).
-	final int		concurrentExecutionsLimitForStreams	= 8;	// java.util.concurrent.ForkJoinPool.common.parallelism
+	private final int		numberOfTasksInOuterLoop = 24;				// In real applications this can be a large number (e.g. > 1000).
+	private final int		numberOfTasksInInnerLoop = 100;				// In real applications this can be a large number (e.g. > 1000).
+	private final int		concurrentExecutionsLimitForStreams	= 8;	// java.util.concurrent.ForkJoinPool.common.parallelism
 
 	// For those, who do not trust the use of Thread.sleep().
-	final boolean	isCPUTimeBurned = false;					// Set to true, if you like a true loop, and not Thread.sleep()
-	final long	 	cpuTimeBurningCountPerMillis = 800000;		// You might need to calibrate this for your machine
+	private final boolean	isCPUTimeBurned = false;					// Set to true, if you like a true loop, and not Thread.sleep()
+	private final long	 	cpuTimeBurningCountPerMillis = 800000;		// You might need to calibrate this for your machine
 
 	public static void main(String[] args) {
 		(new NestedParallelForEachTest()).testNestedLoops();

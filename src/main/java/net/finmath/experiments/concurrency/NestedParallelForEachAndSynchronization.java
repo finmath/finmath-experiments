@@ -66,14 +66,14 @@ import java.util.stream.IntStream;
 public class NestedParallelForEachAndSynchronization {
 
 
-	final NumberFormat formatter2 = new DecimalFormat("0.00");
+	private final NumberFormat formatter2 = new DecimalFormat("0.00");
 
-	final int		numberOfTasksInOuterLoop = 24;				// In real applications this can be a large number.
-	final int		numberOfTasksInInnerLoop = 100;				// In real applications this can be a large number.
-	final int		concurrentExecutionsLimitForStreams	= 8;	// java.util.concurrent.ForkJoinPool.common.parallelism
+	private final int		numberOfTasksInOuterLoop = 24;				// In real applications this can be a large number.
+	private final int		numberOfTasksInInnerLoop = 100;				// In real applications this can be a large number.
+	private final int		concurrentExecutionsLimitForStreams	= 8;	// java.util.concurrent.ForkJoinPool.common.parallelism
 
-	final int		outerLoopOverheadFactor	= 10000;
-	final long	 	calculationTaskFactor	= 10;		// You might need to calibrate this for your machine
+	private final int		outerLoopOverheadFactor	= 10000;
+	private final long	 	calculationTaskFactor	= 10;		// You might need to calibrate this for your machine
 
 	public static void main(String[] args) {
 		(new NestedParallelForEachAndSynchronization()).testNestedLoops();

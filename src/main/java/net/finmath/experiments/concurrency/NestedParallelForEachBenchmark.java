@@ -58,22 +58,22 @@ import java.util.stream.IntStream;
  */
 public class NestedParallelForEachBenchmark {
 
-	ExecutorService singleThreadExecutor = Executors.newFixedThreadPool(1);
+	private ExecutorService singleThreadExecutor = Executors.newFixedThreadPool(1);
 
-	final NumberFormat formatter2 = new DecimalFormat("0.00");
+	private final NumberFormat formatter2 = new DecimalFormat("0.00");
 
-	final int		numberOfWarmUpLoops = 20;
-	final int		numberOfBenchmarkLoops = 20;
+	private final int		numberOfWarmUpLoops = 20;
+	private final int		numberOfBenchmarkLoops = 20;
 
-	final int		numberOfTasksInOuterLoop = 24;
-	final int		numberOfTasksInInnerLoop = 10;
-	final int		concurrentExecutionsLimitForStreams	= 2;	// java.util.concurrent.ForkJoinPool.common.parallelism
+	private final int		numberOfTasksInOuterLoop = 24;
+	private final int		numberOfTasksInInnerLoop = 10;
+	private final int		concurrentExecutionsLimitForStreams	= 2;	// java.util.concurrent.ForkJoinPool.common.parallelism
 
-	final int		outerLoopOverheadFactor	= 100000;
-	final long	 	calculationTaskFactor	= 100;		// You might need to calibrate this for your machine
+	private final int		outerLoopOverheadFactor	= 100000;
+	private final long	 	calculationTaskFactor	= 100;		// You might need to calibrate this for your machine
 
 	// Array where we store calculation results - this is just to prevent the JVM to optimize the task away
-	final double[]	results = new double[numberOfTasksInOuterLoop * numberOfTasksInInnerLoop];
+	private final double[]	results = new double[numberOfTasksInOuterLoop * numberOfTasksInInnerLoop];
 
 	public static void main(String[] args) {
 		final int testCase = 3;		// Set to 1,2,3

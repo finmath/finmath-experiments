@@ -444,7 +444,6 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 
 		final Map<String, Object> results = new HashMap<>();
 
-
 		/*
 		 * Other Methods
 		 */
@@ -482,7 +481,6 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 		}
 		results.put("A1", A1);
 
-
 		return results;
 	}
 
@@ -490,9 +488,8 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 			final AbstractLIBORMonteCarloProduct option,
 			final double widthConditionalExpectationIndicator,
 			final double widthDensityEstimation,
-			final RandomVariable X, final RandomVariable A0, final RandomVariable A1) throws CalculationException, CloneNotSupportedException {
+			final RandomVariable triggerX, final RandomVariable expectationA0, final RandomVariable expectationA1) throws CalculationException, CloneNotSupportedException {
 		final Map<String, Object> results = new HashMap<>();
-
 
 		/*
 		 * Calculate sensitivities using AAD with regression by extracting the derivative A
@@ -501,12 +498,12 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 		 * in the valuation of the derivative being E(A d/dX 1_X ) and analyse the random variables.
 		 */
 		{
-			final RandomVariable A = A1.sub(A0);
+			final RandomVariable A = expectationA1.sub(expectationA0);
 
 			/*
 			 * Density regression
 			 */
-			final double underlyingStdDev = X.getStandardDeviation();
+			final double underlyingStdDev = triggerX.getStandardDeviation();
 			final ArrayList<Double> maskX = new ArrayList<>();
 			final ArrayList<Double> maskY = new ArrayList<>();
 			for(double maskSizeFactor = -widthDensityEstimation; maskSizeFactor<=widthDensityEstimation+0.005; maskSizeFactor+=0.01) {
@@ -514,8 +511,8 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 				if(Math.abs(maskSizeFactor) < 1E-10) {
 					continue;
 				}
-				final RandomVariable maskPos = X.add(Math.max(maskSize2,0)).choose(new Scalar(1.0), new Scalar(0.0));
-				final RandomVariable maskNeg = X.add(Math.min(maskSize2,0)).choose(new Scalar(0.0), new Scalar(1.0));
+				final RandomVariable maskPos = triggerX.add(Math.max(maskSize2,0)).choose(new Scalar(1.0), new Scalar(0.0));
+				final RandomVariable maskNeg = triggerX.add(Math.min(maskSize2,0)).choose(new Scalar(0.0), new Scalar(1.0));
 				final RandomVariable mask2 = maskPos.mult(maskNeg);
 				final double density = mask2.getAverage() / Math.abs(maskSize2);
 				maskX.add(maskSize2);
@@ -540,12 +537,12 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 			/*
 			 * Localization
 			 */
-			final double derivativeLocalizationSize = widthConditionalExpectationIndicator*X.getStandardDeviation();
-			RandomVariable derivativeLocalizer = X.add(derivativeLocalizationSize/2.0).choose(new Scalar(1.0), new Scalar(0.0));
-			derivativeLocalizer = derivativeLocalizer.mult(X.sub(derivativeLocalizationSize/2.0).choose(new Scalar(0.0), new Scalar(1.0)));
+			final double derivativeLocalizationSize = widthConditionalExpectationIndicator*triggerX.getStandardDeviation();
+			RandomVariable derivativeLocalizer = triggerX.add(derivativeLocalizationSize/2.0).choose(new Scalar(1.0), new Scalar(0.0));
+			derivativeLocalizer = derivativeLocalizer.mult(triggerX.sub(derivativeLocalizationSize/2.0).choose(new Scalar(0.0), new Scalar(1.0)));
 
 			final RandomVariable Atilde = A.mult(derivativeLocalizer);
-			final RandomVariable Xtilde = X.mult(derivativeLocalizer);
+			final RandomVariable Xtilde = triggerX.mult(derivativeLocalizer);
 
 			/*
 			 * Linear regression of A
@@ -561,17 +558,17 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 
 			final double alphaNonLinear = adjointDerivativeRegressionCoeff[0] * density;
 
-			final RandomVariable deltaAADReg = A0.add(alphaNonLinear);
+			final RandomVariable deltaAADReg = expectationA0.add(alphaNonLinear);
 
 			RandomVariable sensitivityRegression = new Scalar(adjointDerivativeRegressionCoeff[0]);
 			RandomVariable densityRegressionOnX = new Scalar(densityRegressionCoeff[0]);
 			for(int i=1; i<adjointDerivativeRegressionCoeff.length; i++) {
-				sensitivityRegression = sensitivityRegression.add(X.pow(i).mult(adjointDerivativeRegressionCoeff[i]));
-				densityRegressionOnX = densityRegressionOnX.add(X.pow(i).mult(densityRegressionCoeff[i]));
+				sensitivityRegression = sensitivityRegression.add(triggerX.pow(i).mult(adjointDerivativeRegressionCoeff[i]));
+				densityRegressionOnX = densityRegressionOnX.add(triggerX.pow(i).mult(densityRegressionCoeff[i]));
 			}
 
 			results.put("delta.aad.directregression", deltaAADReg);
-			results.put("delta.aad.directregression.regression.x", X);
+			results.put("delta.aad.directregression.regression.x", triggerX);
 			results.put("delta.aad.directregression.regression.sensitivity", sensitivityRegression);
 			results.put("delta.aad.directregression.regression.density", densityRegressionOnX);
 		}

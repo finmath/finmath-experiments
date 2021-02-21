@@ -43,37 +43,37 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 	private static final long serialVersionUID = 2852737071726359012L;
 
 	// Some formatters used
-	static DecimalFormat formatterInt			= new DecimalFormat("0");
-	static DecimalFormat formatterReal3		= new DecimalFormat("0.000");
-	static DecimalFormat formatterMaturity		= new DecimalFormat("0.00");
-	static DecimalFormat formatterPrice		= new DecimalFormat("  0.000%; -0.000%");
-	static DecimalFormat formatterLIBOR		= new DecimalFormat(" ####.###%;-#####.###%");
-	static DecimalFormat formatterVolatility	= new DecimalFormat("0.000%");
-	static DecimalFormat formatterDeviation	= new DecimalFormat(" 0.00000E00;-0.00000E00");
-	static DecimalFormat formatterPercent		= new DecimalFormat("##0%");
+	private static DecimalFormat formatterInt			= new DecimalFormat("0");
+	private static DecimalFormat formatterReal3		= new DecimalFormat("0.000");
+	private static DecimalFormat formatterMaturity		= new DecimalFormat("0.00");
+	private static DecimalFormat formatterPrice		= new DecimalFormat("  0.000%; -0.000%");
+	private static DecimalFormat formatterLIBOR		= new DecimalFormat(" ####.###%;-#####.###%");
+	private static DecimalFormat formatterVolatility	= new DecimalFormat("0.000%");
+	private static DecimalFormat formatterDeviation	= new DecimalFormat(" 0.00000E00;-0.00000E00");
+	private static DecimalFormat formatterPercent		= new DecimalFormat("##0%");
 
 	/*
 	 * Data of this applet
 	 */
 
-	int		numberOfFactors		= 3;
-	double	correlationParameter	= 0.1;
+	private int		numberOfFactors		= 3;
+	private double	correlationParameter	= 0.1;
 
-	Thread		calculationThread		= null;
+	private Thread		calculationThread		= null;
 
-	JTextField	numberOfFactorsLabel	= new JTextField("3");
+	private JTextField	numberOfFactorsLabel	= new JTextField("3");
 
 	// Correlation Model is rho(i,j) = exp(-a *  abs(i-j))
-	JTextField	correlationParameterA	 = new JTextField(formatterReal3.format(0.1));
+	private JTextField	correlationParameterA	 = new JTextField(formatterReal3.format(0.1));
 
-	JPanel	inputPanel			= new JPanel();
+	private JPanel	inputPanel			= new JPanel();
 
-	JLabel	correlation			= new JLabel("-",JLabel.CENTER);
+	private JLabel	correlation			= new JLabel("-",JLabel.CENTER);
 
-	DefaultXYZDataset	    datasetCorrelationsFull		= new DefaultXYZDataset();
-	DefaultXYZDataset      	datasetCorrelationsReduced	= new DefaultXYZDataset();
-	XYSeriesCollection		datasetFactorsFull		= new XYSeriesCollection();
-	XYSeriesCollection		datasetFactorsReduced		= new XYSeriesCollection();
+	private DefaultXYZDataset	    datasetCorrelationsFull		= new DefaultXYZDataset();
+	private DefaultXYZDataset      	datasetCorrelationsReduced	= new DefaultXYZDataset();
+	private XYSeriesCollection		datasetFactorsFull		= new XYSeriesCollection();
+	private XYSeriesCollection		datasetFactorsReduced		= new XYSeriesCollection();
 
 	public FactorReductionPanel() {
 		super();

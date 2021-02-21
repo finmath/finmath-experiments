@@ -52,7 +52,7 @@ public class HedgeSimulatorPanel extends JPanel implements ActionListener, Runna
 
 	private static final long serialVersionUID = 4409293529502725079L;
 
-	static DecimalFormat formatter = new DecimalFormat("0.00");
+	private static DecimalFormat formatter = new DecimalFormat("0.00");
 
 	// Data of this applet
 
@@ -330,17 +330,7 @@ public class HedgeSimulatorPanel extends JPanel implements ActionListener, Runna
 		final String commandString = e.getActionCommand();
 
 		// Check events
-		if(commandString.equals("Scenario 1")) {
-		}
-		else if(commandString.equals("Scenario 2")) {
-		}
-		else if(commandString.equals("Scenario 3")) {
-		}
-		else if(commandString.equals("Scenario 4")) {
-		}
-		else if(commandString.equals("Scenario 5")) {
-		}
-		else if(commandString.equals("riskFreeRate++")) {
+		if(commandString.equals("riskFreeRate++")) {
 			riskFreeRateTextField.add(+0.01);
 		} else if(commandString.equals("riskFreeRate--")) {
 			riskFreeRateTextField.add(-0.01);
@@ -484,7 +474,7 @@ public class HedgeSimulatorPanel extends JPanel implements ActionListener, Runna
 			// Create binning for histogram
 			final int			numberOfErrorBins	= 64;
 			final XYSeries		seriesError			= new XYSeries("Error");
-			final int errorCount[] = new int[numberOfErrorBins];
+			final int[] errorCount = new int[numberOfErrorBins];
 			java.util.Arrays.fill(errorCount,0);
 			for(int path=0; path<numberOfPaths; path++) {
 				final int indexOfErrorBin = (int)(((error[path] - errorMin) / (errorMax-errorMin) * (numberOfErrorBins-1)));

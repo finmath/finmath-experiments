@@ -30,14 +30,14 @@ import java.util.stream.IntStream;
 public class ForkJoinPoolTest {
 
 	// Any combination of the booleans works, except (true,true,false)
-	final boolean isUseSemaphore			= true;
-	final boolean isUseInnerStream			= true;
-	final boolean isWrappedInnerLoopThread	= false;
+	private final boolean isUseSemaphore			= true;
+	private final boolean isUseInnerStream			= true;
+	private final boolean isWrappedInnerLoopThread	= false;
 
-	final int		numberOfTasksInOuterLoop = 20;				// In real applications this can be a large number (e.g. > 1000).
-	final int		numberOfTasksInInnerLoop = 100;				// In real applications this can be a large number (e.g. > 1000).
-	final int		concurrentExecusionsLimitInOuterLoop = 5;
-	final int		concurrentExecutionsLimitForStreams = 10;
+	private final int		numberOfTasksInOuterLoop = 20;				// In real applications this can be a large number (e.g. > 1000).
+	private final int		numberOfTasksInInnerLoop = 100;				// In real applications this can be a large number (e.g. > 1000).
+	private final int		concurrentExecusionsLimitInOuterLoop = 5;
+	private final int		concurrentExecutionsLimitForStreams = 10;
 
 	final Semaphore concurrentExecutions;
 

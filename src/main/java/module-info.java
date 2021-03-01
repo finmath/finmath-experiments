@@ -7,13 +7,13 @@ module net.finmath.experiments {
 	exports net.finmath.experiments.montecarlo.automaticdifferentiation;
 	exports net.finmath.experiments.montecarlo.interestrates;
 	exports net.finmath.experiments.reproduction;
-
+	exports com.christianfries.teaching;
+	
 	requires transitive net.finmath.lib;
 	requires net.finmath.plots;
 
 	requires org.jfree.jfreechart;
 	requires junit;
-	requires commons.math3;
 
 	requires javafx.controls;
 	requires javafx.base;
@@ -24,6 +24,7 @@ module net.finmath.experiments {
 	requires java.management;
 	requires java.sql;
 	requires commons.csv;
+	requires commons.math3;
 	requires org.apache.commons.lang3;
 	requires net.finmath.gpu;
 }

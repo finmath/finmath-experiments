@@ -233,7 +233,7 @@ public class ParallelComputingAnimation extends Application {
 
 			List<Instruction> instructions = new ArrayList<>();
 			instructions.add(new SingleInstruction("Input", 40.0f));
-			for(int i=0; i<10; i++) {
+			for(int i=0; i<9; i++) {
 				instructions.add(new SingleInstruction());
 			}
 			instructions.add(block1);
@@ -327,7 +327,7 @@ public class ParallelComputingAnimation extends Application {
 		};
 
 		Runnable resetUI = () -> {
-			for(Program thread : threads) thread.setAtRow(0);
+			for(Program thread : threads) thread.setAtRow(-1);
 			cycle = 0;
 			updateUI.run();
 		};

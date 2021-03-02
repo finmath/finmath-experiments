@@ -1,12 +1,10 @@
 package com.christianfries.teaching;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -42,6 +40,9 @@ import javafx.stage.Stage;
  */
 public class ParallelComputingAnimation extends Application { 
 
+	private final int width = 1680;
+	private final int height = 1050;
+	
 	/*
 	 * Settings of the current animation (can be changed via RadioButtons)
 	 */
@@ -282,51 +283,38 @@ public class ParallelComputingAnimation extends Application {
 
 		//Creating a Group object  
 		Group root = new Group(); 
-		float marginX = (1920 - (4*100+5*200) ) / 2;
-		Group root1 = new Group(); 
-		root1.setTranslateX(marginX);
-		root1.setTranslateY(200.0);
+		float marginX = (width - (4*100+5*200) ) / 2;
 
-		Group root2 = new Group(); 
-		root2.setTranslateX(marginX+300.0);
-		root2.setTranslateY(200.0);
-
-		Group root3 = new Group(); 
-		root3.setTranslateX(marginX+600.0);
-		root3.setTranslateY(200.0);
-
-		Group root4 = new Group(); 
-		root4.setTranslateX(marginX+900.0);
-		root4.setTranslateY(200.0);
-
-		Group root5 = new Group(); 
-		root5.setTranslateX(marginX+1200.0);
-		root5.setTranslateY(200.0);
-
-		root.getChildren().addAll(List.of(root1, root2, root3, root4, root5));
+		List<Group> groups = IntStream.range(0, 5).mapToObj(i -> {
+			Group group = new Group(); 
+			group.setTranslateX(marginX+i*300);
+			group.setTranslateY(200.0);
+			return group;
+		}).collect(Collectors.toList());
+		root.getChildren().addAll(groups);
 
 		List<Program> threads = new ArrayList<>();
-		threads.add(new Program(root1, 0, 0, Color.RED, true));
-		threads.add(new Program(root2, 0, 0, Color.GREEN, false));
-		threads.add(new Program(root3, 0, 0, Color.BLUE, true));
-		threads.add(new Program(root4, 0, 0, Color.ORANGE, true));
-		threads.add(new Program(root5, 0, 0, Color.BROWN, false));
+		threads.add(new Program(groups.get(0), -40, 0, Color.RED, true));
+		threads.add(new Program(groups.get(1), -40, 0, Color.GREEN, false));
+		threads.add(new Program(groups.get(2), -40, 0, Color.BLUE, true));
+		threads.add(new Program(groups.get(3), -40, 0, Color.ORANGE, true));
+		threads.add(new Program(groups.get(4), -40, 0, Color.BROWN, false));
 
 		isSIMD = false;
 		threadSchedule = getThreadSchedule(threads, 0);
 
 		Label title = new Label("Different Forms of Computing: SISD, MIMD, SIMD");
-		title.setTranslateX(1920/4);
+		title.setTranslateX(width/4);
 		title.setTranslateY(30);
-		title.setMinWidth(1920/2);
+		title.setMinWidth(width/2);
 		title.setFont(Font.font(32));
 		title.setAlignment(Pos.BASELINE_CENTER);
 		root.getChildren().add(title);
 
 		Label description = new Label();
-		description.setTranslateX(1920/4);
+		description.setTranslateX(width/4);
 		description.setTranslateY(700);
-		description.setMinWidth(1920/2);
+		description.setMinWidth(width/2);
 		description.setFont(Font.font(32));
 		description.setAlignment(Pos.BASELINE_CENTER);
 		root.getChildren().add(description);
@@ -360,10 +348,8 @@ public class ParallelComputingAnimation extends Application {
 			if(cycle > 0) for(Program program : threadSchedule.get(--cycle)) program.decrement();
 			updateUI.run();
 		});
-		
 
 		AnimationTimer timer = new MyTimer(updateUI);
-
 		ToggleButton buttonOn = new ToggleButton("\u25B6\u25B6");
 		buttonOn.setFont(new Font(24));
 		buttonOn.setOnAction(event -> {
@@ -382,6 +368,7 @@ public class ParallelComputingAnimation extends Application {
 		menuItem4.setFont(new Font(18));
 		RadioButton menuItem5 = new RadioButton("SIMD: Five threads five processors.");
 		menuItem5.setFont(new Font(18));
+
 		menuItem1.setOnAction(event -> {
 			isSIMD = false;
 			threadSchedule = getThreadSchedule(threads, 0);
@@ -422,20 +409,20 @@ public class ParallelComputingAnimation extends Application {
 		HBox buttonBox = new HBox(buttonBackward, buttonForward, buttonOn);
 		buttonBox.setPadding(new Insets(15, 15, 15, 15));
 		buttonBox.setSpacing(20);
-		buttonBox.setMinWidth(1920-2*marginX);
+		buttonBox.setMinWidth(width-2*marginX);
 		buttonBox.setAlignment(Pos.BASELINE_CENTER);
 
 		HBox box = new HBox(menuItem1, menuItem2, menuItem3, menuItem4, menuItem5);
 		box.setPadding(new Insets(15, 15, 15, 15));
 		box.setSpacing(20);
 		box.setTranslateX(0);
-		box.setMinWidth(1920);
+		box.setMinWidth(width);
 		box.setAlignment(Pos.BASELINE_CENTER);
 
 		VBox contorls = new VBox(box, buttonBox);
 		contorls.setTranslateX(0);
 		contorls.setTranslateY(800);
-		contorls.setMinWidth(1920);
+		contorls.setMinWidth(width);
 		contorls.setAlignment(Pos.BASELINE_CENTER);
 		root.getChildren().add(contorls);
 
@@ -443,12 +430,12 @@ public class ParallelComputingAnimation extends Application {
 		acknowledgement.setFont(new Font(12));
 		acknowledgement.setMinWidth(1000);
 		acknowledgement.setAlignment(Pos.BASELINE_RIGHT);
-		acknowledgement.setTranslateX(920-marginX);
+		acknowledgement.setTranslateX(width-1000-marginX);
 		acknowledgement.setTranslateY(650);
 		root.getChildren().add(acknowledgement);
 
 		// Creating a scene object 
-		Scene scene = new Scene(root, 1920, 1080);  
+		Scene scene = new Scene(root, width, height);  
 
 		//Setting title to the Stage 
 		stage.setTitle("Parallel Computing Animation"); 
@@ -461,8 +448,6 @@ public class ParallelComputingAnimation extends Application {
 
 		resetUI.run();
 	}      
-
-
 
 	/**
 	 * Create different ways of scheduling the threads.
@@ -515,8 +500,6 @@ public class ParallelComputingAnimation extends Application {
 		return threadSchedule;
 	}
 
-
-
 	private class MyTimer extends AnimationTimer {
 
 		long last = 0;
@@ -545,4 +528,4 @@ public class ParallelComputingAnimation extends Application {
 	public static void main(String args[]){ 
 		launch(args); 
 	} 
-} 
+}

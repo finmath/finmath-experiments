@@ -29,6 +29,8 @@
 		<site-plugin.version>3.8.2</site-plugin.version>
 		<checkstyle-plugin.version>3.1.1</checkstyle-plugin.version>
 		<clover-plugin.version>4.4.1</clover-plugin.version>
+		<!-- skip tests by default -->
+		<skipTests>true</skipTests>
 	</properties>
 
 	<licenses>
@@ -79,6 +81,12 @@
 			</plugin>
 
 			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>3.0.0</version>
+			</plugin>
+
+			<plugin>
 				<groupId>org.openjfx</groupId>
 				<artifactId>javafx-maven-plugin</artifactId>
 				<version>0.0.3</version>
@@ -90,6 +98,7 @@
 				<version>${surefire-plugin.version}</version>
 				<configuration>
 					<argLine>-mx5G</argLine>
+					<skipTests>${skipTests}</skipTests>
 				</configuration>
 			</plugin>
 			<plugin>

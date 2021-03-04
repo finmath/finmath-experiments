@@ -155,9 +155,14 @@ import net.finmath.time.*;
 import net.finmath.plots.*;
 
 // Use the Cuda factory to create GPU enabled random variables
-//RandomVariableFactory randomVariableFactory = new RandomVariableOpenCLFactory();
-RandomVariableFactory randomVariableFactory = new RandomVariableCudaFactory();
+RandomVariableFactory randomVariableFactory = new RandomVariableOpenCLFactory();
+//RandomVariableFactory randomVariableFactory = new RandomVariableCudaFactory();
 //RandomVariableFactory randomVariableFactory = new RandomVariableFromArrayFactory();
+
+// Create Brownian motion
+int numberOfPaths = 1000000;
+var td = new TimeDiscretizationFromArray(0.0, 200, 0.01);
+var brownianMotion = new BrownianMotionLazyInit(td, 1, numberOfPaths, 3231, randomVariableFactory);
 
 // Create a model
 double modelInitialValue = 100.0;
@@ -166,27 +171,12 @@ double modelVolatility = 0.20;
 var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility, randomVariableFactory);
 
 // Create a corresponding MC process
-int numberOfPaths = 5000000;
-var td = new TimeDiscretizationFromArray(0.0, 30, 0.1);
-<<<<<<< HEAD
-var brownianMotion = new BrownianMotionLazyInit(td, 1, numberOfPaths, 3231);
-=======
-var brownianMotion = new BrownianMotionLazyInit(td, 1, 50000, 3231);
->>>>>>> branch 'master' of https://github.com/finmath/finmath-experiments.git
 var process = new EulerSchemeFromProcessModel(model, brownianMotion);
 
 // Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
 var simulation = new MonteCarloAssetModel(process);
-<<<<<<< HEAD
-=======
 
-double maturity = 3.0;
-double strike = 106.0;
-
-var europeanOption = new EuropeanOption(maturity, strike);
->>>>>>> branch 'master' of https://github.com/finmath/finmath-experiments.git
-
-double maturity = 3.0;
+double maturity = 2.0;
 double strike = 106.0;
 
 var europeanOption = new EuropeanOption(maturity, strike);

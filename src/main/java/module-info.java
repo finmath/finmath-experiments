@@ -7,7 +7,6 @@ module net.finmath.experiments {
 	exports net.finmath.experiments.montecarlo.automaticdifferentiation;
 	exports net.finmath.experiments.montecarlo.interestrates;
 	exports net.finmath.experiments.reproduction;
-	exports com.christianfries.teaching;
 	
 	requires transitive net.finmath.lib;
 	requires net.finmath.plots;

@@ -61,38 +61,38 @@ public class HedgeSimulatorPanel extends JPanel implements ActionListener, Runna
 	/**
 	 * Model parameters
 	 */
-	private int				numberOfPaths			= 4000;
-	private JTextField		numberOfPathsTextField	= new JTextField();
-	private JNumberField	initialValueTextField	= new JNumberField(1.0,	 new DecimalFormat("0.00"), this);
-	private JNumberField	riskFreeRateTextField	= new JNumberField(0.05,	 new DecimalFormat("0.00"), this);
-	private JNumberField	volatilityTextField		= new JNumberField(0.5,	 new DecimalFormat("0.00"), this);
+	private final int				numberOfPaths			= 4000;
+	private final JTextField		numberOfPathsTextField	= new JTextField();
+	private final JNumberField	initialValueTextField	= new JNumberField(1.0,	 new DecimalFormat("0.00"), this);
+	private final JNumberField	riskFreeRateTextField	= new JNumberField(0.05,	 new DecimalFormat("0.00"), this);
+	private final JNumberField	volatilityTextField		= new JNumberField(0.5,	 new DecimalFormat("0.00"), this);
 
 	/**
 	 * Simulation parameters
 	 */
-	private double			timeHorizon				= 2.0;
-	private JNumberField	deltaTTextField			= new JNumberField(1,	 new DecimalFormat("0"), this);
+	private final double			timeHorizon				= 2.0;
+	private final JNumberField	deltaTTextField			= new JNumberField(1,	 new DecimalFormat("0"), this);
 
 	/**
 	 * Option parameters
 	 */
-	private JNumberField		optionMaturityTextField		= new JNumberField(2.0,	 new DecimalFormat("0.00"), this);
-	private JNumberField		optionStrikeTextField		= new JNumberField(1.0,	 new DecimalFormat("0.00"), this);
+	private final JNumberField		optionMaturityTextField		= new JNumberField(2.0,	 new DecimalFormat("0.00"), this);
+	private final JNumberField		optionStrikeTextField		= new JNumberField(1.0,	 new DecimalFormat("0.00"), this);
 
 	/**
 	 * Hedge parameters
 	 */
-	private JNumberField		hedgeRiskFreeRateTextField	= new JNumberField(0.05, new DecimalFormat("0.00"), this);
-	private JNumberField		hedgeVolatilityTextField	= new JNumberField(0.5,	 new DecimalFormat("0.00"), this);
+	private final JNumberField		hedgeRiskFreeRateTextField	= new JNumberField(0.05, new DecimalFormat("0.00"), this);
+	private final JNumberField		hedgeVolatilityTextField	= new JNumberField(0.5,	 new DecimalFormat("0.00"), this);
 
 	private JComboBox<String> 		comboBoxHedgeStrategy;
 
 	/**
 	 * Output
 	 */
-	private XYSeriesCollection	datasetPayoff			= new XYSeriesCollection();
-	private XYSeriesCollection	datasetHistogram		= new XYSeriesCollection();
-	private JTextArea			statusLine				= new JTextArea("");
+	private final XYSeriesCollection	datasetPayoff			= new XYSeriesCollection();
+	private final XYSeriesCollection	datasetHistogram		= new XYSeriesCollection();
+	private final JTextArea			statusLine				= new JTextArea("");
 
 
 	public HedgeSimulatorPanel() {

@@ -19,17 +19,20 @@ public class BackProjectionTest {
 	@Ignore
 	@Test
 	public void test() {
-		double[] distribution = DiscretizedLognormalDistribution.getDistribution(10, 5, 3);
-		double[] distribution2 = DiscretizedLognormalDistribution.getDistribution(10, 10, 6);
+		final double[] distribution = DiscretizedLognormalDistribution.getDistribution(10, 5, 3);
+		final double[] distribution2 = DiscretizedLognormalDistribution.getDistribution(10, 10, 6);
 
-		double[] infections = new double[200];
+		final double[] infections = new double[200];
 		for(int i = 0; i<200; i++) {
-			if(i<100) infections[i] = 2;
-			else infections[i] = 1;
+			if(i<100) {
+				infections[i] = 2;
+			} else {
+				infections[i] = 1;
+			}
 		}
 
-		double[] observations = new double[200-(distribution.length-1)];
-		double[] infectionsExpected = new double[200-(distribution.length-1)];
+		final double[] observations = new double[200-(distribution.length-1)];
+		final double[] infectionsExpected = new double[200-(distribution.length-1)];
 		for(int i=0; i<observations.length; i++) {
 			for(int j=0; j<distribution.length; j++) {
 				infectionsExpected[i] += infections[i+(distribution.length-1)];
@@ -37,15 +40,15 @@ public class BackProjectionTest {
 			}
 		}
 
-		double[] infectionsProjected = (new BackProjection(distribution2, -2, 2)).getInfections(observations);
+		final double[] infectionsProjected = (new BackProjection(distribution2, -2, 2)).getInfections(observations);
 
-		List<Point2D> series1 = new ArrayList<Point2D>();
-		List<Point2D> series2 = new ArrayList<Point2D>();
+		final List<Point2D> series1 = new ArrayList<Point2D>();
+		final List<Point2D> series2 = new ArrayList<Point2D>();
 		for(int i=0; i<infectionsExpected.length; i++) {
 			series1.add(new Point2D(i, infectionsExpected[i]));
 			series2.add(new Point2D(i, infectionsProjected[i]));
 		}
-		Plot2D plot = new Plot2D(List.of(
+		final Plot2D plot = new Plot2D(List.of(
 				new PlotablePoints2D("True Data", series1, new NumberAxis(), new NumberAxis(), new GraphStyle(new Rectangle(-1, -1, 2, 2))),
 				new PlotablePoints2D("Estimated Data", series2, new NumberAxis(), new NumberAxis(), new GraphStyle(new Rectangle(-1, -1, 2, 2)))
 				));
@@ -55,7 +58,7 @@ public class BackProjectionTest {
 
 		try {
 			Thread.sleep(5000);
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

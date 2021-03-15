@@ -27,19 +27,19 @@ public class MonteCarloValuationUsingOpenCL {
 
 		/**
 		 * Factories to test - these are the implementations we inject.
-		 * On some machines some tests may fail, e.g. if you do not have a Cuda enabled 
+		 * On some machines some tests may fail, e.g. if you do not have a Cuda enabled
 		 */
-		var randomVariableFactories = List.of(
+		final var randomVariableFactories = List.of(
 				new RandomVariableFromArrayFactory(false),
 				new RandomVariableOpenCLFactory(),
 				new RandomVariableCudaFactory()
 				);
 
-		for(RandomVariableFactory randomVariableFactory : randomVariableFactories) {
+		for(final RandomVariableFactory randomVariableFactory : randomVariableFactories) {
 			try {
 				testWithRandomVariableFactory(randomVariableFactory);
 			}
-			catch(Exception e) {};
+			catch(final Exception e) {}
 		}
 
 		System.exit(0);
@@ -53,56 +53,56 @@ public class MonteCarloValuationUsingOpenCL {
 		 * First run
 		 */
 
-		var run1Start = System.currentTimeMillis();
+		final var run1Start = System.currentTimeMillis();
 
 		// Create Brownian motion
-		int numberOfPaths = 800000;
-		var td = new TimeDiscretizationFromArray(0.0, 200, 0.01);
-		var brownianMotion = new BrownianMotionFromMersenneRandomNumbers(td, 1, numberOfPaths, 3231, randomVariableFactory);
+		final int numberOfPaths = 800000;
+		final var td = new TimeDiscretizationFromArray(0.0, 200, 0.01);
+		final var brownianMotion = new BrownianMotionFromMersenneRandomNumbers(td, 1, numberOfPaths, 3231, randomVariableFactory);
 
-		var value1 = performValuation(randomVariableFactory, brownianMotion);
+		final var value1 = performValuation(randomVariableFactory, brownianMotion);
 
-		var run1End = System.currentTimeMillis();
-		var run1Time = (run1End-run1Start)/1000.0;
+		final var run1End = System.currentTimeMillis();
+		final var run1Time = (run1End-run1Start)/1000.0;
 
 		System.out.printf("\t (1st run) value = %12.8f \t computation time = %6.3f seconds.\n", value1, run1Time);
 
 		/*
 		 * Second run - reusing brownianMotion
 		 */
-		var run2Start = System.currentTimeMillis();
+		final var run2Start = System.currentTimeMillis();
 
-		var value2 = performValuation(randomVariableFactory, brownianMotion);
+		final var value2 = performValuation(randomVariableFactory, brownianMotion);
 
-		var run2End = System.currentTimeMillis();
-		var run2Time = (run2End-run2Start)/1000.0;
+		final var run2End = System.currentTimeMillis();
+		final var run2Time = (run2End-run2Start)/1000.0;
 
 		System.out.printf("\t (2nd run) value = %12.8f \t computation time = %6.3f seconds.\n", value2, run2Time);
 	}
 
 	private static double performValuation(RandomVariableFactory randomVariableFactory, BrownianMotion brownianMotion) {
 		// Create a model
-		double modelInitialValue = 100.0;
-		double modelRiskFreeRate = 0.05;
-		double modelVolatility = 0.20;
-		var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility, randomVariableFactory);
+		final double modelInitialValue = 100.0;
+		final double modelRiskFreeRate = 0.05;
+		final double modelVolatility = 0.20;
+		final var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility, randomVariableFactory);
 
 		// Create a corresponding MC process
-		var process = new EulerSchemeFromProcessModel(model, brownianMotion);
+		final var process = new EulerSchemeFromProcessModel(model, brownianMotion);
 
 		// Using the process (Euler scheme), create an MC simulation of a Black-Scholes model
-		var simulation = new MonteCarloAssetModel(process);
+		final var simulation = new MonteCarloAssetModel(process);
 
-		double maturity = 2.0;
-		double strike = 106.0;
+		final double maturity = 2.0;
+		final double strike = 106.0;
 
-		var europeanOption = new EuropeanOption(maturity, strike);
+		final var europeanOption = new EuropeanOption(maturity, strike);
 
 		double value = 0.0;
 		try {
-			RandomVariable valueOfEuropeanOption = europeanOption.getValue(0.0, simulation).average();
+			final RandomVariable valueOfEuropeanOption = europeanOption.getValue(0.0, simulation).average();
 			value = valueOfEuropeanOption.doubleValue();
-		} catch (CalculationException e) {
+		} catch (final CalculationException e) {
 			System.out.println("Calculation failed with exception: " + e.getCause().getMessage());
 		}
 

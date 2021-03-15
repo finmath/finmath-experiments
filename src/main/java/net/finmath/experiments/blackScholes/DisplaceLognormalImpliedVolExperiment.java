@@ -19,24 +19,24 @@ public class DisplaceLognormalImpliedVolExperiment {
 
 	public static void main(String[] args) throws Exception {
 
-		double forward = 0.02;
-		double optionMaturity = 5.0;
-		double lognormalVolatility = 0.212;
+		final double forward = 0.02;
+		final double optionMaturity = 5.0;
+		final double lognormalVolatility = 0.212;
 
-		double payoffUnit = 1.0;		// does not matter in this conversion
+		final double payoffUnit = 1.0;		// does not matter in this conversion
 
-		DoubleBinaryOperator volCurveForDisplacement = (optionStrike, displacement) -> {
-			double optionValue = AnalyticFormulas.blackScholesGeneralizedOptionValue(
+		final DoubleBinaryOperator volCurveForDisplacement = (optionStrike, displacement) -> {
+			final double optionValue = AnalyticFormulas.blackScholesGeneralizedOptionValue(
 					forward+displacement, lognormalVolatility, optionMaturity, optionStrike+displacement, payoffUnit);
-			double impliedLognormalVolatility = AnalyticFormulas.blackScholesOptionImpliedVolatility(forward, optionMaturity, optionStrike, payoffUnit, optionValue);
+			final double impliedLognormalVolatility = AnalyticFormulas.blackScholesOptionImpliedVolatility(forward, optionMaturity, optionStrike, payoffUnit, optionValue);
 			return impliedLognormalVolatility;
 		};
 
-		DoubleUnaryOperator volCurve0 = x -> volCurveForDisplacement.applyAsDouble(x, 0.00);
-		DoubleUnaryOperator volCurve1 = x -> volCurveForDisplacement.applyAsDouble(x, 0.01);
-		DoubleUnaryOperator volCurve2 = x -> volCurveForDisplacement.applyAsDouble(x, 0.02);
+		final DoubleUnaryOperator volCurve0 = x -> volCurveForDisplacement.applyAsDouble(x, 0.00);
+		final DoubleUnaryOperator volCurve1 = x -> volCurveForDisplacement.applyAsDouble(x, 0.01);
+		final DoubleUnaryOperator volCurve2 = x -> volCurveForDisplacement.applyAsDouble(x, 0.02);
 
-		Plot plot = new Plot2D(0.01, 0.05, 100, List.of(
+		final Plot plot = new Plot2D(0.01, 0.05, 100, List.of(
 				new Named<>("0.00", volCurve0),
 				new Named<>("0.01", volCurve1),
 				new Named<>("0.02", volCurve2)

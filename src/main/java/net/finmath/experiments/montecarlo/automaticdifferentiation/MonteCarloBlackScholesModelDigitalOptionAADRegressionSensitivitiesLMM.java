@@ -98,7 +98,7 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 	private final double	periodStart = 9.0;
 	private final double	periodEnd = 10.0;
 
-	private DiracDeltaApproximationMethod diracDeltaApproximationMethod = DiracDeltaApproximationMethod.REGRESSION_ON_DENSITY;
+	private final DiracDeltaApproximationMethod diracDeltaApproximationMethod = DiracDeltaApproximationMethod.REGRESSION_ON_DENSITY;
 	//	private DiracDeltaApproximationMethod diracDeltaApproximationMethod = DiracDeltaApproximationMethod.REGRESSION_ON_DISTRIBUITON;
 
 
@@ -109,12 +109,12 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 
 	public void run () throws CalculationException, CloneNotSupportedException, IOException {
 
-		String filename = filenamePrefix + "- " + numberOfFactors + "-" + measure + "-" + stateSpace + ".csv";
+		final String filename = filenamePrefix + "- " + numberOfFactors + "-" + measure + "-" + stateSpace + ".csv";
 
 		System.out.println("Running analyis of algorithmic differentiation of a digital caplet in a LIBOR market model.");
 		System.out.println("This calculation runs very long. Data is saved in the file " + filename + ".");
 
-		FileWriter out = new FileWriter(filename);
+		final FileWriter out = new FileWriter(filename);
 		try(CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader(
 				new String[] {
 						"index1", "index2",
@@ -142,12 +142,12 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 			final double width1 = 0.1;
 			final double width2 = 0.1;
 
-			for(int seed : new int[] { 3216, 3141, 12317 }) {
+			for(final int seed : new int[] { 3216, 3141, 12317 }) {
 
 				// Create Brownian motion with specified seed
 				final BrownianMotion brownianMotion = new BrownianMotionFromMersenneRandomNumbers(timeDiscretization, numberOfFactors, numberOfPaths, seed);
 
-				for(double forwardRate : new double[] { 0.05, 0.04, 0.03, 0.02, 0.01 }) {
+				for(final double forwardRate : new double[] { 0.05, 0.04, 0.03, 0.02, 0.01 }) {
 					this.forwardRate = forwardRate;
 
 					final Map<String, Object> randomVariableForRegression = getSensitivityApproximationByDirectRegressionRandomVariables(option, brownianMotion);
@@ -193,28 +193,28 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 							printError.apply(deltaFD, deltaAnalytic).forEach(t -> {
 								try {
 									printer.print(t);
-								} catch (IOException e) {
+								} catch (final IOException e) {
 									throw new RuntimeException(e);
 								}
 							});
 							printError.apply(deltaAAD, deltaAnalytic).forEach(t -> {
 								try {
 									printer.print(t);
-								} catch (IOException e) {
+								} catch (final IOException e) {
 									throw new RuntimeException(e);
 								}
 							});
 							printError.apply(deltaAADRegression, deltaAnalytic).forEach(t -> {
 								try {
 									printer.print(t);
-								} catch (IOException e) {
+								} catch (final IOException e) {
 									throw new RuntimeException(e);
 								}
 							});
 							printError.apply(deltaAADRegressionDirect, deltaAnalytic).forEach(t -> {
 								try {
 									printer.print(t);
-								} catch (IOException e) {
+								} catch (final IOException e) {
 									throw new RuntimeException(e);
 								}
 							});
@@ -254,8 +254,8 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 		final double liborRateTimeHorzion	= 10.0;
 		final TimeDiscretization liborPeriodDiscretization = new TimeDiscretizationFromArray(0.0, (int) (liborRateTimeHorzion / liborPeriodLength), liborPeriodLength);
 
-		double[] forwardRateFixings = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
-		double[] forwardRateValues = new double[forwardRateFixings.length];
+		final double[] forwardRateFixings = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
+		final double[] forwardRateValues = new double[forwardRateFixings.length];
 		Arrays.fill(forwardRateValues, forwardRate);
 
 		// Create the forward curve (initial value of the LIBOR market model)
@@ -325,7 +325,7 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 		/*
 		 * Analytic
 		 */
-		double df = getMonteCarloLMM(new RandomVariableFromArrayFactory(), brownianMotion).getModel().getDiscountCurve().getDiscountFactor(periodEnd);
+		final double df = getMonteCarloLMM(new RandomVariableFromArrayFactory(), brownianMotion).getModel().getDiscountCurve().getDiscountFactor(periodEnd);
 		final double deltaAnalytic;
 		if(stateSpace.equals("LOGNORMAL")) {
 			deltaAnalytic = AnalyticFormulas.blackScholesDigitalOptionDelta(forwardRate, 0.0, modelVolatility, optionMaturity, optionStrike) * df * (periodEnd-periodStart);
@@ -374,14 +374,14 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 			final Map<String, Object> shiftedValues = new HashMap<>();
 
 
-			double[] forwardCurveValues = ((LIBORMarketModel)monteCarloBlackScholesModel.getModel()).getForwardRateCurve().getParameter();
+			final double[] forwardCurveValues = ((LIBORMarketModel)monteCarloBlackScholesModel.getModel()).getForwardRateCurve().getParameter();
 
-			double[] forwardCurveUpShift = forwardCurveValues.clone();
+			final double[] forwardCurveUpShift = forwardCurveValues.clone();
 			forwardCurveUpShift[forwardCurveUpShift.length-1] = forwardCurveUpShift[forwardCurveUpShift.length-1] + epsilon/2.0;
 			shiftedValues.put("forwardRateCurve", ((LIBORMarketModel)monteCarloBlackScholesModel.getModel()).getForwardRateCurve().getCloneForParameter(forwardCurveUpShift));
 			final RandomVariable valueUp = option.getValue(0.0, monteCarloBlackScholesModel.getCloneWithModifiedData(shiftedValues));
 
-			double[] forwardCurveDnShift = forwardCurveValues.clone();
+			final double[] forwardCurveDnShift = forwardCurveValues.clone();
 			forwardCurveDnShift[forwardCurveUpShift.length-1] = forwardCurveDnShift[forwardCurveUpShift.length-1] - epsilon/2.0;
 			shiftedValues.put("forwardRateCurve", ((LIBORMarketModel)monteCarloBlackScholesModel.getModel()).getForwardRateCurve().getCloneForParameter(forwardCurveDnShift));
 			final RandomVariable valueDn = option.getValue(0.0, monteCarloBlackScholesModel.getCloneWithModifiedData(shiftedValues));

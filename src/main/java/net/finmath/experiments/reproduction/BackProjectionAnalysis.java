@@ -44,17 +44,20 @@ public class BackProjectionAnalysis {
 
 			) throws IOException {
 
-		double[] distributionTrue = DiscretizedLognormalDistribution.getDistribution(50, distrTrueMean, distrTrueStdev);
-		double[] distributionEstm = DiscretizedLognormalDistribution.getDistribution(50, distrEstmMean, distrEstmStdev);
+		final double[] distributionTrue = DiscretizedLognormalDistribution.getDistribution(50, distrTrueMean, distrTrueStdev);
+		final double[] distributionEstm = DiscretizedLognormalDistribution.getDistribution(50, distrEstmMean, distrEstmStdev);
 
-		double[] infections = new double[200];
+		final double[] infections = new double[200];
 		for(int i = 0; i<200; i++) {
-			if(i<100) infections[i] = 2;
-			else infections[i] = 1;
+			if(i<100) {
+				infections[i] = 2;
+			} else {
+				infections[i] = 1;
+			}
 		}
 
-		double[] observations = new double[200+(distributionTrue.length-1)];
-		double[] infectionsExpected = new double[200];
+		final double[] observations = new double[200+(distributionTrue.length-1)];
+		final double[] infectionsExpected = new double[200];
 		System.arraycopy(infections, 0, infectionsExpected, 0, infections.length);
 		for(int i=0; i<infections.length; i++) {
 			for(int j=0; j<distributionTrue.length; j++) {
@@ -62,22 +65,22 @@ public class BackProjectionAnalysis {
 			}
 		}
 
-		double[] infectionsProjected = (new BackProjection(distributionEstm, smoothingIntervalStart, smoothingIntervalEnd)).getInfections(observations);
+		final double[] infectionsProjected = (new BackProjection(distributionEstm, smoothingIntervalStart, smoothingIntervalEnd)).getInfections(observations);
 
-		List<Point2D> series1 = new ArrayList<Point2D>();
-		List<Point2D> series2 = new ArrayList<Point2D>();
+		final List<Point2D> series1 = new ArrayList<Point2D>();
+		final List<Point2D> series2 = new ArrayList<Point2D>();
 		for(int i=0; i<infectionsExpected.length; i++) {
 			series1.add(new Point2D(i, infectionsExpected[i]));
 			series2.add(new Point2D(i, infectionsProjected[i]));
 		}
-		NumberAxis domain = new NumberAxis("Day", 80.0, 120.0);
-		NumberAxis range = new NumberAxis("Value", 0.0, 4.0);
-		Plot2D plot = new Plot2D(List.of(
+		final NumberAxis domain = new NumberAxis("Day", 80.0, 120.0);
+		final NumberAxis range = new NumberAxis("Value", 0.0, 4.0);
+		final Plot2D plot = new Plot2D(List.of(
 				new PlotablePoints2D("Estimated Data", series2, domain, range, new GraphStyle(new Rectangle(-2, -2, 3, 3))),
 				new PlotablePoints2D("True Data", series1, domain, range, new GraphStyle(new Rectangle(-2, -2, 5, 5)))
 				));
 
-		String description = "\u03BC\u1D63 = " + distrTrueMean + ",  " +
+		final String description = "\u03BC\u1D63 = " + distrTrueMean + ",  " +
 				"\u03C3\u1D63 = " + distrTrueStdev + ",  " +
 				"\u03BC\u2091 = " + distrEstmMean + ",  " +
 				"\u03C3\u2091 = " + distrEstmStdev + ",  " +

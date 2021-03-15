@@ -104,7 +104,10 @@ public class MonteCarloSchemeTests {
 	 * Small helper to create nice output string.
 	 */
 	private static String formatPercent(double value) {
-		if(Double.isNaN(value)) return "--NaN--";
-		else return String.format("%6.3f%%", value * 100);
+		if(Double.isNaN(value)) {
+			return "--NaN--";
+		} else {
+			return String.format("%6.3f%%", value * 100);
+		}
 	}
 }

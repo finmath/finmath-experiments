@@ -29,12 +29,12 @@ public class BackProjection {
 
 		boolean converged = false;
 
-		double averageObservataion = DoubleStream.of(observations).average().orElse(1.0);
+		final double averageObservataion = DoubleStream.of(observations).average().orElse(1.0);
 
-		double[] infectionsNew = new double[observations.length];
+		final double[] infectionsNew = new double[observations.length];
 		Arrays.fill(infectionsNew, averageObservataion);
 
-		double[] infections = new double[infectionsNew.length];
+		final double[] infections = new double[infectionsNew.length];
 		System.arraycopy(infectionsNew, 0, infections, 0, infections.length);
 
 		while(!converged) {
@@ -42,7 +42,7 @@ public class BackProjection {
 
 			for(int k=0; k<observations.length-(distribution.length-1); k++) {
 				double sum = 0.0;
-				double infection = infections[k];
+				final double infection = infections[k];
 				for(int i=0; i<distribution.length; i++) {
 					double observationProjected = 0.0;
 					for(int j=0; j<distribution.length; j++) {
@@ -57,12 +57,12 @@ public class BackProjection {
 
 			// Smoothing step
 			for(int i=0; i<infectionsNew.length; i++) {
-				double infectionPrev = infections[i];
+				final double infectionPrev = infections[i];
 				infections[i] = 0.0;
 
 				double sumOfWeight = 0.0;
 				for(int k=smoothingIntervalStart; k<=smoothingIntervalEnd; k++) {
-					double weight = CombinatoricsUtils.binomialCoefficient(smoothingIntervalEnd-smoothingIntervalStart, k-smoothingIntervalStart) / Math.pow(2, smoothingIntervalEnd-smoothingIntervalStart);
+					final double weight = CombinatoricsUtils.binomialCoefficient(smoothingIntervalEnd-smoothingIntervalStart, k-smoothingIntervalStart) / Math.pow(2, smoothingIntervalEnd-smoothingIntervalStart);
 					infections[i] += infectionsNew[Math.min(Math.max(i+k,0),infections.length-1)] * weight;
 					sumOfWeight += weight;
 				}

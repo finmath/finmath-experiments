@@ -11,21 +11,21 @@ public class DiscretizedLognormalDistribution {
 		/*
 		 * Transformation to lognormal distribution parameters
 		 */
-		double muGuess = Math.log(  mean / Math.sqrt(Math.pow(stddev / mean,2)+1 ) );
-		double sigmaGuess = Math.sqrt( 2 * (Math.log(mean)-muGuess) );
+		final double muGuess = Math.log(  mean / Math.sqrt(Math.pow(stddev / mean,2)+1 ) );
+		final double sigmaGuess = Math.sqrt( 2 * (Math.log(mean)-muGuess) );
 
 		/*
 		 * We use a numerical solver to match the distribution parameters exactly
 		 */
-		LevenbergMarquardt lm = new LevenbergMarquardt(new double[] { muGuess, sigmaGuess }, new double[] { mean, stddev*stddev }, 100, 2) {
+		final LevenbergMarquardt lm = new LevenbergMarquardt(new double[] { muGuess, sigmaGuess }, new double[] { mean, stddev*stddev }, 100, 2) {
 			private static final long serialVersionUID = -6224587584814957914L;
 
 			@Override
 			public void setValues(double[] parameters, double[] values) throws SolverException {
-				double mu = parameters[0];
-				double sigma = parameters[1];
+				final double mu = parameters[0];
+				final double sigma = parameters[1];
 
-				double[] distribution = getDiscretizedDistribution(numberOfSamples, mu, sigma);
+				final double[] distribution = getDiscretizedDistribution(numberOfSamples, mu, sigma);
 
 				// Report discitized mean and stddev
 				double distribuionMean = 0.0;
@@ -46,20 +46,20 @@ public class DiscretizedLognormalDistribution {
 
 		try {
 			lm.run();
-		} catch (SolverException e) {}
+		} catch (final SolverException e) {}
 
-		double[] parameters = lm.getBestFitParameters();
+		final double[] parameters = lm.getBestFitParameters();
 
 		return getDiscretizedDistribution(numberOfSamples, parameters[0], parameters[1]);
 	}
 
 	private static double[] getDiscretizedDistribution(int numberOfSamples, double mu, double sigma) {
-		double[] distribution = new double[numberOfSamples];
+		final double[] distribution = new double[numberOfSamples];
 		double sum = 0.0;
 		for(int i=0; i<distribution.length; i++) {
-			double x = i+1;
-			double P = (NormalDistribution.cumulativeDistribution((Math.log(i+1)-mu)/sigma)-NormalDistribution.cumulativeDistribution((Math.log(i)-mu)/sigma));
-			double p = 1.0/(x*Math.sqrt(2*Math.PI)*sigma) * Math.exp(-Math.pow(Math.log(x)-mu, 2.0)/(2*sigma*sigma));
+			final double x = i+1;
+			final double P = (NormalDistribution.cumulativeDistribution((Math.log(i+1)-mu)/sigma)-NormalDistribution.cumulativeDistribution((Math.log(i)-mu)/sigma));
+			final double p = 1.0/(x*Math.sqrt(2*Math.PI)*sigma) * Math.exp(-Math.pow(Math.log(x)-mu, 2.0)/(2*sigma*sigma));
 			distribution[i] = p;
 			sum += p;
 		}

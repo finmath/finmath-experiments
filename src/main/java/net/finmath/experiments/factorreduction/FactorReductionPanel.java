@@ -61,19 +61,19 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 
 	private Thread		calculationThread		= null;
 
-	private JTextField	numberOfFactorsLabel	= new JTextField("3");
+	private final JTextField	numberOfFactorsLabel	= new JTextField("3");
 
 	// Correlation Model is rho(i,j) = exp(-a *  abs(i-j))
-	private JTextField	correlationParameterA	 = new JTextField(formatterReal3.format(0.1));
+	private final JTextField	correlationParameterA	 = new JTextField(formatterReal3.format(0.1));
 
 	private JPanel	inputPanel			= new JPanel();
 
-	private JLabel	correlation			= new JLabel("-",JLabel.CENTER);
+	private final JLabel	correlation			= new JLabel("-",JLabel.CENTER);
 
-	private DefaultXYZDataset	    datasetCorrelationsFull		= new DefaultXYZDataset();
-	private DefaultXYZDataset      	datasetCorrelationsReduced	= new DefaultXYZDataset();
-	private XYSeriesCollection		datasetFactorsFull		= new XYSeriesCollection();
-	private XYSeriesCollection		datasetFactorsReduced		= new XYSeriesCollection();
+	private final DefaultXYZDataset	    datasetCorrelationsFull		= new DefaultXYZDataset();
+	private final DefaultXYZDataset      	datasetCorrelationsReduced	= new DefaultXYZDataset();
+	private final XYSeriesCollection		datasetFactorsFull		= new XYSeriesCollection();
+	private final XYSeriesCollection		datasetFactorsReduced		= new XYSeriesCollection();
 
 	public FactorReductionPanel() {
 		super();
@@ -90,7 +90,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		correlationParameterA.addActionListener(this);
 
 		// Set up a panel containing the input correlation curve
-		JPanel inputPanelCorCurve = new JPanel();
+		final JPanel inputPanelCorCurve = new JPanel();
 		inputPanelCorCurve.setLayout(new BoxLayout(inputPanelCorCurve, BoxLayout.X_AXIS));
 		inputPanelCorCurve.setAlignmentX(Component.LEFT_ALIGNMENT);
 		inputPanelCorCurve.add(new JLabel("r(Ti,Tj) = exp( -",SwingConstants.LEFT));
@@ -98,11 +98,11 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		inputPanelCorCurve.add(new JLabel("* abs(Ti - Tj)).",SwingConstants.LEFT));
 
 		// Set up a panel containing the input
-		JPanel inputPanelModelSpec = new JPanel();
+		final JPanel inputPanelModelSpec = new JPanel();
 		inputPanelModelSpec.setLayout(new GridBagLayout());
 
 		// We use the GridBagConstraints throughout to specify the postion of the GUI component
-		GridBagConstraints c = new GridBagConstraints();
+		final GridBagConstraints c = new GridBagConstraints();
 
 		// General parameters
 		c.weightx = 1.0;
@@ -112,10 +112,10 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		c.fill = GridBagConstraints.HORIZONTAL;
 
 		// Create number of Factors input
-		JPanel numberOfFactorsPanel = new JPanel();
+		final JPanel numberOfFactorsPanel = new JPanel();
 		numberOfFactorsPanel.setLayout(new BoxLayout(numberOfFactorsPanel, BoxLayout.X_AXIS));
-		JButton buttonPlus	= new JButton("+");
-		JButton buttonMinus	= new JButton("-");
+		final JButton buttonPlus	= new JButton("+");
+		final JButton buttonMinus	= new JButton("-");
 		buttonPlus.setActionCommand("numberOfFactors++");
 		buttonPlus.addActionListener(this);
 		buttonMinus.setActionCommand("numberOfFactors--");
@@ -126,9 +126,9 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		numberOfFactorsPanel.add(buttonPlus);
 		numberOfFactorsPanel.add(buttonMinus);
 
-		JLabel labelFactors		= new JLabel("Number of factors: ",SwingConstants.TRAILING);
+		final JLabel labelFactors		= new JLabel("Number of factors: ",SwingConstants.TRAILING);
 		labelFactors.setLabelFor(numberOfFactorsPanel);
-		JLabel labelCorrelation	= new JLabel("Correlation structure: ",SwingConstants.TRAILING);
+		final JLabel labelCorrelation	= new JLabel("Correlation structure: ",SwingConstants.TRAILING);
 		labelCorrelation.setLabelFor(inputPanelCorCurve);
 		c.gridx = 0;		c.gridy = 0;		inputPanelModelSpec.add(labelFactors,c);
 		c.gridx = 0;		c.gridy = 1;		inputPanelModelSpec.add(labelCorrelation,c);
@@ -141,16 +141,16 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		c.fill = GridBagConstraints.NONE;
 		c.gridx = 1;		c.gridy = 2;
 
-		JButton calculateButton = new JButton("Calculate");
+		final JButton calculateButton = new JButton("Calculate");
 		calculateButton.addActionListener(this);
 		inputPanelModelSpec.add(calculateButton,c);
 		inputPanelModelSpec.setBorder(BorderFactory.createTitledBorder("Model specification"));
 
 		// Create panel with scenario buttons
-		JPanel scenarioPanel = new JPanel();
+		final JPanel scenarioPanel = new JPanel();
 		scenarioPanel.setLayout(new BoxLayout(scenarioPanel, BoxLayout.Y_AXIS));
 		for(int scenarioNumber=1; scenarioNumber<=5; scenarioNumber++) {
-			JButton scenarioButton = new JButton("Scenario " + scenarioNumber);
+			final JButton scenarioButton = new JButton("Scenario " + scenarioNumber);
 			scenarioButton.addActionListener(this);
 			scenarioButton.setActionCommand("Scenario " + scenarioNumber);
 			scenarioPanel.add(scenarioButton);
@@ -161,7 +161,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		/*
 		 * Generate factor plot
 		 */
-		JFreeChart factorPlotFullChart = JFreeChartUtilities.getXYPlotChart(
+		final JFreeChart factorPlotFullChart = JFreeChartUtilities.getXYPlotChart(
 				null,
 				"component index",
 				" 0",
@@ -171,7 +171,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		factorPlotFullChart.getXYPlot().getRangeAxis().setAutoRange(false);
 		factorPlotFullChart.getXYPlot().getRangeAxis().setRange(-1.05, 1.05);
 
-		JPanel factorPlotFullPanel = new JPanel();
+		final JPanel factorPlotFullPanel = new JPanel();
 		factorPlotFullPanel.setLayout(new BoxLayout(factorPlotFullPanel, BoxLayout.X_AXIS));
 		factorPlotFullPanel.add(new ChartPanel(
 				factorPlotFullChart,
@@ -184,7 +184,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		/*
 		 * Generate factor plot
 		 */
-		JFreeChart factorPlotReducedChart = JFreeChartUtilities.getXYPlotChart(
+		final JFreeChart factorPlotReducedChart = JFreeChartUtilities.getXYPlotChart(
 				null,
 				"component index",
 				" 0",
@@ -194,7 +194,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		factorPlotReducedChart.getXYPlot().getRangeAxis().setAutoRange(false);
 		factorPlotReducedChart.getXYPlot().getRangeAxis().setRange(-1.05, 1.05);
 
-		JPanel factorPlotReduced = new JPanel();
+		final JPanel factorPlotReduced = new JPanel();
 		factorPlotReduced.setLayout(new BoxLayout(factorPlotReduced, BoxLayout.X_AXIS));
 		factorPlotReduced.add(new ChartPanel(
 				factorPlotReducedChart,
@@ -207,12 +207,12 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		/*
 		 * Generate correlation plot
 		 */
-		NumberAxis xAxis = new NumberAxis("column");
-		NumberAxis yAxis = new NumberAxis("row");
-		NumberAxis zAxis = new NumberAxis("correlation");
-		HuePaintScale paintScale = new HuePaintScale(-1.0,1.0);
+		final NumberAxis xAxis = new NumberAxis("column");
+		final NumberAxis yAxis = new NumberAxis("row");
+		final NumberAxis zAxis = new NumberAxis("correlation");
+		final HuePaintScale paintScale = new HuePaintScale(-1.0,1.0);
 
-		JPanel correlationPlotFull = new JPanel();
+		final JPanel correlationPlotFull = new JPanel();
 		correlationPlotFull.setLayout(new BoxLayout(correlationPlotFull, BoxLayout.X_AXIS));
 		correlationPlotFull.add(new ChartPanel(
 				JFreeChartUtilities.getContourPlot(
@@ -233,7 +233,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		/*
 		 * Generate correlation plot
 		 */
-		JPanel correlationPlotReduced = new JPanel();
+		final JPanel correlationPlotReduced = new JPanel();
 		correlationPlotReduced.setLayout(new BoxLayout(correlationPlotReduced, BoxLayout.X_AXIS));
 		correlationPlotReduced.add(new ChartPanel(
 				JFreeChartUtilities.getContourPlot(
@@ -261,25 +261,25 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		inputPanel.add(inputPanelModelSpec);
 		//		inputPanel.add(scenarioPanel);
 
-		JPanel correlationFullPanel = new JPanel();
+		final JPanel correlationFullPanel = new JPanel();
 		correlationFullPanel.setLayout(new BoxLayout(correlationFullPanel, BoxLayout.X_AXIS));
 		correlationFullPanel.setBorder(BorderFactory.createTitledBorder("Original correlation"));
 		correlationFullPanel.add(correlationPlotFull);
 		correlationFullPanel.add(factorPlotFullPanel);
 
-		JPanel correlationReducedPanel = new JPanel();
+		final JPanel correlationReducedPanel = new JPanel();
 		correlationReducedPanel.setLayout(new BoxLayout(correlationReducedPanel, BoxLayout.X_AXIS));
 		correlationReducedPanel.setBorder(BorderFactory.createTitledBorder("Factor reduced correlation"));
 		correlationReducedPanel.add(correlationPlotReduced);
 		correlationReducedPanel.add(factorPlotReduced);
 
-		JPanel resultPanel = new JPanel();
+		final JPanel resultPanel = new JPanel();
 		resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
 		resultPanel.setBorder(BorderFactory.createTitledBorder("Results"));
 		resultPanel.add(correlationFullPanel);
 		resultPanel.add(correlationReducedPanel);
 
-		Container cp = this;
+		final Container cp = this;
 		cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
 		cp.add(Box.createVerticalStrut(10));
 		cp.add(Box.createVerticalGlue());
@@ -304,12 +304,12 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 			numberOfFactors			= formatterInt.parse(numberOfFactorsLabel.getText()).intValue();
 			correlationParameter		= formatterReal3.parse(correlationParameterA.getText()).doubleValue();
 		}
-		catch(Exception exception) {
+		catch(final Exception exception) {
 		}
 
 		// Check events
 		// Retrieve the command associated with the action. The command is the name of the visual component the triggered the event.
-		String commandString = e.getActionCommand();
+		final String commandString = e.getActionCommand();
 
 		if(commandString.equals("numberOfFactors++")) {
 			numberOfFactors++;
@@ -339,8 +339,12 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		}
 
 		// Apply constrains
-		if(numberOfFactors < 1)		numberOfFactors = 1;
-		if(numberOfFactors > 20)		numberOfFactors = 20;
+		if(numberOfFactors < 1) {
+			numberOfFactors = 1;
+		}
+		if(numberOfFactors > 20) {
+			numberOfFactors = 20;
+		}
 
 		// Update GUI
 		numberOfFactorsLabel.setText(formatterInt.format(numberOfFactors));
@@ -361,7 +365,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		try {
 			updateData();
 		}
-		catch(OutOfMemoryError e) {
+		catch(final OutOfMemoryError e) {
 			setContainerEnabled(inputPanel,true);
 			System.err.println(e.getLocalizedMessage());
 		}
@@ -370,7 +374,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 
 	private void setContainerEnabled(Container container, boolean enabled)
 	{
-		Component[] components = container.getComponents();
+		final Component[] components = container.getComponents();
 
 		for(int i=0; i<components.length; i++) {
 			components[i].setEnabled(enabled);
@@ -385,32 +389,34 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		/*
 		 * Create the time discretization of the processes
 		 */
-		double lastTime = 25.0, dt = 0.25;
-		double[] liborPeriodDiscretization = new double[(int)(lastTime/dt)+1];
-		for(int i=0; i<(lastTime/dt)+1; i++) liborPeriodDiscretization[i] = i * dt;
+		final double lastTime = 25.0, dt = 0.25;
+		final double[] liborPeriodDiscretization = new double[(int)(lastTime/dt)+1];
+		for(int i=0; i<(lastTime/dt)+1; i++) {
+			liborPeriodDiscretization[i] = i * dt;
+		}
 
 		/*
 		 * Create instanteaneous correlation matrix
 		 */
-		double[][] originalCorrelationMatrix = createCorrelationMatirxFromFunctionalForm(
+		final double[][] originalCorrelationMatrix = createCorrelationMatirxFromFunctionalForm(
 				liborPeriodDiscretization,
 				correlationParameter);
 
 		/*
 		 * Get the full factor matrix
 		 */
-		double[][] factorMatrixReduced	= LinearAlgebra.factorReduction(originalCorrelationMatrix, numberOfFactors);
-		double[][] factorMatrixFull		= LinearAlgebra.factorReduction(originalCorrelationMatrix, originalCorrelationMatrix.length);
-		double[][] reducedCorrelationMatrix = LinearAlgebra.multMatrices(factorMatrixReduced, LinearAlgebra.transpose(factorMatrixReduced));
+		final double[][] factorMatrixReduced	= LinearAlgebra.factorReduction(originalCorrelationMatrix, numberOfFactors);
+		final double[][] factorMatrixFull		= LinearAlgebra.factorReduction(originalCorrelationMatrix, originalCorrelationMatrix.length);
+		final double[][] reducedCorrelationMatrix = LinearAlgebra.multMatrices(factorMatrixReduced, LinearAlgebra.transpose(factorMatrixReduced));
 
 		/*
 		 * Buid datasets
 		 */
-		int		numberOfValues	= originalCorrelationMatrix.length * originalCorrelationMatrix.length;
-		double[]	xValues			= new double[numberOfValues];
-		double[]	yValues			= new double[numberOfValues];
-		double[]	zValues			= new double[numberOfValues];
-		double[]	zValuesRed			= new double[numberOfValues];
+		final int		numberOfValues	= originalCorrelationMatrix.length * originalCorrelationMatrix.length;
+		final double[]	xValues			= new double[numberOfValues];
+		final double[]	yValues			= new double[numberOfValues];
+		final double[]	zValues			= new double[numberOfValues];
+		final double[]	zValuesRed			= new double[numberOfValues];
 		int valueIndex = 0;
 		for(int col=0; col<originalCorrelationMatrix.length; col++) {
 			for(int row=0; row<originalCorrelationMatrix[col].length; row++) {
@@ -442,7 +448,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		 */
 		datasetFactorsFull.removeAllSeries();
 		for(int col=0; col<factorMatrixFull[0].length; col++) {
-			XYSeries series = new XYSeries("" + col);
+			final XYSeries series = new XYSeries("" + col);
 			for(int row=0; row<factorMatrixFull.length; row++) {
 				series.add(row, factorMatrixFull[row][col]);
 			}
@@ -450,7 +456,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		}
 		datasetFactorsReduced.removeAllSeries();
 		for(int col=0; col<factorMatrixReduced[0].length; col++) {
-			XYSeries series = new XYSeries("" + col);
+			final XYSeries series = new XYSeries("" + col);
 			for(int row=0; row<factorMatrixReduced.length; row++) {
 				series.add(row, factorMatrixReduced[row][col]);
 			}
@@ -474,7 +480,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 			double[]    tenorTimeDiscretization,
 			double      parameterA) {
 
-		double[][] correlation = new double[tenorTimeDiscretization.length][tenorTimeDiscretization.length];
+		final double[][] correlation = new double[tenorTimeDiscretization.length][tenorTimeDiscretization.length];
 		for(int row=0; row<tenorTimeDiscretization.length; row++) {
 			for(int col=0; col<tenorTimeDiscretization.length; col++) {
 				// Exponentially decreasing instanteaneous correlation

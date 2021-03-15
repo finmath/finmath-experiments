@@ -40,7 +40,7 @@ public class ReproductionSimulationExperiment {
 			IMMUNE
 		}
 
-		private Map<State, Double> probabilities;
+		private final Map<State, Double> probabilities;
 
 		public StateProbabilities(double infectedNotInfectious, double infectedAndInfectious, double immune) {
 			probabilities = Map.of(
@@ -52,21 +52,21 @@ public class ReproductionSimulationExperiment {
 		}
 	}
 
-	private List<StateProbabilities> stateProbabilitiyEvolution = new ArrayList<StateProbabilities>();
+	private final List<StateProbabilities> stateProbabilitiyEvolution = new ArrayList<StateProbabilities>();
 
 
 	public static double getCalibrateRate(double rateTarget, double incubationMean, double incubationStdDev, int timeInfectious) {
-		RootFinder rf = new BisectionSearch(1.00, 1.1);
+		final RootFinder rf = new BisectionSearch(1.00, 1.1);
 		while(!rf.isDone()) {
-			double rate = rf.getNextPoint();
+			final double rate = rf.getNextPoint();
 
-			ReproductionSimulationExperiment sim = new ReproductionSimulationExperiment(incubationMean, incubationStdDev, timeInfectious);
+			final ReproductionSimulationExperiment sim = new ReproductionSimulationExperiment(incubationMean, incubationStdDev, timeInfectious);
 
 			for(int i=0; i<200; i++) {
-				StateProbabilities prob = sim.evolve(rate, incubationMean, incubationStdDev);
+				final StateProbabilities prob = sim.evolve(rate, incubationMean, incubationStdDev);
 			}
-			List<Double> rates = getCalculatedRates(getInfected(sim), 50, 100, 5);
-			double rateMeasured = rates.get(rates.size()-10);
+			final List<Double> rates = getCalculatedRates(getInfected(sim), 50, 100, 5);
+			final double rateMeasured = rates.get(rates.size()-10);
 			System.out.println(rateMeasured);
 			rf.setValue(1.0+rateMeasured-rateTarget);
 		}
@@ -76,7 +76,7 @@ public class ReproductionSimulationExperiment {
 	}
 
 	static List<Double> getCalculatedRates(List<Double> infected, int start, int end, int averagePeriod) {
-		List<Double> rate = new ArrayList<Double>();
+		final List<Double> rate = new ArrayList<Double>();
 		for(int j=start; j<end; j++) {
 			double sum1 = 0.0;
 			for(int k=averagePeriod; k<2*averagePeriod; k++) {
@@ -102,34 +102,34 @@ public class ReproductionSimulationExperiment {
 	}
 
 	private static void createPlot(String filename, double incubationMean, double incubationStdDev, int timeInfectious, boolean useTimeOfInfection) throws IOException {
-		ReproductionSimulationExperiment sim = new ReproductionSimulationExperiment(incubationMean, incubationStdDev, timeInfectious);
+		final ReproductionSimulationExperiment sim = new ReproductionSimulationExperiment(incubationMean, incubationStdDev, timeInfectious);
 
-		double rate1 = getCalibrateRate(1.04, incubationMean, incubationStdDev, timeInfectious);
-		double rate2 = getCalibrateRate(1.02, incubationMean, incubationStdDev, timeInfectious);
+		final double rate1 = getCalibrateRate(1.04, incubationMean, incubationStdDev, timeInfectious);
+		final double rate2 = getCalibrateRate(1.02, incubationMean, incubationStdDev, timeInfectious);
 
 		System.out.println(rate1);
 		System.out.println(rate2);
 
 		for(int i=0; i<500; i++) {
 			if(i < 100) {
-				StateProbabilities prob = sim.evolve(rate1, incubationMean, incubationStdDev);
+				final StateProbabilities prob = sim.evolve(rate1, incubationMean, incubationStdDev);
 			}
 			else {
-				StateProbabilities prob = sim.evolve(rate2, incubationMean, incubationStdDev);
+				final StateProbabilities prob = sim.evolve(rate2, incubationMean, incubationStdDev);
 			}
 		}
 
-		List<Double> infected = getInfected(sim);
+		final List<Double> infected = getInfected(sim);
 
-		int plotStart = 50;
-		int plotEnd = 150;
-		int average = 5;
+		final int plotStart = 50;
+		final int plotEnd = 150;
+		final int average = 5;
 
-		List<Double> day = IntStream.range(plotStart, plotEnd).asDoubleStream().map(x -> (useTimeOfInfection ? x - incubationMean : x)).boxed().collect(Collectors.toList());
-		List<Double> rate = getCalculatedRates(infected, plotStart, plotEnd, average);
+		final List<Double> day = IntStream.range(plotStart, plotEnd).asDoubleStream().map(x -> (useTimeOfInfection ? x - incubationMean : x)).boxed().collect(Collectors.toList());
+		final List<Double> rate = getCalculatedRates(infected, plotStart, plotEnd, average);
 
-		List<Double> dayOfInventionX = IntStream.range(0, 500).mapToDouble(x -> 100.0).boxed().collect(Collectors.toList());
-		List<Double> dayOfInventionY = IntStream.range(0, 500).mapToDouble(x -> 1.01 + x*(1.05-1.01)/500.0).boxed().collect(Collectors.toList());
+		final List<Double> dayOfInventionX = IntStream.range(0, 500).mapToDouble(x -> 100.0).boxed().collect(Collectors.toList());
+		final List<Double> dayOfInventionY = IntStream.range(0, 500).mapToDouble(x -> 1.01 + x*(1.05-1.01)/500.0).boxed().collect(Collectors.toList());
 
 		final List<Point2D> series1 = new ArrayList<Point2D>();
 		for(int i=0; i<day.size(); i++) {
@@ -145,7 +145,7 @@ public class ReproductionSimulationExperiment {
 				new PlotablePoints2D("Intervention", series2, new GraphStyle(new Rectangle(2, 2), null, Color.BLUE))
 				);
 
-		Plot2D plot2 = new Plot2D(plotables);
+		final Plot2D plot2 = new Plot2D(plotables);
 		plot2
 		.setTitle("Reproduction rate derived from simulated data\n (mean = " + incubationMean + ", std.dev = " + incubationStdDev + ")")
 		.setXAxisLabel(useTimeOfInfection ? "Estimated time of infection (day)" : "Time of measurement (day)")
@@ -158,8 +158,8 @@ public class ReproductionSimulationExperiment {
 	}
 
 	private static List<Double> getInfected(ReproductionSimulationExperiment sim) {
-		List<Double> infected = new ArrayList<Double>();
-		for(StateProbabilities prob : sim.stateProbabilitiyEvolution) {
+		final List<Double> infected = new ArrayList<Double>();
+		for(final StateProbabilities prob : sim.stateProbabilitiyEvolution) {
 			infected.add(prob.probabilities.get(State.INFECTED_AND_INFECTIOUS)+prob.probabilities.get(State.IMMUNE));
 		}
 		return infected;
@@ -170,7 +170,7 @@ public class ReproductionSimulationExperiment {
 		this.incubationStdDev = incubationStdDev;
 		this.timeInfectious = timeInfectious;
 
-		double seed = 1E-12;
+		final double seed = 1E-12;
 
 		// Seed the simulation
 		stateProbabilitiyEvolution.add(new StateProbabilities(0.0, seed, 0.0));
@@ -186,15 +186,15 @@ public class ReproductionSimulationExperiment {
 		/*
 		 * Transformation to lognormal distribution parameters
 		 */
-		double mu = Math.log(  mean / Math.sqrt(Math.pow(stddev / mean,2)+1 ) );
-		double sigma = Math.sqrt( 2 * (Math.log(mean)-mu) );
+		final double mu = Math.log(  mean / Math.sqrt(Math.pow(stddev / mean,2)+1 ) );
+		final double sigma = Math.sqrt( 2 * (Math.log(mean)-mu) );
 
-		double[] incubation = new double[maxIncubation];
+		final double[] incubation = new double[maxIncubation];
 
 		double sum = 0.0;
 		for(int i=0; i<incubation.length; i++) {
-			double x = i+1;
-			double p = 1.0/(x*Math.sqrt(2*Math.PI)*sigma) * Math.exp(-Math.pow(Math.log(x)-mu, 2.0)/(2*sigma*sigma));
+			final double x = i+1;
+			final double p = 1.0/(x*Math.sqrt(2*Math.PI)*sigma) * Math.exp(-Math.pow(Math.log(x)-mu, 2.0)/(2*sigma*sigma));
 			incubation[i] = p;
 			sum += p;
 		}
@@ -214,15 +214,15 @@ public class ReproductionSimulationExperiment {
 			var += Math.pow((i+1) - avg, 2.0) * incubation[i];
 		}
 
-		StateProbabilities currentState = stateProbabilitiyEvolution.get(currentTime);
-		double currentUninfected = 1+currentState.probabilities.get(State.UNINFECTED);
-		double currentIntfectedAnd = currentState.probabilities.get(State.INFECTED_AND_INFECTIOUS);
+		final StateProbabilities currentState = stateProbabilitiyEvolution.get(currentTime);
+		final double currentUninfected = 1+currentState.probabilities.get(State.UNINFECTED);
+		final double currentIntfectedAnd = currentState.probabilities.get(State.INFECTED_AND_INFECTIOUS);
 
-		double effectiveRate = solveForRate(rate, incubation, timeInfectious);
+		final double effectiveRate = solveForRate(rate, incubation, timeInfectious);
 
-		double newInfected = effectiveRate * currentIntfectedAnd * currentUninfected;
+		final double newInfected = effectiveRate * currentIntfectedAnd * currentUninfected;
 
-		StateProbabilities lastState = stateProbabilitiyEvolution.get(stateProbabilitiyEvolution.size()-1);
+		final StateProbabilities lastState = stateProbabilitiyEvolution.get(stateProbabilitiyEvolution.size()-1);
 		while(stateProbabilitiyEvolution.size() < currentTime+incubation.length+timeInfectious+1) {
 			stateProbabilitiyEvolution.add(lastState);
 		}
@@ -232,12 +232,15 @@ public class ReproductionSimulationExperiment {
 			double p = 0;
 			double q = 0;
 			for(int j = 0; j<Math.min(i, incubation.length); j++) {
-				if(i-j > timeInfectious)	q += incubation[j];
-				else						p += incubation[j];
+				if(i-j > timeInfectious) {
+					q += incubation[j];
+				} else {
+					p += incubation[j];
+				}
 			}
 
-			StateProbabilities state = stateProbabilitiyEvolution.get(currentTime+i);
-			StateProbabilities newState = new StateProbabilities(
+			final StateProbabilities state = stateProbabilitiyEvolution.get(currentTime+i);
+			final StateProbabilities newState = new StateProbabilities(
 					state.probabilities.get(State.INFECTED_NOT_INFECTIOUS) + newInfected * (1-p-q),
 					state.probabilities.get(State.INFECTED_AND_INFECTIOUS) + newInfected * p,
 					state.probabilities.get(State.IMMUNE) + newInfected * q);
@@ -250,9 +253,9 @@ public class ReproductionSimulationExperiment {
 	}
 
 	private double solveForRate(double rateTarget, double[] distribution, int n) {
-		RootFinder rf = new BisectionSearch(0.0, 2.0);
+		final RootFinder rf = new BisectionSearch(0.0, 2.0);
 		while(!rf.isDone()) {
-			double rate = rf.getNextPoint();
+			final double rate = rf.getNextPoint();
 			double rateEff = 1.0;
 			for(int i=0; i<distribution.length; i++) {
 				for(int j=0; j<n; j++) {
@@ -262,7 +265,7 @@ public class ReproductionSimulationExperiment {
 			rf.setValue(rateEff-rateTarget);
 		}
 
-		double rateGeom = rf.getBestPoint()/n;
+		final double rateGeom = rf.getBestPoint()/n;
 
 		return rateGeom;
 	}

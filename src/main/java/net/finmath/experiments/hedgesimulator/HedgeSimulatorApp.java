@@ -11,14 +11,14 @@ public class HedgeSimulatorApp extends Application {
 
 	@Override
 	public void start(Stage stage) {
-		SwingNode swingNode = new SwingNode();
+		final SwingNode swingNode = new SwingNode();
 		createAndSetSwingContent(swingNode);
 		swingNode.setVisible(true);
 
 		final StackPane pane = new StackPane();
 		pane.getChildren().add(swingNode);
 
-		Scene scene = new Scene(pane, 1200, 800);
+		final Scene scene = new Scene(pane, 1200, 800);
 
 		stage.setScene(scene);
 		//		stage.setFullScreen(true);

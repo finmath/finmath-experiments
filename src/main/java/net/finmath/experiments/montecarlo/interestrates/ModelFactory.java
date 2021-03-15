@@ -74,10 +74,12 @@ public class ModelFactory {
 		/*
 		 * Create a volatility structure v[i][j] = sigma_j(t_i)
 		 */
-		int numberOfCompnents = liborPeriodDiscretization.getNumberOfTimeSteps();
-		int numberOfTimesSteps = timeDiscretization.getNumberOfTimes();
+		final int numberOfCompnents = liborPeriodDiscretization.getNumberOfTimeSteps();
+		final int numberOfTimesSteps = timeDiscretization.getNumberOfTimes();
 		final double[][] volatilities = new double[numberOfTimesSteps][numberOfCompnents];
-		for(int i=0; i<volatilities.length; i++) Arrays.fill(volatilities[i], volatility);
+		for(int i=0; i<volatilities.length; i++) {
+			Arrays.fill(volatilities[i], volatility);
+		}
 		final LIBORVolatilityModel volatilityModel = new LIBORVolatilityModelFromGivenMatrix(
 				randomVariableFactory, timeDiscretization, liborPeriodDiscretization, volatilities);
 
@@ -96,7 +98,7 @@ public class ModelFactory {
 						liborPeriodDiscretization, volatilityModel, correlationModel);
 
 		// BlendedLocalVolatlityModel
-		AbstractLIBORCovarianceModel covarianceModelBlended = new BlendedLocalVolatilityModel(
+		final AbstractLIBORCovarianceModel covarianceModelBlended = new BlendedLocalVolatilityModel(
 				covarianceModelWithConstantVolatility, forwardCurve, localVolNormalityBlend, false);
 		//		covarianceModelBlended = covarianceModelWithConstantVolatility;
 

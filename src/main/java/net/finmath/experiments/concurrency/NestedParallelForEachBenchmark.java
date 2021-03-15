@@ -58,7 +58,7 @@ import java.util.stream.IntStream;
  */
 public class NestedParallelForEachBenchmark {
 
-	private ExecutorService singleThreadExecutor = Executors.newFixedThreadPool(1);
+	private final ExecutorService singleThreadExecutor = Executors.newFixedThreadPool(1);
 
 	private final NumberFormat formatter2 = new DecimalFormat("0.00");
 

@@ -5,6 +5,9 @@
  */
 package net.finmath.experiments.montecarlo.assetderivativevaluation;
 
+import java.util.List;
+
+import net.finmath.cuda.montecarlo.RandomVariableCudaFactory;
 import net.finmath.exception.CalculationException;
 import net.finmath.montecarlo.BrownianMotion;
 import net.finmath.montecarlo.BrownianMotionFromMersenneRandomNumbers;
@@ -21,14 +24,26 @@ import net.finmath.time.TimeDiscretizationFromArray;
 public class MonteCarloValuationUsingOpenCL {
 
 	public static void main(String[] args) {
-		
-		testWithRandomVariableFactory(new RandomVariableFromArrayFactory(false));
-		testWithRandomVariableFactory(new RandomVariableOpenCLFactory());
-		
+
+		// Factories to test - these are the implementations we inject
+		var randomVariableFactories = List.of(
+				new RandomVariableFromArrayFactory(false),
+				new RandomVariableOpenCLFactory(),
+				new RandomVariableCudaFactory()
+				);
+
+		for(RandomVariableFactory randomVariableFactory : randomVariableFactories) {
+			try {
+				testWithRandomVariableFactory(randomVariableFactory);
+			}
+			catch(Exception e) {};
+		}
+
+		System.exit(0);
 	}
 
 	private static void testWithRandomVariableFactory(RandomVariableFactory randomVariableFactory) {
-		
+
 		System.out.println("Using " + randomVariableFactory.getClass().getSimpleName());
 
 		/*
@@ -36,9 +51,9 @@ public class MonteCarloValuationUsingOpenCL {
 		 */
 
 		var run1Start = System.currentTimeMillis();
-		
+
 		// Create Brownian motion
-		int numberOfPaths = 1000000;
+		int numberOfPaths = 100000;	// change this to 1000000
 		var td = new TimeDiscretizationFromArray(0.0, 200, 0.01);
 		var brownianMotion = new BrownianMotionFromMersenneRandomNumbers(td, 1, numberOfPaths, 3231, randomVariableFactory);
 
@@ -46,7 +61,7 @@ public class MonteCarloValuationUsingOpenCL {
 
 		var run1End = System.currentTimeMillis();
 		var run1Time = (run1End-run1Start)/1000.0;
-		
+
 		System.out.printf("\t value = %6.3f \t computation time = %6.3f seconds.\n", value1, run1Time);
 
 		/*
@@ -87,7 +102,7 @@ public class MonteCarloValuationUsingOpenCL {
 		} catch (CalculationException e) {
 			System.out.println("Calculation failed with exception: " + e.getCause().getMessage());
 		}
-		
+
 		return value;
 	}
 }

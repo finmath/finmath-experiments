@@ -26,4 +26,5 @@ module net.finmath.experiments {
 	requires commons.csv;
 	requires commons.math3;
 	requires org.apache.commons.lang3;
+	requires finmath.lib.cuda.extensions;
 }

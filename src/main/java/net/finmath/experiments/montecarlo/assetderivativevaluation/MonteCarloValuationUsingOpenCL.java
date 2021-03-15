@@ -56,7 +56,7 @@ public class MonteCarloValuationUsingOpenCL {
 		var run1Start = System.currentTimeMillis();
 
 		// Create Brownian motion
-		int numberOfPaths = 100000;	// change this to 1000000
+		int numberOfPaths = 1000000;	// change this to 1000000
 		var td = new TimeDiscretizationFromArray(0.0, 200, 0.01);
 		var brownianMotion = new BrownianMotionFromMersenneRandomNumbers(td, 1, numberOfPaths, 3231, randomVariableFactory);
 

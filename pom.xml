@@ -15,10 +15,12 @@
 		<src.test.kotlin.dir>src/test/kotlin</src.test.kotlin.dir>
 		<kotlin.version>1.2.0</kotlin.version>
 		<junit.version>4.13.1</junit.version>
-		<finmath-lib.version>5.1.1</finmath-lib.version>
+		<finmath-lib.version>5.1.3</finmath-lib.version>
 		<finmath-plot.version>0.4.2</finmath-plot.version>
-		<finmath-cuda.version>5.0.5</finmath-cuda.version>
+		<finmath-opencl.version>5.1.3</finmath-opencl.version>
+		<finmath-cuda.version>5.1.3</finmath-cuda.version>
 		<finmath-cuda.classifier />
+		<finmath-opencl.classifier>opencl-1.0</finmath-opencl.classifier>
 		<!-- maven plugins -->
 		<compiler-plugin.version>3.8.1</compiler-plugin.version>
 		<surefire-plugin.version>3.0.0-M4</surefire-plugin.version>
@@ -29,6 +31,7 @@
 		<site-plugin.version>3.8.2</site-plugin.version>
 		<checkstyle-plugin.version>3.1.1</checkstyle-plugin.version>
 		<clover-plugin.version>4.4.1</clover-plugin.version>
+		<maven-bnd-plugin.version>5.3.0</maven-bnd-plugin.version>
 		<!-- skip tests by default -->
 		<skipTests>true</skipTests>
 	</properties>
@@ -224,6 +227,13 @@
 			<artifactId>finmath-lib-cuda-extensions</artifactId>
 			<version>${finmath-cuda.version}</version>
 			<classifier>${finmath-cuda.classifier}</classifier>
+		</dependency>
+
+		<dependency>
+			<groupId>net.finmath</groupId>
+			<artifactId>finmath-lib-opencl-extensions</artifactId>
+			<version>${finmath-opencl.version}</version>
+			<classifier>${finmath-opencl.classifier}</classifier>
 		</dependency>
 
 		<!-- apache commons -->

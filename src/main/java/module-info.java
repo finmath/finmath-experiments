@@ -9,7 +9,8 @@ module net.finmath.experiments {
 	exports net.finmath.experiments.reproduction;
 	
 	requires transitive net.finmath.lib;
-	requires net.finmath.plots;
+	requires transitive net.finmath.opencl;
+	requires transitive net.finmath.plots;
 
 	requires org.jfree.jfreechart;
 	requires junit;
@@ -25,5 +26,4 @@ module net.finmath.experiments {
 	requires commons.csv;
 	requires commons.math3;
 	requires org.apache.commons.lang3;
-	requires net.finmath.gpu;
 }

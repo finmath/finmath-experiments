@@ -25,7 +25,10 @@ public class MonteCarloValuationUsingOpenCL {
 
 	public static void main(String[] args) {
 
-		// Factories to test - these are the implementations we inject
+		/**
+		 * Factories to test - these are the implementations we inject.
+		 * On some machines some tests may fail, e.g. if you do not have a Cuda enabled 
+		 */
 		var randomVariableFactories = List.of(
 				new RandomVariableFromArrayFactory(false),
 				new RandomVariableOpenCLFactory(),

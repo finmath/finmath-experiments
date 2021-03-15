@@ -56,7 +56,7 @@ public class MonteCarloValuationUsingOpenCL {
 		var run1Start = System.currentTimeMillis();
 
 		// Create Brownian motion
-		int numberOfPaths = 500000;	// change this to 1000000
+		int numberOfPaths = 800000;
 		var td = new TimeDiscretizationFromArray(0.0, 200, 0.01);
 		var brownianMotion = new BrownianMotionFromMersenneRandomNumbers(td, 1, numberOfPaths, 3231, randomVariableFactory);
 
@@ -65,7 +65,7 @@ public class MonteCarloValuationUsingOpenCL {
 		var run1End = System.currentTimeMillis();
 		var run1Time = (run1End-run1Start)/1000.0;
 
-		System.out.printf("\t value = %6.3f \t computation time = %6.3f seconds.\n", value1, run1Time);
+		System.out.printf("\t (1st run) value = %12.8f \t computation time = %6.3f seconds.\n", value1, run1Time);
 
 		/*
 		 * Second run - reusing brownianMotion
@@ -77,7 +77,7 @@ public class MonteCarloValuationUsingOpenCL {
 		var run2End = System.currentTimeMillis();
 		var run2Time = (run2End-run2Start)/1000.0;
 
-		System.out.printf("\t value = %6.3f \t computation time = %6.3f seconds.\n", value2, run2Time);
+		System.out.printf("\t (2nd run) value = %12.8f \t computation time = %6.3f seconds.\n", value2, run2Time);
 	}
 
 	private static double performValuation(RandomVariableFactory randomVariableFactory, BrownianMotion brownianMotion) {

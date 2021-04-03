@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>finMath.net: Experiments: Parallel Computing Animation</title>
+		<link rel="stylesheet" type="text/css" href="../finmathnet-style.css"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="keywords" content="gpu simd mimd"/>
+		<meta name="description" content="Parallel Computing Animation"/>
+		<meta name="robots" content="index, follow"/>
+		<meta name="language" content="en"/>
+		<meta http-equiv="Content-Language" content="en"/>
+		<meta name="viewport" content="width=device-width"/>
+	</head>
+	<body>
+		<!--
+		<script type="text/javascript">
+			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+		<script type="text/javascript">
+			var pageTracker = _gat._getTracker("UA-849152-2");
+			pageTracker._trackPageview();
+		</script>
+		-->
+		<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+		<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+		<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+		<script>new ClipboardJS('.btn');</script>
+
+	
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.css" rel="stylesheet" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/components/prism-core.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/plugins/autoloader/prism-autoloader.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/plugins/normalize-whitespace/prism-normalize-whitespace.js"></script>
+
+		<script type="text/javascript">
+			Prism.plugins.NormalizeWhitespace.setDefaults({
+				'remove-trailing': false,
+				'remove-indent': true,
+				'left-trim': true,
+				'right-trim': false
+				});
+		</script>
+
+		<header>
+			<span class="logo-white">finMath</span><span class="logo-red">.net</span>
+		</header>
+
+		<h1>Parallel Computing Animation</h1>
+
+		<p>
+			To run the animation checkout the project JavaGPUExperiments and launch
+			com.christianfries.teaching.gpu.ParallelComputingAnimation via Maven exec.
+		</p>
+
+		<div class="codeboxwithheader">
+			Terminal / Console: 
+			<span style="float: right;"><button class="btn" data-clipboard-target="#experiment1">Copy to clipboard</button></span>
+			<div class="codebox"><pre class="prettyprint"><code class="language-java" id="experiment1">
+				git clone https://github.com/cfries/JavaGPUExperiments
+				cd JavaGPUExperiments
+				mvn clean install exec:java -Dexec.mainClass=com.christianfries.teaching.gpu.ParallelComputingAnimation
+			 </code></pre></div>
+		</div>
+
+		<center>
+<!--			<img width="80%" src="experiment-01.png"/>-->
+		</center>
+		
+	</body>
+</html>

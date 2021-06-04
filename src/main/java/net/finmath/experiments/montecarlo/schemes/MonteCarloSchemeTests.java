@@ -9,7 +9,7 @@ package net.finmath.experiments.montecarlo.schemes;
 import java.text.DecimalFormat;
 
 /**
- * Testing the behavior of some time discretization schemes w.r.t. time step size.
+ * Testing the behaviour of some time discretization schemes w.r.t. time step size.
  *
  * @author Christian Fries
  */
@@ -48,7 +48,7 @@ public class MonteCarloSchemeTests {
 					sigma);				// sigma
 
 			// Create an instance of the euler scheme class
-			final LogProcessExpEulerScheme expEulerScheme = new LogProcessExpEulerScheme(
+			final LogProcessLogEulerScheme logEulerScheme = new LogProcessLogEulerScheme(
 					numberOfTimeSteps,	// numberOfTimeSteps
 					deltaT,				// deltaT
 					numberOfPath,		// numberOfPaths
@@ -62,12 +62,12 @@ public class MonteCarloSchemeTests {
 
 			final double	averageEuler	= eulerScheme.getAverageOfLog( lastTimeIndex );
 			final double	averageMilstein	= milsteinScheme.getAverageOfLog( lastTimeIndex );
-			final double	averageExpEuler	= expEulerScheme.getAverageOfLog( lastTimeIndex );
+			final double	averageLogEuler	= logEulerScheme.getAverageOfLog( lastTimeIndex );
 			final double	averageAnalytic	= Math.log(initialValue)-(0.5 * sigma * sigma * (lastTimeIndex * deltaT) );
 
 			final double	varianceEuler		= eulerScheme.getVarianceOfLog( lastTimeIndex );
 			final double	varianceMilstein	= milsteinScheme.getVarianceOfLog( lastTimeIndex );
-			final double	varianceExpEuler	= expEulerScheme.getVarianceOfLog( lastTimeIndex );
+			final double	varianceLogEuler	= logEulerScheme.getVarianceOfLog( lastTimeIndex );
 			final double	varianceAnalytic	= sigma * sigma * (lastTimeIndex * deltaT);
 
 			// Get end time of calculation
@@ -79,16 +79,16 @@ public class MonteCarloSchemeTests {
 			final DecimalFormat decimalFormatInteger = new DecimalFormat("000");
 			final double errorAverageEuler     = Math.abs(averageEuler    - averageAnalytic);
 			final double errorVarianceEuler    = Math.abs(varianceEuler   - varianceAnalytic);
-			final double errorAverageExpEuler  = Math.abs(averageExpEuler - averageAnalytic);
-			final double errorVarianceExpEuler = Math.abs(varianceExpEuler- varianceAnalytic);
 			final double errorAverageMilstein  = Math.abs(averageMilstein - averageAnalytic);
 			final double errorVarianceMilstein = Math.abs(varianceMilstein- varianceAnalytic);
+			final double errorAverageLogEuler  = Math.abs(averageLogEuler - averageAnalytic);
+			final double errorVarianceLogEuler = Math.abs(varianceLogEuler- varianceAnalytic);
 
 			System.out.print("nPath = " + numberOfPath);
 			System.out.print("\tnSteps = " + decimalFormatInteger.format(numberOfTimeSteps));
 			System.out.print("\tEuler...: \u0394m=" + formatPercent(errorAverageEuler)    + "  \u0394V=" + formatPercent(errorVarianceEuler));
 			System.out.print("\tMilstein: \u0394m=" + formatPercent(errorAverageMilstein) + "  \u0394V=" + formatPercent(errorVarianceMilstein));
-			System.out.print("\tExpEuler: \u0394m=" + formatPercent(errorAverageExpEuler) + "  \u0394V=" + formatPercent(errorVarianceExpEuler));
+			System.out.print("\tLogEuler: \u0394m=" + formatPercent(errorAverageLogEuler) + "  \u0394V=" + formatPercent(errorVarianceLogEuler));
 			System.out.println("\t(Time=" + calculationTimeInSeconds + " sec)." );
 		}
 	}

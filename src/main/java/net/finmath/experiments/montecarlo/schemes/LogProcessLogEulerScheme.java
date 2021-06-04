@@ -14,7 +14,7 @@ import net.finmath.time.TimeDiscretizationFromArray;
 /**
  * @author Christian Fries
  */
-public class LogProcessExpEulerScheme
+public class LogProcessLogEulerScheme
 {
 	private final int		numberOfTimeSteps;
 	private final double	deltaT;
@@ -33,7 +33,7 @@ public class LogProcessExpEulerScheme
 	 * @param initialValue The inital value.
 	 * @param sigma The parameter sigma.
 	 */
-	public LogProcessExpEulerScheme(
+	public LogProcessLogEulerScheme(
 			int numberOfTimeSteps,
 			double deltaT,
 			int numberOfPaths,

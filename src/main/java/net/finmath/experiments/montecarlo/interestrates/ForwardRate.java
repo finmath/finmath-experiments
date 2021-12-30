@@ -7,7 +7,7 @@ package net.finmath.experiments.montecarlo.interestrates;
 
 import net.finmath.exception.CalculationException;
 import net.finmath.montecarlo.interestrate.TermStructureMonteCarloSimulationModel;
-import net.finmath.montecarlo.interestrate.products.AbstractLIBORMonteCarloProduct;
+import net.finmath.montecarlo.interestrate.products.AbstractTermStructureMonteCarloProduct;
 import net.finmath.stochastic.RandomVariable;
 
 /**
@@ -16,7 +16,7 @@ import net.finmath.stochastic.RandomVariable;
  * @author Christian Fries
  * @version 1.0
  */
-public class ForwardRate extends AbstractLIBORMonteCarloProduct {
+public class ForwardRate extends AbstractTermStructureMonteCarloProduct {
 
 	private final double	fixingTime;
 	private final double	periodStartTime;

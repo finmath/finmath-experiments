@@ -18,7 +18,7 @@ import net.finmath.functions.AnalyticFormulas;
 import net.finmath.montecarlo.RandomVariableFactory;
 import net.finmath.montecarlo.RandomVariableFromArrayFactory;
 import net.finmath.montecarlo.interestrate.TermStructureMonteCarloSimulationModel;
-import net.finmath.montecarlo.interestrate.products.AbstractLIBORMonteCarloProduct;
+import net.finmath.montecarlo.interestrate.products.AbstractTermStructureMonteCarloProduct;
 import net.finmath.montecarlo.interestrate.products.Bond;
 import net.finmath.montecarlo.interestrate.products.Caplet;
 import net.finmath.montecarlo.interestrate.products.Caplet.ValueUnit;
@@ -47,7 +47,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletATMImpliedVolInterpolation();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmile();
 		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmiles();
-		//		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmilesOnGPU();
+		(new LIBORMarketModelDiscretizationErrorsExperiment()).testCapletSmilesOnGPU();
 	}
 
 	public LIBORMarketModelDiscretizationErrorsExperiment() throws CalculationException {}
@@ -57,16 +57,21 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 
 		final double forwardRate = 0.05;
 		final double periodLength = 0.5;
+		final double volatility = 0.30;
+		final double localVolNormalityBlend = 0.0;
+		final double correlationDecayParam = 0.0;
 
 		for(final Boolean useDiscountCurve : new Boolean[] { false, true }) {
 			for(final String measure : new String[] { "terminal", "spot"}) {
-				final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createLIBORMarketModel(
+				final TermStructureMonteCarloSimulationModel simulationModel = ModelFactory.createTermStuctureModel(
 						randomVariableFactory,
 						measure,
 						forwardRate,
 						periodLength,
 						useDiscountCurve,
-						0.30, 0.0, 0.0,
+						volatility,
+						localVolNormalityBlend,
+						correlationDecayParam,
 						numberOfFactors,
 						numberOfPaths, seed);
 
@@ -75,7 +80,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 
 				for(double maturity = 0.5; maturity < 20; maturity += 0.5) {
 					final TermStructureMonteCarloProduct product = new Bond(maturity);
-					final double value = product.getValue(lmm);
+					final double value = product.getValue(simulationModel);
 					final double yieldMonteCarlo = -Math.log(value)/maturity;
 
 					final double valueAnalytic = 1.0/Math.pow((1+forwardRate*periodLength), maturity/periodLength);
@@ -93,7 +98,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 
 				final String filename = "BondDiscretizationError-measure-" + measure + (useDiscountCurve ? "-with-control" : "");
 				plot.saveAsSVG(new File(filename + ".svg"), 900, 400);
-
+				plot.saveAsPDF(new File(filename + ".pdf"), 900, 400);
 				plot.show();
 			}
 		}
@@ -107,7 +112,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 		final boolean useDiscountCurve = true;
 
 		for(final String measure : new String[] { "terminal", "spot"}) {
-			final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createLIBORMarketModel(
+			final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createTermStuctureModel(
 					randomVariableFactory,
 					measure,
 					forwardRate,
@@ -141,6 +146,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 
 			final String filename = "ForwardRateDiscretizationError-measure-" + measure + (useDiscountCurve ? "-with-control" : "");
 			plot.saveAsSVG(new File(filename + ".svg"), 900, 400);
+			plot.saveAsPDF(new File(filename + ".pdf"), 900, 400);
 
 			plot.show();
 		}
@@ -158,7 +164,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 
 		final double volatility = 0.30;
 
-		final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createLIBORMarketModel(
+		final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createTermStuctureModel(
 				randomVariableFactory,
 				measure,
 				simulationTimeInterpolationMethod,
@@ -213,7 +219,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 		final boolean useDiscountCurve = false;
 
 		for(final String simulationTimeInterpolationMethod : new String[] { "round_down", "round_nearest" }) {
-			final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createLIBORMarketModel(
+			final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createTermStuctureModel(
 					randomVariableFactory,
 					measure,
 					simulationTimeInterpolationMethod,
@@ -269,7 +275,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 		final boolean useDiscountCurve = false;
 
 		for(final String measure : new String[] { "terminal", "spot"}) {
-			final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createLIBORMarketModel(
+			final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createTermStuctureModel(
 					randomVariableFactory,
 					measure,
 					simulationTimeInterpolationMethod,
@@ -292,7 +298,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 				 */
 				final double forward = 0.05;
 				final double optionMaturity = 5.0;
-				final AbstractLIBORMonteCarloProduct bondAtPayment = new Bond(5.5);
+				final AbstractTermStructureMonteCarloProduct bondAtPayment = new Bond(5.5);
 				final double optionStrike = strike;
 				final double payoffUnit = bondAtPayment.getValue(lmm) * periodLength;
 				final double optionValue = value;
@@ -324,7 +330,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 		final List<Double> strikes = new ArrayList<Double>();
 		final Map<String, List<Double>> impliedVolCurves = new HashMap();
 		for(double normality = 0.0; normality <= 1.0; normality += 0.1) {
-			final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createLIBORMarketModel(
+			final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createTermStuctureModel(
 					randomVariableFactory,
 					measure,
 					simulationTimeInterpolationMethod,
@@ -343,7 +349,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 				final double vol3 = productVol.getValue(lmm);
 				final double forward = 0.05;
 				final double optionMaturity = 5.0;
-				final AbstractLIBORMonteCarloProduct bondAtPayment = new Bond(5.5);
+				final AbstractTermStructureMonteCarloProduct bondAtPayment = new Bond(5.5);
 				final double optionStrike = strike;
 				//			double payoffUnit = bondAtPayment.getValue(lmm);
 				final double payoffUnit = 1.0/Math.pow(1+0.05*0.5, 5*2+1) * 0.5;
@@ -379,7 +385,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 			final List<Double> strikes = new ArrayList<Double>();
 			final Map<String, List<Double>> impliedVolCurves = new HashMap();
 			for(double normality = 0.0; normality <= 1.0; normality += 0.5) {
-				final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createLIBORMarketModel(
+				final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createTermStuctureModel(
 						randomVariableFactory,
 						measure,
 						simulationTimeInterpolationMethod,
@@ -397,7 +403,7 @@ public class LIBORMarketModelDiscretizationErrorsExperiment {
 
 					final double forward = 0.05;
 					final double optionMaturity = 5.0;
-					final AbstractLIBORMonteCarloProduct bondAtPayment = new Bond(5.5);
+					final AbstractTermStructureMonteCarloProduct bondAtPayment = new Bond(5.5);
 					final double optionStrike = strike;
 					final double payoffUnit = bondAtPayment.getValue(lmm);
 					final double optionValue = value;

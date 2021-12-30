@@ -46,7 +46,7 @@ import net.finmath.montecarlo.interestrate.models.covariance.LIBORCovarianceMode
 import net.finmath.montecarlo.interestrate.models.covariance.LIBORCovarianceModelFromVolatilityAndCorrelation;
 import net.finmath.montecarlo.interestrate.models.covariance.LIBORVolatilityModel;
 import net.finmath.montecarlo.interestrate.models.covariance.LIBORVolatilityModelFourParameterExponentialForm;
-import net.finmath.montecarlo.interestrate.products.AbstractLIBORMonteCarloProduct;
+import net.finmath.montecarlo.interestrate.products.AbstractTermStructureMonteCarloProduct;
 import net.finmath.montecarlo.interestrate.products.DigitalCaplet;
 import net.finmath.montecarlo.process.EulerSchemeFromProcessModel;
 import net.finmath.stochastic.RandomVariable;
@@ -137,7 +137,7 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 			/*
 			 * Create product
 			 */
-			final AbstractLIBORMonteCarloProduct option = new DigitalCaplet(optionMaturity, periodStart, periodEnd, optionStrike);
+			final AbstractTermStructureMonteCarloProduct option = new DigitalCaplet(optionMaturity, periodStart, periodEnd, optionStrike);
 
 			final double width1 = 0.1;
 			final double width2 = 0.1;
@@ -317,7 +317,7 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 	}
 
 	public Map<String, Object> getSensitivityApproximationsOneShiftParameter(
-			final AbstractLIBORMonteCarloProduct option,
+			final AbstractTermStructureMonteCarloProduct option,
 			final double widthConditionalExpectationIndicator,
 			final BrownianMotion brownianMotion) throws CalculationException, CloneNotSupportedException {
 		final Map<String, Object> results = new HashMap<>();
@@ -405,7 +405,7 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 	}
 
 	public Map<String, Object> getSensitivityApproximationsTwoShiftParameter(
-			final AbstractLIBORMonteCarloProduct option,
+			final AbstractTermStructureMonteCarloProduct option,
 			final double widthConditionalExpectationIndicator,
 			final double widthDensityEstimation,
 			final BrownianMotion brownianMotion) throws CalculationException, CloneNotSupportedException {
@@ -438,7 +438,7 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 	}
 
 	public Map<String, Object> getSensitivityApproximationByDirectRegressionRandomVariables(
-			final AbstractLIBORMonteCarloProduct option,
+			final AbstractTermStructureMonteCarloProduct option,
 			final BrownianMotion brownianMotion
 			) throws CalculationException, CloneNotSupportedException {
 
@@ -485,7 +485,7 @@ public class MonteCarloBlackScholesModelDigitalOptionAADRegressionSensitivitiesL
 	}
 
 	public Map<String, Object> getSensitivityApproximationByDirectRegression(
-			final AbstractLIBORMonteCarloProduct option,
+			final AbstractTermStructureMonteCarloProduct option,
 			final double widthConditionalExpectationIndicator,
 			final double widthDensityEstimation,
 			final RandomVariable triggerX, final RandomVariable expectationA0, final RandomVariable expectationA1) throws CalculationException, CloneNotSupportedException {

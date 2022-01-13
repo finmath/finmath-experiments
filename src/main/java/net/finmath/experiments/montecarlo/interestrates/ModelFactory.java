@@ -21,6 +21,7 @@ import net.finmath.montecarlo.interestrate.models.covariance.LIBORCorrelationMod
 import net.finmath.montecarlo.interestrate.models.covariance.LIBORCovarianceModel;
 import net.finmath.montecarlo.interestrate.models.covariance.LIBORCovarianceModelFromVolatilityAndCorrelation;
 import net.finmath.montecarlo.interestrate.models.covariance.LIBORVolatilityModel;
+import net.finmath.montecarlo.interestrate.models.covariance.LIBORVolatilityModelFourParameterExponentialForm;
 import net.finmath.montecarlo.interestrate.models.covariance.LIBORVolatilityModelFromGivenMatrix;
 import net.finmath.montecarlo.process.EulerSchemeFromProcessModel;
 import net.finmath.montecarlo.process.MonteCarloProcess;
@@ -37,6 +38,7 @@ public class ModelFactory {
 			double periodLength,
 			boolean useDiscountCurve,
 			double volatility,
+			double volatilityExponentialDecay,
 			double localVolNormalityBlend,
 			double correlationDecayParam,
 			int numberOfFactors,
@@ -51,6 +53,10 @@ public class ModelFactory {
 		final double forwardRateRateTimeHorzion		= 20.0;
 		final int numberOfPeriods = (int) (forwardRateRateTimeHorzion / forwardRatePeriodLength);
 		final TimeDiscretization liborPeriodDiscretization = new TimeDiscretizationFromArray(0.0, numberOfPeriods, forwardRatePeriodLength);
+
+		/*
+		 * Interest rate curve (here a flat (constant) value of forwardRate for the curve of forward rates
+		 */
 
 		// Create the forward curve (initial value of the term structure model) - this curve is flat
 		final ForwardCurve forwardCurve = ForwardCurveInterpolation.createForwardCurveFromForwards(
@@ -79,9 +85,10 @@ public class ModelFactory {
 		for(int i=0; i<volatilities.length; i++) {
 			Arrays.fill(volatilities[i], volatility);
 		}
-		final LIBORVolatilityModel volatilityModel = new LIBORVolatilityModelFromGivenMatrix(
-				randomVariableFactory, timeDiscretization, liborPeriodDiscretization, volatilities);
+//		final LIBORVolatilityModel volatilityModel = new LIBORVolatilityModelFromGivenMatrix(randomVariableFactory, timeDiscretization, liborPeriodDiscretization, volatilities);
 
+		final LIBORVolatilityModel volatilityModel = new LIBORVolatilityModelFourParameterExponentialForm(timeDiscretization, liborPeriodDiscretization, volatility, 0, volatilityExponentialDecay, 0.0, false);
+		
 		/*
 		 * Create a correlation model rho_{i,j} = exp(-a * abs(T_i-T_j))
 		 */
@@ -96,10 +103,11 @@ public class ModelFactory {
 				new LIBORCovarianceModelFromVolatilityAndCorrelation(timeDiscretization,
 						liborPeriodDiscretization, volatilityModel, correlationModel);
 
-		// BlendedLocalVolatlityModel
+		/*
+		 * BlendedLocalVolatlityModel: Puts the factor (a L_{i}(0) + (1-a) L_{i}(t)) in front of the diffusion.
+		 */
 		final LIBORCovarianceModel covarianceModelBlended = new BlendedLocalVolatilityModel(
 				covarianceModelWithConstantVolatility, forwardCurve, localVolNormalityBlend, false);
-		//		covarianceModelBlended = covarianceModelWithConstantVolatility;
 
 		/*
 		 * Set model properties
@@ -129,6 +137,45 @@ public class ModelFactory {
 		return new LIBORMonteCarloSimulationFromLIBORModel(process);
 	}
 
+	/*
+	 * Some version with default arguments
+	 */
+	public static TermStructureMonteCarloSimulationModel createTermStuctureModel(
+			RandomVariableFactory randomVariableFactory,
+			String measure,
+			double forwardRate,
+			double periodLength,
+			boolean useDiscountCurve,
+			double volatility,
+			double volatilityExponentialDecay,
+			double localVolNormalityBlend,
+			double correlationDecayParam,
+			int numberOfFactors,
+			int numberOfPaths,
+			int seed
+			) throws CalculationException {
+
+		return createTermStuctureModel(randomVariableFactory, measure, "round_down" /* simulationTimeInterpolationMethod */, forwardRate, periodLength, useDiscountCurve, volatility, volatilityExponentialDecay, localVolNormalityBlend, correlationDecayParam, numberOfFactors, numberOfPaths, seed);
+	}
+
+	public static TermStructureMonteCarloSimulationModel createTermStuctureModel(
+			RandomVariableFactory randomVariableFactory,
+			String measure,
+			String simulationTimeInterpolationMethod,
+			double forwardRate,
+			double periodLength,
+			boolean useDiscountCurve,
+			double volatility,
+			double localVolNormalityBlend,
+			double correlationDecayParam,
+			int numberOfFactors,
+			int numberOfPaths,
+			int seed
+			) throws CalculationException {
+
+		return createTermStuctureModel(randomVariableFactory, measure, simulationTimeInterpolationMethod, forwardRate, periodLength, useDiscountCurve, volatility, 0.0 /* volatilityExponentialDecay */, localVolNormalityBlend, correlationDecayParam, numberOfFactors, numberOfPaths, seed);
+	}
+
 	public static TermStructureMonteCarloSimulationModel createTermStuctureModel(
 			RandomVariableFactory randomVariableFactory,
 			String measure,
@@ -143,6 +190,6 @@ public class ModelFactory {
 			int seed
 			) throws CalculationException {
 
-		return createTermStuctureModel(randomVariableFactory, measure, "round_down", forwardRate, periodLength, useDiscountCurve, volatility, localVolNormalityBlend, correlationDecayParam, numberOfFactors, numberOfPaths, seed);
+		return createTermStuctureModel(randomVariableFactory, measure, "round_down" /* simulationTimeInterpolationMethod */, forwardRate, periodLength, useDiscountCurve, volatility,  0.0 /* volatilityExponentialDecay */, localVolNormalityBlend, correlationDecayParam, numberOfFactors, numberOfPaths, seed);
 	}
 }

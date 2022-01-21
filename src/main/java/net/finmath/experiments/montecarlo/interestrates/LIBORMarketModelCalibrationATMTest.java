@@ -105,11 +105,18 @@ public class LIBORMarketModelCalibrationATMTest {
 	private final int numberOfPathsBenchmark;
 
 	public static void main(String[] args) throws Exception {
-
-		// Small number of path, to reduce runtime of the unit test. Calibration should use 10 to 100 times more.
-		(new LIBORMarketModelCalibrationATMTest(LIBORMarketModelType.NORMAL, CalibrationProductType.ANALYTIC, 10000 /* numberOfPathsCalibration */, 10000 /* numberOfPathBenchmark */)).testATMSwaptionCalibration();
-		(new LIBORMarketModelCalibrationATMTest(LIBORMarketModelType.NORMAL, CalibrationProductType.MONTECARLO, 10000 /* numberOfPathsCalibration */, 10000 /* numberOfPathBenchmark */)).testATMSwaptionCalibration();
-		(new LIBORMarketModelCalibrationATMTest(LIBORMarketModelType.NORMAL, CalibrationProductType.ANALYTIC, 10000 /* numberOfPathsCalibration */, 10000 /* numberOfPathBenchmark */)).testATMSwaptionCalibration();
+		
+		/*
+		 * You may modify the number of path (e.g. divide all by 10), depending on your machine.
+		 * Also: the last run may need more memory: Use -Xmx12G as JVM option to run with 12 GB.
+		 */
+		
+		(new LIBORMarketModelCalibrationATMTest(LIBORMarketModelType.NORMAL, CalibrationProductType.ANALYTIC, 1000 /* numberOfPathsCalibration */, 1000 /* numberOfPathBenchmark */)).testATMSwaptionCalibration();
+		(new LIBORMarketModelCalibrationATMTest(LIBORMarketModelType.NORMAL, CalibrationProductType.MONTECARLO, 1000 /* numberOfPathsCalibration */, 1000 /* numberOfPathBenchmark */)).testATMSwaptionCalibration();
+		(new LIBORMarketModelCalibrationATMTest(LIBORMarketModelType.NORMAL, CalibrationProductType.MONTECARLO, 1000 /* numberOfPathsCalibration */, 10000 /* numberOfPathBenchmark */)).testATMSwaptionCalibration();
+		(new LIBORMarketModelCalibrationATMTest(LIBORMarketModelType.NORMAL, CalibrationProductType.ANALYTIC, 1000 /* numberOfPathsCalibration */, 10000 /* numberOfPathBenchmark */)).testATMSwaptionCalibration();
+		(new LIBORMarketModelCalibrationATMTest(LIBORMarketModelType.NORMAL, CalibrationProductType.MONTECARLO, 10000 /* numberOfPathsCalibration */, 50000 /* numberOfPathBenchmark */)).testATMSwaptionCalibration();
+		(new LIBORMarketModelCalibrationATMTest(LIBORMarketModelType.NORMAL, CalibrationProductType.ANALYTIC, 10000 /* numberOfPathsCalibration */, 50000 /* numberOfPathBenchmark */)).testATMSwaptionCalibration();
 	}
 
 	public LIBORMarketModelCalibrationATMTest(LIBORMarketModelType modelType, CalibrationProductType calibrationProductType, int numberOfPathsCalibration, int numberOfPathBenchmark) {
@@ -371,7 +378,9 @@ public class LIBORMarketModelCalibrationATMTest {
 		final EulerSchemeFromProcessModel processBenchmark = new EulerSchemeFromProcessModel(liborMarketModelBenchmark, brownianMotionBenchmark);
 		final LIBORModelMonteCarloSimulationModel simulationBenchmark = new LIBORMonteCarloSimulationFromLIBORModel(processBenchmark);
 
-		System.out.println("\nCalibration using calibration product " + calibrationProductType + " and a calibration model with " + numberOfPathsCalibration + " paths");
+		/*
+		 * Check the calibrated model - with the analytic and the Monte-Carlo product
+		 */
 		double deviationCalibrationSum			= 0.0;
 		double deviationCalibrationSquaredSum	= 0.0;
 		double deviationValuationSum			= 0.0;

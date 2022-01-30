@@ -5,6 +5,8 @@ import java.util.function.BiFunction;
 /**
  * The function that maps CarbonConcentration and external forcing to forcing.
  * 
+ * TODO fix time step
+ * 
  * @author Christian Fries
  */
 public class ForcingFunction implements BiFunction<CarbonConcentration, Double, Double> {

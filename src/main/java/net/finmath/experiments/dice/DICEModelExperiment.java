@@ -21,7 +21,7 @@ import net.finmath.plots.Plots;
  */
 public class DICEModelExperiment {
 
-	private static int numberOfTimes = 300;
+	private static int numberOfTimes = 100;
 
 	/*
 	 * Note: Calling default constructors for the sub-models will initialise the default parameters.
@@ -45,7 +45,7 @@ public class DICEModelExperiment {
 	EvolutionOfCarbonConcentration evolutionOfCarbonConcentration = new EvolutionOfCarbonConcentration();
 	CarbonConcentration[] carbonConcentration = new CarbonConcentration[numberOfTimes];
 
-	double forcingExternal = 0.5;
+	double forcingExternal = 1.0;
 	ForcingFunction forcingFunction = new ForcingFunction();
 
 	EmissionIntensityFunction emissionIntensityFunction = new EmissionIntensityFunction();
@@ -72,18 +72,18 @@ public class DICEModelExperiment {
 	double[] welfare = new double[numberOfTimes];
 	double[] value = new double[numberOfTimes];
 
-	double growth = 0.00;
+	double growth = 0.02;
 	static double abatementMax = 1.0;
 
 	double r = 0.03;
 
 	public static void main(String[] args) {
 
-		System.out.println("1: x with 300/x = Year in which max abatement is reached (linear interpolation, then constant).");
+		System.out.println("1: x with 500/x = Year in which max abatement is reached (linear interpolation, then constant).");
 		System.out.println("2: Value");
 
 		double abatementInitial = 0.03;
-		for(int abatementSzenario = 0; abatementSzenario < 500; abatementSzenario++) {
+		for(int abatementSzenario = 0; abatementSzenario < 100; abatementSzenario++) {
 			double abatementIncrease = abatementSzenario * 0.05;			// 0 to 25
 
 			DICEModelExperiment diceModel = new DICEModelExperiment();
@@ -91,7 +91,7 @@ public class DICEModelExperiment {
 			/*
 			 * Linear abatement model
 			 */
-			for(int i=0; i<300; i++) {
+			for(int i=0; i<100; i++) {
 				diceModel.abatement[i] = Math.min(abatementInitial + abatementIncrease*i/numberOfTimes, abatementMax);
 			}
 
@@ -107,7 +107,7 @@ public class DICEModelExperiment {
 			 */
 			System.out.println(String.format("%8.4f \t %8.4f", abatementIncrease, diceModel.value[numberOfTimes-1]));
 
-			if(abatementSzenario%100 == 0) {
+			if(abatementSzenario%20 == 0) {
 				Plots
 				.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), diceModel.welfare, 0, 300, 3)
 				.setTitle("welfare (szenario=" + abatementSzenario + ")").setXAxisLabel("time (years)").show();
@@ -176,12 +176,12 @@ public class DICEModelExperiment {
 
 			//			double abatementCost = emissionIntensityFunction.apply(time) * abatementCostFunction.apply(time, abatement[i]);
 			double abatementCost = abatementCostFunction.apply(time, abatement[i]);
-			double discountFactor = Math.exp(- r * time);
+			double discountFactor = Math.exp(- r * (time*5.0));
 
 			welfare[i] = gdp[i] * (1-damage[i]) * (1 - abatementCost);
 			value[i+1] = value[i] + welfare[i] * discountFactor;
 
-			gdp[i+1] = gdp[i] * (1+growth);	// Simplified
+			gdp[i+1] = gdp[i] * Math.pow(1+growth, 5.0);	// Simplified
 		}
 	}
 }

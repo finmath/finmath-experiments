@@ -2,7 +2,7 @@ package net.finmath.experiments.dice.submodels;
 
 import java.util.function.BiFunction;
 
-import net.finmath.functions.LinearAlgebra;
+import net.finmath.experiments.LinearAlgebra;
 
 /**
  * the evolution of the carbon concentration.
@@ -10,14 +10,19 @@ import net.finmath.functions.LinearAlgebra;
  * 	M(t_{i+1}) = \Phi M(t_{i}) + emission
  * \)
  * 
+ * Note: The function depends on the time step size
+ * TODO Fix time stepping
+ * 
  * @author Christian Fries
  */
 public class EvolutionOfCarbonConcentration implements BiFunction<CarbonConcentration, Double, CarbonConcentration> {
 
+	private static double timeStep = 5.0;	// time step in the original model (should become a parameter)
+
 	private static double[][] transitionMatrixDefault;
 	static {
-	    double b12 = 0.12;
-	    double b23 = 0.007;
+	    double b12 = 0.12;		// scale
+	    double b23 = 0.007;		// scale
 	    double mateq = 588;
 	    double mueq = 360;
 	    double mleq = 1720;
@@ -46,8 +51,7 @@ public class EvolutionOfCarbonConcentration implements BiFunction<CarbonConcentr
 
 	@Override
 	public CarbonConcentration apply(CarbonConcentration carbonConcentration, Double emissions) {
-		// This is a bit clumsy code. We have to convert the row vector to a column vector, multiply it, then convert it back to a row.
-		double[] carbonConcentrationNext = LinearAlgebra.transpose(LinearAlgebra.multMatrices(transitionMatrix, LinearAlgebra.transpose(new double[][] { carbonConcentration.getAsDoubleArray() })))[0];
+		double[] carbonConcentrationNext = LinearAlgebra.multMatrixVector(transitionMatrix, carbonConcentration.getAsDoubleArray());
 
 		// Add emissions
 		carbonConcentrationNext[0] += emissions;

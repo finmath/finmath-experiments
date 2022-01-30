@@ -23,7 +23,7 @@ public class CarbonConcentration {
 	}
 
 	public CarbonConcentration() {
-		this(851, 460, 1740);			// https://github.com/cmkellett/MPC-DICE/blob/master/assign_parameters_v2016.m
+		this(851, 460, 1740);		// GtC
 	}
 
 	

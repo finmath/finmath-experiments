@@ -5,13 +5,18 @@ import java.util.function.BiFunction;
 /**
  * The function that maps economicOutput to emission at a given time
  * 
+ * Note: The function depends on the time step size
+ * TODO Change parameter to per year.
+ * 
  * @author Christian Fries
  */
 public class EmissionFunction implements BiFunction<Double, Double, Double> {
 
+	private static double timeStep = 5.0;	// time step in the original model (should become a parameter)
+
     private final EmissionIntensityFunction emissionIntensityFunction;
     private final double externalEmissionsInitial;
-    private final double externalEmissionsDecay;
+    private final double externalEmissionsDecay;	// per 5Y
     
      public EmissionFunction(EmissionIntensityFunction emissionIntensityFunction, double externalEmissionsInitial, double externalEmissionsDecay) {
 		super();
@@ -29,7 +34,7 @@ public class EmissionFunction implements BiFunction<Double, Double, Double> {
 	public Double apply(Double time, Double economicOutput) {
 		double emissionPerEconomicOutput = emissionIntensityFunction.apply(time);
 		// The parameter externalEmissionsDecay is formulated for a 5 year period
-		double externalEmissions = externalEmissionsInitial * Math.pow(1-externalEmissionsDecay, time/5.0);
+		double externalEmissions = externalEmissionsInitial * Math.pow(1-externalEmissionsDecay, time*timeStep/5.0) * timeStep/5.0;
 
 		return emissionPerEconomicOutput * economicOutput + externalEmissions;
 	}

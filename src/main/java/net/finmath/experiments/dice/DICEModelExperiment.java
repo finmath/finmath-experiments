@@ -46,7 +46,7 @@ public class DICEModelExperiment {
 
 	double forcingExternal = 0.5;
 	ForcingFunction forcingFunction = new ForcingFunction();
-	
+
 	EmissionIntensityFunction emissionIntensityFunction = new EmissionIntensityFunction();
 	EmissionFunction emissionFunction = new EmissionFunction(emissionIntensityFunction);
 
@@ -54,7 +54,7 @@ public class DICEModelExperiment {
 	 * Abatement 
 	 */
 	AbatementCostFunction abatementCostFunction = new AbatementCostFunction();
-	
+
 
 	/*
 	 * GPB - currently constant, but the values from the original model
@@ -84,12 +84,12 @@ public class DICEModelExperiment {
 
 		System.out.println("1: x with 300/x = Year in which max abatement is reached (linear interpolation, then constant).");
 		System.out.println("2: Value");
-		
+
 		double abatementInitial = 0.03;
 		for(double abatementIncrease=0.00; abatementIncrease<20.0; abatementIncrease += 0.05) {
 
 			DICEModelExperiment diceModel = new DICEModelExperiment();
-			
+
 			/*
 			 * Linear abatement model
 			 */
@@ -106,29 +106,29 @@ public class DICEModelExperiment {
 								i, diceModel.damage[i], diceModel.emission[i], diceModel.carbonConcentration[i].getCarbonConcentrationInAtmosphere(), diceModel.temperature[i].getTemperatureOfAtmosphere(), diceModel.gdp[i]
 								));
 			}
-			*/
+			 */
 			System.out.println(String.format("%8.4f \t %8.4f", abatementIncrease, diceModel.value[numberOfTimes-1]));
 
 			if(Math.round(abatementIncrease*100)%500 == 0) {
-			Plots
-			.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), diceModel.welfare, 0, 300, 3)
-			.setTitle("welfare (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
+				Plots
+				.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), diceModel.welfare, 0, 300, 3)
+				.setTitle("welfare (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
 
-			Plots
-			.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), Arrays.stream(diceModel.temperature).mapToDouble(Temperature::getTemperatureOfAtmosphere).toArray(), 0, 300, 3)
-			.setTitle("temperature (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
+				Plots
+				.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), diceModel.damage, 0, 300, 3)
+				.setTitle("damage (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
 
-			Plots
-			.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), Arrays.stream(diceModel.carbonConcentration).mapToDouble(CarbonConcentration::getCarbonConcentrationInAtmosphere).toArray(), 0, 300, 3)
-			.setTitle("carbon (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
+				Plots
+				.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), Arrays.stream(diceModel.carbonConcentration).mapToDouble(CarbonConcentration::getCarbonConcentrationInAtmosphere).toArray(), 0, 300, 3)
+				.setTitle("carbon (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
 
-			Plots
-			.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), diceModel.abatement, 0, 300, 3)
-			.setTitle("abatement (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
+				Plots
+				.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), Arrays.stream(diceModel.temperature).mapToDouble(Temperature::getTemperatureOfAtmosphere).toArray(), 0, 300, 3)
+				.setTitle("temperature (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
 
-			Plots
-			.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), diceModel.damage, 0, 300, 3)
-			.setTitle("damage (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
+				Plots
+				.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), diceModel.abatement, 0, 300, 3)
+				.setTitle("abatement (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
 			}
 		}
 	}
@@ -150,7 +150,7 @@ public class DICEModelExperiment {
 			/*
 			 * Evolve geo-physical quantities
 			 */
-			
+
 			/*
 			 * Note: In the original model the 1/(1-\mu(0)) is part of the emission function.
 			 * Here we add the factor on the outside
@@ -170,13 +170,13 @@ public class DICEModelExperiment {
 			/*
 			 * Abatement cost
 			 */
-			
-		    double e0 = 35.85;			// Initial emissions
-		    double q0 = 105.5;			// Initial global output
-		    double mu0 = 0.03;			// Initial mitigation rate
-		    double sigma0 = e0/(q0*(1-mu0));			// Calculated initial emissions intensity
 
-//			double abatementCost = emissionIntensityFunction.apply(time) * abatementCostFunction.apply(time, abatement[i]);
+			double e0 = 35.85;			// Initial emissions
+			double q0 = 105.5;			// Initial global output
+			double mu0 = 0.03;			// Initial mitigation rate
+			double sigma0 = e0/(q0*(1-mu0));			// Calculated initial emissions intensity
+
+			//			double abatementCost = emissionIntensityFunction.apply(time) * abatementCostFunction.apply(time, abatement[i]);
 			double abatementCost = abatementCostFunction.apply(time, abatement[i]);
 			double discountFactor = Math.exp(- r * time);
 

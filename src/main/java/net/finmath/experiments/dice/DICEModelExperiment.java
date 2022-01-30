@@ -21,25 +21,9 @@ public class DICEModelExperiment {
 	private Temperature temperatureInitial = new Temperature(0.85, 0.0068);	
 	private CarbonConcentration carbonConcentrationInitial = new CarbonConcentration(851, 460, 1740);	// Level of Carbon (GtC)
 
-	double forcingExternal = 0.5;
-
-	double damageInitial = 0.0;
-
-	double A0 = 5.115;		// Initial Total Factor of Productivity 
-	double K0 = 223;		// Initial Capital
-	double L0 = 7403;		// Initial Population
-	double gamma = 0.3;		// Capital Elasticity in Production Function
-	double gdpInitial = A0*Math.pow(K0,gamma)*Math.pow(L0/1000,1-gamma);
-
 	int numberOfTimes = 300;
 
 	
-    double e0 = 35.85;						// Initial emissions
-    double q0 = 105.5;						// Initial global output
-    double mu0 = 0.03;						// Initial mitigation rate
-    double sigma0 = e0/(q0*(1-mu0));		// Calculated initial emissions intensity
-
-
 	/*
 	 * Note: Calling default constructors for the sub-models will initialise the default parameters.
 	 */
@@ -57,6 +41,7 @@ public class DICEModelExperiment {
 	EvolutionOfCarbonConcentration evolutionOfCarbonConcentration = new EvolutionOfCarbonConcentration();
 	CarbonConcentration[] carbonConcentration = new CarbonConcentration[numberOfTimes];
 
+	double forcingExternal = 0.5;
 	ForcingFunction forcingFunction = new ForcingFunction();
 	
 	EmissionIntensityFunction emissionIntensityFunction = new EmissionIntensityFunction();
@@ -67,7 +52,17 @@ public class DICEModelExperiment {
 	 */
 	AbatementCostFunction abatementCostFunction = new AbatementCostFunction();
 	
-	
+
+	/*
+	 * GPB - currently constant, but the values from the original model
+	 */
+	double A0 = 5.115;		// Initial Total Factor of Productivity 
+	double K0 = 223;		// Initial Capital
+	double L0 = 7403;		// Initial Population
+	double gamma = 0.3;		// Capital Elasticity in Production Function
+	double gdpInitial = A0*Math.pow(K0,gamma)*Math.pow(L0/1000,1-gamma);
+
+
 	/*
 	 * Simulated values - stored for plotting
 	 */

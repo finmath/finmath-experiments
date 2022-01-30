@@ -21,10 +21,7 @@ import net.finmath.plots.Plots;
  */
 public class DICEModelExperiment {
 
-	private Temperature temperatureInitial = new Temperature(0.85, 0.0068);	
-	private CarbonConcentration carbonConcentrationInitial = new CarbonConcentration(851, 460, 1740);	// Level of Carbon (GtC)
-
-	int numberOfTimes = 300;
+	private static int numberOfTimes = 300;
 
 	/*
 	 * Note: Calling default constructors for the sub-models will initialise the default parameters.
@@ -33,6 +30,10 @@ public class DICEModelExperiment {
 	/*
 	 * Model that describes the damage on the GBP as a function of the temperature-above-normal
 	 */
+
+	// State vectors initial values
+	private Temperature temperatureInitial = new Temperature(0.85, 0.0068);	
+	private CarbonConcentration carbonConcentrationInitial = new CarbonConcentration(851, 460, 1740);	// Level of Carbon (GtC)
 
 	DoubleUnaryOperator damageFunction = new DamageFromTemperature();
 	double[] damage = new double[numberOfTimes];
@@ -93,7 +94,7 @@ public class DICEModelExperiment {
 			 * Linear abatement model
 			 */
 			for(int i=0; i<300; i++) {
-				diceModel.abatement[i] = Math.min(abatementInitial + abatementIncrease*i/300.0, abatementMax);
+				diceModel.abatement[i] = Math.min(abatementInitial + abatementIncrease*i/numberOfTimes, abatementMax);
 			}
 
 			diceModel.init();
@@ -106,27 +107,27 @@ public class DICEModelExperiment {
 								));
 			}
 			*/
-			System.out.println(String.format("%8.4f \t %8.4f", abatementIncrease, diceModel.value[300-2]));
+			System.out.println(String.format("%8.4f \t %8.4f", abatementIncrease, diceModel.value[numberOfTimes-1]));
 
 			if(Math.round(abatementIncrease*100)%500 == 0) {
 			Plots
-			.createScatter(IntStream.range(0, 300).mapToDouble(i -> (double)i).toArray(), diceModel.welfare, 0, 300, 3)
+			.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), diceModel.welfare, 0, 300, 3)
 			.setTitle("welfare (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
 
 			Plots
-			.createScatter(IntStream.range(0, 300).mapToDouble(i -> (double)i).toArray(), Arrays.stream(diceModel.temperature).mapToDouble(Temperature::getTemperatureOfAtmosphere).toArray(), 0, 300, 3)
+			.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), Arrays.stream(diceModel.temperature).mapToDouble(Temperature::getTemperatureOfAtmosphere).toArray(), 0, 300, 3)
 			.setTitle("temperature (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
 
 			Plots
-			.createScatter(IntStream.range(0, 300).mapToDouble(i -> (double)i).toArray(), Arrays.stream(diceModel.carbonConcentration).mapToDouble(CarbonConcentration::getCarbonConcentrationInAtmosphere).toArray(), 0, 300, 3)
+			.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), Arrays.stream(diceModel.carbonConcentration).mapToDouble(CarbonConcentration::getCarbonConcentrationInAtmosphere).toArray(), 0, 300, 3)
 			.setTitle("carbon (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
 
 			Plots
-			.createScatter(IntStream.range(0, 300).mapToDouble(i -> (double)i).toArray(), diceModel.abatement, 0, 300, 3)
+			.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), diceModel.abatement, 0, 300, 3)
 			.setTitle("abatement (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
 
 			Plots
-			.createScatter(IntStream.range(0, 300).mapToDouble(i -> (double)i).toArray(), diceModel.damage, 0, 300, 3)
+			.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), diceModel.damage, 0, 300, 3)
 			.setTitle("damage (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
 			}
 		}

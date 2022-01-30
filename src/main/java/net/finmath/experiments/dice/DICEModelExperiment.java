@@ -86,7 +86,8 @@ public class DICEModelExperiment {
 		System.out.println("2: Value");
 
 		double abatementInitial = 0.03;
-		for(double abatementIncrease=0.00; abatementIncrease<20.0; abatementIncrease += 0.05) {
+		for(int abatementSzenario = 0; abatementSzenario < 500; abatementSzenario++) {
+			double abatementIncrease = abatementSzenario * 0.05;			// 0 to 25
 
 			DICEModelExperiment diceModel = new DICEModelExperiment();
 
@@ -109,26 +110,26 @@ public class DICEModelExperiment {
 			 */
 			System.out.println(String.format("%8.4f \t %8.4f", abatementIncrease, diceModel.value[numberOfTimes-1]));
 
-			if(Math.round(abatementIncrease*100)%500 == 0) {
+			if(abatementSzenario%100 == 0) {
 				Plots
 				.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), diceModel.welfare, 0, 300, 3)
-				.setTitle("welfare (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
+				.setTitle("welfare (szenario=" + abatementSzenario + ")").setXAxisLabel("time (years)").show();
 
 				Plots
 				.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), diceModel.damage, 0, 300, 3)
-				.setTitle("damage (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
+				.setTitle("damage (szenario=" + abatementSzenario + ")").setXAxisLabel("time (years)").show();
 
 				Plots
 				.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), Arrays.stream(diceModel.carbonConcentration).mapToDouble(CarbonConcentration::getCarbonConcentrationInAtmosphere).toArray(), 0, 300, 3)
-				.setTitle("carbon (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
+				.setTitle("carbon (szenario=" + abatementSzenario + ")").setXAxisLabel("time (years)").show();
 
 				Plots
 				.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), Arrays.stream(diceModel.temperature).mapToDouble(Temperature::getTemperatureOfAtmosphere).toArray(), 0, 300, 3)
-				.setTitle("temperature (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
+				.setTitle("temperature (szenario=" + abatementSzenario + ")").setXAxisLabel("time (years)").show();
 
 				Plots
 				.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), diceModel.abatement, 0, 300, 3)
-				.setTitle("abatement (" + abatementIncrease + ")").setXAxisLabel("time (years)").show();
+				.setTitle("abatement (szenario=" + abatementSzenario + ")").setXAxisLabel("time (years)").show();
 			}
 		}
 	}

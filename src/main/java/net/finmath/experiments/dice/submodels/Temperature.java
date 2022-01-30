@@ -1,7 +1,7 @@
 package net.finmath.experiments.dice.submodels;
 
 /**
- * State vector representing carbon concentration.
+ * State vector representing temperature above pre-industrial level.
  * 
  * @author Christian Fries
  */

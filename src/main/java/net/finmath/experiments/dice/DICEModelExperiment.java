@@ -27,14 +27,15 @@ public class DICEModelExperiment {
 	 * Note: Calling default constructors for the sub-models will initialise the default parameters.
 	 */
 
-	/*
-	 * Model that describes the damage on the GBP as a function of the temperature-above-normal
-	 */
-
 	// State vectors initial values
 	private Temperature temperatureInitial = new Temperature(0.85, 0.0068);	
 	private CarbonConcentration carbonConcentrationInitial = new CarbonConcentration(851, 460, 1740);	// Level of Carbon (GtC)
 
+	/*
+	 * Sub-Modules: functional dependencies and evolution
+	 */
+
+	// Model that describes the damage on the GBP as a function of the temperature-above-normal
 	DoubleUnaryOperator damageFunction = new DamageFromTemperature();
 	double[] damage = new double[numberOfTimes];
 
@@ -50,21 +51,17 @@ public class DICEModelExperiment {
 	EmissionIntensityFunction emissionIntensityFunction = new EmissionIntensityFunction();
 	EmissionFunction emissionFunction = new EmissionFunction(emissionIntensityFunction);
 
-	/*
-	 * Abatement 
-	 */
+	// Abatement
 	AbatementCostFunction abatementCostFunction = new AbatementCostFunction();
 
-
 	/*
-	 * GPB - currently constant, but the values from the original model
+	 * GDB - currently constant, but the values from the original model
 	 */
-	double A0 = 5.115;		// Initial Total Factor of Productivity 
-	double K0 = 223;		// Initial Capital
-	double L0 = 7403;		// Initial Population
-	double gamma = 0.3;		// Capital Elasticity in Production Function
-	double gdpInitial = A0*Math.pow(K0,gamma)*Math.pow(L0/1000,1-gamma);
-
+	private double A0 = 5.115;		// Initial Total Factor of Productivity 
+	private double K0 = 223;		// Initial Capital
+	private double L0 = 7403;		// Initial Population
+	private double gamma = 0.3;		// Capital Elasticity in Production Function
+	private double gdpInitial = A0*Math.pow(K0,gamma)*Math.pow(L0/1000,1-gamma);
 
 	/*
 	 * Simulated values - stored for plotting

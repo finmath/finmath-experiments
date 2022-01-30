@@ -4,7 +4,6 @@
 package net.finmath.experiments.montecarlo.interestrates;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +19,6 @@ import net.finmath.montecarlo.interestrate.TermStructureMonteCarloSimulationMode
 import net.finmath.montecarlo.interestrate.products.AbstractTermStructureMonteCarloProduct;
 import net.finmath.montecarlo.interestrate.products.Bond;
 import net.finmath.montecarlo.interestrate.products.Caplet;
-import net.finmath.montecarlo.interestrate.products.Caplet.ValueUnit;
 import net.finmath.montecarlo.interestrate.products.TermStructureMonteCarloProduct;
 import net.finmath.opencl.montecarlo.RandomVariableOpenCLFactory;
 import net.finmath.plots.DoubleToRandomVariableFunction;
@@ -45,9 +43,9 @@ public class TermStructureMonteCarloSimulationExperiments {
 	public static void main(String[] args) throws Exception {
 		//		(new TermStructureMonteCarloSimulationExperiments()).testBondUnderMeasure();
 		//		(new TermStructureMonteCarloSimulationExperiments()).testForwardRateUnderMeasure();
-		(new TermStructureMonteCarloSimulationExperiments()).testCapletSmile();
+		//		(new TermStructureMonteCarloSimulationExperiments()).testCapletSmile();
 		//		(new TermStructureMonteCarloSimulationExperiments()).testCapletSmiles();
-		//		(new TermStructureMonteCarloSimulationExperiments()).testShortRate();
+				(new TermStructureMonteCarloSimulationExperiments()).testShortRate();
 		//		(new TermStructureMonteCarloSimulationExperiments()).testCapletATMImpliedVol();
 		//		(new TermStructureMonteCarloSimulationExperiments()).testCapletATMImpliedVolInterpolation();
 		//		(new TermStructureMonteCarloSimulationExperiments()).testCapletSmilesOnGPU();
@@ -158,8 +156,8 @@ public class TermStructureMonteCarloSimulationExperiments {
 						.setYAxisNumberFormat(new DecimalFormat("0.0E00"));
 
 				final String filename = "ForwardRateDiscretizationError-measure-" + measure + (useDiscountCurve ? "-with-control" : "");
-				plot.saveAsSVG(new File(filename + ".svg"), 900, 400);
-				plot.saveAsPDF(new File(filename + ".pdf"), 900, 400);
+//				plot.saveAsSVG(new File(filename + ".svg"), 900, 400);
+//				plot.saveAsPDF(new File(filename + ".pdf"), 900, 400);
 
 				plot.show();
 			}
@@ -317,11 +315,11 @@ public class TermStructureMonteCarloSimulationExperiments {
 		final double correlationDecayParam = 0.0;		// one factor, correlation of all drivers is 1
 		final Boolean useDiscountCurve = false; 
 
-		for(final String measure : new String[] { "terminal", "spot"}) {
+		for(final String measure : new String[] { "spot"}) {
 
-			for(final double volatilityExponentialDecay : new double[] { 0.0, 0.05, 0.1 }) {
+			for(final double volatilityExponentialDecay : new double[] { 0.0, 0.04, 0.08, 0.12 }) {
 
-				final TermStructureMonteCarloSimulationModel lmm = ModelFactory.createTermStuctureModel(
+				final TermStructureMonteCarloSimulationModel forwardRateModel = ModelFactory.createTermStuctureModel(
 						randomVariableFactory,
 						measure,
 						forwardRate,
@@ -334,16 +332,13 @@ public class TermStructureMonteCarloSimulationExperiments {
 						numberOfFactors,
 						numberOfPaths, seed);
 
-				PlotProcess2D plot = new PlotProcess2D(new TimeDiscretizationFromArray(lmm.getTimeDiscretization().getAsArrayList().subList(0, lmm.getTimeDiscretization().getNumberOfTimes()-1)),
-						(DoubleToRandomVariableFunction)time -> lmm.getForwardRate(time, time, time+periodLength), 100);
-				plot.setTitle("Paths of the (discretized) short rate T -> L(T, T+\u0394T; T) (measure: " + measure + ", vol decay: " + volatilityExponentialDecay + ")").setXAxisLabel("time").setYAxisLabel("forward rate").setYAxisNumberFormat(new DecimalFormat("#.##%")).show();
+				DoubleToRandomVariableFunction shortRateProcess = time -> forwardRateModel.getForwardRate(time, time, time+periodLength);
+				
+				PlotProcess2D plot = new PlotProcess2D(new TimeDiscretizationFromArray(forwardRateModel.getTimeDiscretization().getAsArrayList().subList(0, forwardRateModel.getTimeDiscretization().getNumberOfTimes()-1)),
+						shortRateProcess, 100);
+				plot.setTitle("Paths of the (discretized) short rate T ⟼ L(T,T+\u0394T;T) (" + measure + ", vol decay: " + volatilityExponentialDecay + ")").setXAxisLabel("time").setYAxisLabel("forward rate").setYAxisNumberFormat(new DecimalFormat("#.##%")).show();
 
 				/*
-				.setTitle("Forward rate error using " + measure + " measure" + (useDiscountCurve ? " and numeraire control variate." : "."))
-						.setXAxisLabel("fixing")
-						.setYAxisLabel("error")
-						.setYAxisNumberFormat(new DecimalFormat("0.0E00"));
-
 				final String filename = "ForwardRateDiscretizationError-measure-" + measure + (useDiscountCurve ? "-with-control" : "");
 				plot.saveAsSVG(new File(filename + ".svg"), 900, 400);
 				plot.saveAsPDF(new File(filename + ".pdf"), 900, 400);

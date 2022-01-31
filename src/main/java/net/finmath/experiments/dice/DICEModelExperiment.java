@@ -9,6 +9,7 @@ import net.finmath.experiments.dice.submodels.CarbonConcentration;
 import net.finmath.experiments.dice.submodels.DamageFromTemperature;
 import net.finmath.experiments.dice.submodels.EmissionFunction;
 import net.finmath.experiments.dice.submodels.EmissionIntensityFunction;
+import net.finmath.experiments.dice.submodels.EvolutionOfCapital;
 import net.finmath.experiments.dice.submodels.EvolutionOfCarbonConcentration;
 import net.finmath.experiments.dice.submodels.EvolutionOfTemperature;
 import net.finmath.experiments.dice.submodels.ForcingFunction;
@@ -63,6 +64,10 @@ public class DICEModelExperiment {
 	private double gamma = 0.3;		// Capital Elasticity in Production Function
 	private double gdpInitial = A0*Math.pow(K0,gamma)*Math.pow(L0/1000,1-gamma);
 
+	// Capital
+	EvolutionOfCapital evolutionOfCapital = new EvolutionOfCapital();
+	double[] capital = new double[numberOfTimes];
+
 	/*
 	 * Simulated values - stored for plotting
 	 */
@@ -72,10 +77,9 @@ public class DICEModelExperiment {
 	double[] welfare = new double[numberOfTimes];
 	double[] value = new double[numberOfTimes];
 
-	double growth = 0.02;
 	static double abatementMax = 1.0;
 
-	double r = 0.03;
+	double r = 0.02;
 
 	public static void main(String[] args) {
 
@@ -91,7 +95,7 @@ public class DICEModelExperiment {
 			/*
 			 * Linear abatement model
 			 */
-			for(int i=0; i<100; i++) {
+			for(int i=0; i<numberOfTimes; i++) {
 				diceModel.abatement[i] = Math.min(abatementInitial + abatementIncrease*i/numberOfTimes, abatementMax);
 			}
 
@@ -139,6 +143,8 @@ public class DICEModelExperiment {
 
 		gdp[0] = gdpInitial;
 		carbonConcentration[0] = carbonConcentrationInitial;
+		capital[0] = K0;
+		double utility = 0;
 
 		for(int i=0; i<numberOfTimes-1; i++) {
 
@@ -169,19 +175,42 @@ public class DICEModelExperiment {
 			 * Abatement cost
 			 */
 
-			double e0 = 35.85;			// Initial emissions
-			double q0 = 105.5;			// Initial global output
-			double mu0 = 0.03;			// Initial mitigation rate
-			double sigma0 = e0/(q0*(1-mu0));			// Calculated initial emissions intensity
-
 			//			double abatementCost = emissionIntensityFunction.apply(time) * abatementCostFunction.apply(time, abatement[i]);
 			double abatementCost = abatementCostFunction.apply(time, abatement[i]);
+
+			double gdpNet = gdp[i] * (1-damage[i]) * (1 - abatementCost);
+			
+			// Constant from the original model - in the original model this is a time varying control variable.
+			double savingsRate = 0.259029014481802;
+			
+			double consumption = (1-savingsRate) * gdpNet;
+			double investment = savingsRate * gdpNet;
+			
+			capital[i+1] = evolutionOfCapital.apply(time).apply(capital[i], 5*investment);
+			
+			double La = 11500; // Asymptotic population
+			double lg = 0.134; // Population growth			
+			L0 = L0 * Math.pow(La/L0,lg);
+
+		    double ga = 0.076;          // Initial TFP rate
+		    double deltaA = 0.005;      // TFP increase rate
+		    A0 = A0 / (1 - ga * Math.exp(-deltaA * 5 * (i-1)));
+			
+			gdp[i+1] = A0*Math.pow(capital[i+1],gamma)*Math.pow(L0/1000,1-gamma);
+			
+			double alpha = 1.45;           // Elasticity of marginal utility of consumption (GAMS elasmu)
+			double C = consumption;
+			double L = L0;
+			double rho = r/5;
+//			J = J - L0*(( Math.pow(1000/L*C,1-alpha) - 1)/((1-alpha)))/Math.pow(1+rho,5*(i-1));
+			utility = utility + L*Math.pow(C / (L/1000),1-alpha)/(1-alpha)/Math.pow(1+rho,5*(i-1));
+
+			// The 150000 is just a shift to make te plot nice
+
+			welfare[i] = utility + 150000; //consumption;
+			
 			double discountFactor = Math.exp(- r * (time*5.0));
-
-			welfare[i] = gdp[i] * (1-damage[i]) * (1 - abatementCost);
-			value[i+1] = value[i] + welfare[i] * discountFactor;
-
-			gdp[i+1] = gdp[i] * Math.pow(1+growth, 5.0);	// Simplified
+			value[i+1] = welfare[i]; //value[i] + welfare[i] * discountFactor;
 		}
 	}
 }

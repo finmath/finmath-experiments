@@ -40,13 +40,14 @@ public class EvolutionOfCarbonConcentration implements BiFunction<CarbonConcentr
 	
 	private double[][] transitionMatrix;		// phi in [i][j] (i = row, j = column)
 
-	public EvolutionOfCarbonConcentration() {
-		this(transitionMatrixDefault);
-	}
-
 	public EvolutionOfCarbonConcentration(double[][] transitionMatrix) {
 		super();
 		this.transitionMatrix = transitionMatrix;
+	}
+
+	public EvolutionOfCarbonConcentration() {
+ 		// Parameters from original model
+		this(transitionMatrixDefault);
 	}
 
 	@Override

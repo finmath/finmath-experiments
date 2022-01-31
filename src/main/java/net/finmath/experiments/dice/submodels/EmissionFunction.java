@@ -34,7 +34,7 @@ public class EmissionFunction implements BiFunction<Double, Double, Double> {
 	public Double apply(Double time, Double economicOutput) {
 		double emissionPerEconomicOutput = emissionIntensityFunction.apply(time);
 		// The parameter externalEmissionsDecay is formulated for a 5 year period
-		double externalEmissions = externalEmissionsInitial * Math.pow(1-externalEmissionsDecay, time*timeStep/5.0) * timeStep/5.0;
+		double externalEmissions = externalEmissionsInitial * Math.pow(1-externalEmissionsDecay, time*timeStep/5.0);
 
 		return emissionPerEconomicOutput * economicOutput + externalEmissions;
 	}

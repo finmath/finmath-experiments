@@ -35,6 +35,7 @@ public class EmissionIntensityFunction implements Function<Double, Double> {
 	}
 
 	public EmissionIntensityFunction() {
+ 		// Parameters from original model
 		this(sigma0, 0.0152, 0.001);
 	}
 

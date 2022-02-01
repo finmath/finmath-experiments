@@ -17,16 +17,17 @@ import net.finmath.experiments.LinearAlgebra;
 public class EvolutionOfTemperature implements BiFunction<Temperature, Double, Temperature> {
 
 	private static double timeStep = 5.0;	// time step in the original model (should become a parameter)
+	
 	private static double c1 = 0.1005;		// sometimes called xi1
 	
 	private static double[][] transitionMatrixDefault;
 	static {
-		double eta = 3.6813;            // Forcings of Equilibrium CO2 Doubling (GAMS fco22x)
-	    double t2xco2 = 3.1;
-	    double c3 = 0.088;
+		double fco22x = 3.6813;         // Forcings of equilibrium CO2 doubling (Wm-2)
+	    double t2xco2 = 3.1;			// Equilibrium temp impact (°C per doubling CO2)
+	    double c3 = 0.088;				// Transfer coefficient upper to lower stratum
 		double c4 = 0.025;
 
-	    double phi11 = 1-c1*((eta/t2xco2) + c3);
+	    double phi11 = 1-c1*((fco22x/t2xco2) + c3);
 	    double phi12 = c1*c3;
 	    double phi21 = c4;
 	    double phi22 = 1-c4;

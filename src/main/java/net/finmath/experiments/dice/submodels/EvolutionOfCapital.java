@@ -3,8 +3,6 @@ package net.finmath.experiments.dice.submodels;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import net.finmath.experiments.LinearAlgebra;
-
 /**
  * the evolution of the capital (economy)
  * \(

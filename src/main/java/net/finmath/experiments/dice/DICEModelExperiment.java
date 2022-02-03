@@ -35,19 +35,19 @@ public class DICEModelExperiment {
 	private final UnaryOperator<Double> abatementFunction;
 
 	/*
-	 * Simulated values - stored for plotting
+	 * Simulated values - stored for plotting ande analysis
 	 */
 	private Temperature[] temperature = new Temperature[numberOfTimes];
 	private CarbonConcentration[] carbonConcentration = new CarbonConcentration[numberOfTimes];
 	private double[] gdp = new double[numberOfTimes];
 	private double[] emission = new double[numberOfTimes];
 	private double[] abatement = new double[numberOfTimes];
-	private double[] welfare = new double[numberOfTimes];
-	private double[] value = new double[numberOfTimes];
 	private double[] damage = new double[numberOfTimes];
 	private double[] capital = new double[numberOfTimes];
 	private double[] population = new double[numberOfTimes];
 	private double[] productivity = new double[numberOfTimes];
+	private double[] welfare = new double[numberOfTimes];
+	private double[] value = new double[numberOfTimes];
 
 	public DICEModelExperiment(UnaryOperator<Double> abatementFunction) {
 		super();
@@ -78,9 +78,11 @@ public class DICEModelExperiment {
 			System.out.println(String.format("\t %8.4f \t\t %8.4f", abatementMaxTime, diceModel.value[numberOfTimes-1]));
 
 			if(abatementSzenario%20 == 0) {
+				/*
 				Plots
 				.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), diceModel.welfare, 0, 300, 3)
 				.setTitle("welfare (szenario=" + abatementMaxTime + ")").setXAxisLabel("time index").show();
+				*/
 
 				Plots
 				.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), diceModel.damage, 0, 300, 3)
@@ -224,7 +226,7 @@ public class DICEModelExperiment {
 			double consumption = (1-savingsRate) * gdpNet;
 			double investment = savingsRate * gdpNet;
 
-			capital[i+1] = evolutionOfCapital.apply(time).apply(capital[i], timeStep*investment);
+			capital[i+1] = evolutionOfCapital.apply(time).apply(capital[i], investment);
 
 			/*
 			 * Evolve population and productivity for next GDP

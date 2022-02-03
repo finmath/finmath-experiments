@@ -10,7 +10,7 @@ import net.finmath.experiments.LinearAlgebra;
  * 	T(t_{i+1}) = \Phi T(t_{i}) + (forcingToTemp \cdot (forcing, 0, 0)
  * \)
  * 
- * TODO: Fix time step (5 to 1)
+ * TODO: Fix time step (5 to 1). Forcing is "per 5Y".
  * 
  * @author Christian Fries
  */
@@ -37,10 +37,6 @@ public class EvolutionOfTemperature implements BiFunction<Temperature, Double, T
 	private final double[][] transitionMatrix;		// phi in [i][j] (i = row, j = column)
 	private final double forcingToTemp;
 
-	public EvolutionOfTemperature() {
-		this(transitionMatrixDefault, c1);
-	}
-
 	/**
 	 * @param transitionMatrix Transition matrix \( \Phi \)
 	 * @param forcingToTemp The scaling coefficient for the external forcing.
@@ -49,6 +45,10 @@ public class EvolutionOfTemperature implements BiFunction<Temperature, Double, T
 		super();
 		this.transitionMatrix = transitionMatrix;
 		this.forcingToTemp = forcingToTemp;
+	}
+
+	public EvolutionOfTemperature() {
+		this(transitionMatrixDefault, c1);
 	}
 
 	@Override

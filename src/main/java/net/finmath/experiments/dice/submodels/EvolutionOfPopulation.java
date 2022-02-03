@@ -17,8 +17,8 @@ public class EvolutionOfPopulation implements Function<Double, Function<Double, 
 
 	private final double timeStep;	// time step in the original model (should become a parameter)
 
-	private final double populationAsymptotic; // Asymptotic population (La)
-	private final double populationGrowth; // Population growth (lg)		
+	private final double populationAsymptotic;	 // Asymptotic population (La)
+	private final double populationGrowth;		 // Population growth (lg) (in the original model this a per-5Y)
 
 	public EvolutionOfPopulation(double timeStep, double populationAsymptotic, double populationGrowth) {
 		super();

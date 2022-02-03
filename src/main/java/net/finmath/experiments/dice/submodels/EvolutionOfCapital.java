@@ -33,7 +33,7 @@ public class EvolutionOfCapital implements Function<Double, BiFunction<Double, D
 	@Override
 	public BiFunction<Double, Double, Double> apply(Double time) {
 		return (Double capital, Double investment) -> {
-			return (1.0-capitalDeprecation) * capital + investment;
+			return (1.0-capitalDeprecation) * capital + investment * timeStep;
 		};		
 	}
 

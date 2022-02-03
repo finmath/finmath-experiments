@@ -12,13 +12,18 @@ import net.finmath.experiments.dice.submodels.EmissionFunction;
 import net.finmath.experiments.dice.submodels.EmissionIntensityFunction;
 import net.finmath.experiments.dice.submodels.EvolutionOfCapital;
 import net.finmath.experiments.dice.submodels.EvolutionOfCarbonConcentration;
+import net.finmath.experiments.dice.submodels.EvolutionOfPopulation;
+import net.finmath.experiments.dice.submodels.EvolutionOfProductivity;
 import net.finmath.experiments.dice.submodels.EvolutionOfTemperature;
 import net.finmath.experiments.dice.submodels.ForcingFunction;
 import net.finmath.experiments.dice.submodels.Temperature;
 import net.finmath.plots.Plots;
 
 /*
- * Experiment related to the DICE model
+ * Experiment related to the DICE model.
+ * 
+ * Note: The code makes some small simplification: it uses a constant savings rate and a constant external forcings.
+ * It may still be usefull for illustration.
  */
 public class DICEModelExperiment {
 
@@ -41,6 +46,8 @@ public class DICEModelExperiment {
 	private double[] value = new double[numberOfTimes];
 	private double[] damage = new double[numberOfTimes];
 	private double[] capital = new double[numberOfTimes];
+	private double[] population = new double[numberOfTimes];
+	private double[] productivity = new double[numberOfTimes];
 
 	public DICEModelExperiment(UnaryOperator<Double> abatementFunction) {
 		super();
@@ -49,8 +56,8 @@ public class DICEModelExperiment {
 
 	public static void main(String[] args) {
 
-		System.out.println("1: x with 500/x = Year in which max abatement is reached (linear interpolation, then constant).");
-		System.out.println("2: Value");
+		System.out.println("Timeindex of max abatement \t   Value");
+		System.out.println("_".repeat(79));
 
 		double abatementInitial = 0.03;
 		double abatementMax = 1.0;
@@ -68,28 +75,28 @@ public class DICEModelExperiment {
 			DICEModelExperiment diceModel = new DICEModelExperiment(abatementFunction);
 			diceModel.init();
 
-			System.out.println(String.format("%8.4f \t %8.4f", abatementMaxTime, diceModel.value[numberOfTimes-1]));
+			System.out.println(String.format("\t %8.4f \t\t %8.4f", abatementMaxTime, diceModel.value[numberOfTimes-1]));
 
 			if(abatementSzenario%20 == 0) {
 				Plots
 				.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), diceModel.welfare, 0, 300, 3)
-				.setTitle("welfare (szenario=" + abatementMaxTime + ")").setXAxisLabel("time (years)").show();
+				.setTitle("welfare (szenario=" + abatementMaxTime + ")").setXAxisLabel("time index").show();
 
 				Plots
 				.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), diceModel.damage, 0, 300, 3)
-				.setTitle("damage (szenario=" + abatementMaxTime + ")").setXAxisLabel("time (years)").show();
+				.setTitle("damage (szenario=" + abatementMaxTime + ")").setXAxisLabel("time index").show();
 
 				Plots
 				.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), Arrays.stream(diceModel.carbonConcentration).mapToDouble(CarbonConcentration::getCarbonConcentrationInAtmosphere).toArray(), 0, 300, 3)
-				.setTitle("carbon (szenario=" + abatementMaxTime + ")").setXAxisLabel("time (years)").show();
+				.setTitle("carbon (szenario=" + abatementMaxTime + ")").setXAxisLabel("time index").show();
 
 				Plots
 				.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), Arrays.stream(diceModel.temperature).mapToDouble(Temperature::getTemperatureOfAtmosphere).toArray(), 0, 300, 3)
-				.setTitle("temperature (szenario=" + abatementMaxTime + ")").setXAxisLabel("time (years)").show();
+				.setTitle("temperature (szenario=" + abatementMaxTime + ")").setXAxisLabel("time index").show();
 
 				Plots
 				.createScatter(IntStream.range(0, numberOfTimes).mapToDouble(i -> (double)i).toArray(), diceModel.abatement, 0, 300, 3)
-				.setTitle("abatement (szenario=" + abatementMaxTime + ")").setXAxisLabel("time (years)").show();
+				.setTitle("abatement (szenario=" + abatementMaxTime + ")").setXAxisLabel("time index").show();
 			}
 		}
 	}
@@ -103,8 +110,8 @@ public class DICEModelExperiment {
 		/*
 		 * Discount rate
 		 * 
-		 * r = 0.01	 78.5091 
-		 * r = 0.05 157.0182
+		 * r = 0.01	 90.9091 
+		 * r = 0.05 400.0182
 		 */
 		double r = 0.01;
 
@@ -141,14 +148,20 @@ public class DICEModelExperiment {
 		/*
 		 * GDP
 		 */
-		double A0 = 5.115;		// Initial Total Factor of Productivity 
 		double K0 = 223;		// Initial Capital
 		double L0 = 7403;		// Initial Population
+		double A0 = 5.115;		// Initial Total Factor of Productivity 
 		double gamma = 0.3;		// Capital Elasticity in Production Function
 		double gdpInitial = A0*Math.pow(K0,gamma)*Math.pow(L0/1000,1-gamma);
 
 		// Capital
 		EvolutionOfCapital evolutionOfCapital = new EvolutionOfCapital();
+		
+		// Population
+		EvolutionOfPopulation evolutionOfPopulation = new EvolutionOfPopulation();
+
+		// Productivity
+		EvolutionOfProductivity evolutionOfProductivity = new EvolutionOfProductivity();
 
 		/*
 		 * Set initial values
@@ -157,49 +170,47 @@ public class DICEModelExperiment {
 		carbonConcentration[0] = carbonConcentrationInitial;
 		gdp[0] = gdpInitial;
 		capital[0] = K0;
+		population[0] = L0;
+		productivity[0] = A0;
 		double utilityDiscountedSum = 0;
-		double L = L0;
-		double A = A0;
 
 		/*
 		 * Evolve
 		 */
 		for(int i=0; i<numberOfTimes-1; i++) {
 
-			// We are stepping in years (the models are currently hardcoded to dT = 1 year
+			/*
+			 * We are stepping in 5 years (the models are currently hardcoded to dT = 5 year.
+			 * The time parameter is currently just the index. (Need to rework this).
+			 */
 			double time = i;
+			double timeStep = 5.0;
+
+			/*
+			 * Evolve geo-physical quantities i -> i+1 (as a function of gdb[i])
+			 */
+
+			double forcing = forcingFunction.apply(carbonConcentration[i], forcingExternal);
+			temperature[i+1] = evolutionOfTemperature.apply(temperature[i], forcing);
 
 			abatement[i] = abatementFunction.apply(time);
 
-			/*
-			 * Evolve geo-physical quantities i -> i+1
-			 */
+			// Note: In the original model the 1/(1-\mu(0)) is part of the emission function. Here we add the factor on the outside
 			emission[i] = (1 - abatement[i])/(1-abatement[0]) * emissionFunction.apply(time, gdp[i]);
 
 			carbonConcentration[i+1] = evolutionOfCarbonConcentration.apply(carbonConcentration[i], emission[i]);
 
-			double forcing = forcingFunction.apply(carbonConcentration[i+1], forcingExternal);
-			temperature[i+1] = evolutionOfTemperature.apply(temperature[i], forcing);
 
 			/*
-			 * Note: In the original model the 1/(1-\mu(0)) is part of the emission function.
-			 * Here we add the factor on the outside
+			 * Evolve economy i -> i+1 (as a function of temperature[i])
 			 */
 
-			/*
-			 * Evolve economy i -> i+1
-			 */
-
-			/*
-			 * Apply damage to economy
-			 */
+			// Apply damage to economy
 			damage[i] = damageFunction.applyAsDouble(temperature[i].getTemperatureOfAtmosphere());
 
 			/*
 			 * Abatement cost
 			 */
-
-			//			double abatementCost = emissionIntensityFunction.apply(time) * abatementCostFunction.apply(time, abatement[i]);
 			double abatementCost = abatementCostFunction.apply(time, abatement[i]);
 
 			/*
@@ -208,24 +219,21 @@ public class DICEModelExperiment {
 			double gdpNet = gdp[i] * (1-damage[i]) * (1 - abatementCost);
 
 			// Constant from the original model - in the original model this is a time varying control variable.
-			double savingsRate = 0.259029014481802;
+			double savingsRate = 0.50;		// 0.259029014481802;
 
 			double consumption = (1-savingsRate) * gdpNet;
 			double investment = savingsRate * gdpNet;
 
-			capital[i+1] = evolutionOfCapital.apply(time).apply(capital[i], 5*investment);
+			capital[i+1] = evolutionOfCapital.apply(time).apply(capital[i], timeStep*investment);
 
 			/*
 			 * Evolve population and productivity for next GDP
 			 */
-			double La = 11500; // Asymptotic population
-			double lg = 0.134; // Population growth			
-			L = L * Math.pow(La/L,lg);
+			population[i+1] = evolutionOfPopulation.apply(time).apply(population[i]);
+			productivity[i+1] = evolutionOfProductivity.apply(time).apply(productivity[i]);
 
-			double ga = 0.076;          // Initial TFP rate
-			double deltaA = 0.005;      // TFP increase rate
-			A = A / (1 - ga * Math.exp(-deltaA * 5 * (i-1)));
-
+			double L = population[i+1];
+			double A = productivity[i+1];
 			gdp[i+1] = A*Math.pow(capital[i+1],gamma)*Math.pow(L/1000,1-gamma);
 
 			/*
@@ -238,14 +246,11 @@ public class DICEModelExperiment {
 			/*
 			 * Discounted utility
 			 */
-			double discountFactor = Math.exp(- r * (time*5.0));
+			double discountFactor = Math.exp(- r * (time*timeStep));
 			welfare[i] = utility; //consumption;
 
 			utilityDiscountedSum = utilityDiscountedSum + utility*discountFactor;
-
-			// The 150000 is just a shift to make te plot nice
-
-			value[i+1] = utilityDiscountedSum; //value[i] + welfare[i] * discountFactor;
+			value[i+1] = utilityDiscountedSum;
 		}
 	}
 }

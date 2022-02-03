@@ -7,7 +7,7 @@ import net.finmath.experiments.LinearAlgebra;
 /**
  * The evolution of the temperature.
  * \(
- * 	T(t_{i+1}) = \Phi T(t_{i}) + (forcingToTemp \cdot forcing, 0, 0)
+ * 	T(t_{i+1}) = \Phi T(t_{i}) + (forcingToTemp \cdot (forcing, 0, 0)
  * \)
  * 
  * TODO: Fix time step (5 to 1)
@@ -16,8 +16,6 @@ import net.finmath.experiments.LinearAlgebra;
  */
 public class EvolutionOfTemperature implements BiFunction<Temperature, Double, Temperature> {
 
-	private static double timeStep = 5.0;	// time step in the original model (should become a parameter)
-	
 	private static double c1 = 0.1005;		// sometimes called xi1
 	
 	private static double[][] transitionMatrixDefault;
@@ -35,22 +33,29 @@ public class EvolutionOfTemperature implements BiFunction<Temperature, Double, T
 	    transitionMatrixDefault = new double[][] { new double[] { phi11, phi12 }, new double[] { phi21, phi22 } };
 	}
 	
-	private double[][] transitionMatrix;		// phi in [i][j] (i = row, j = column)
+	private final double timeStep = 5.0;	// time step in the original model (should become a parameter)
+	private final double[][] transitionMatrix;		// phi in [i][j] (i = row, j = column)
+	private final double forcingToTemp;
 
 	public EvolutionOfTemperature() {
-		this(transitionMatrixDefault);
+		this(transitionMatrixDefault, c1);
 	}
 
-	public EvolutionOfTemperature(double[][] transitionMatrix) {
+	/**
+	 * @param transitionMatrix Transition matrix \( \Phi \)
+	 * @param forcingToTemp The scaling coefficient for the external forcing.
+	 */
+	public EvolutionOfTemperature(double[][] transitionMatrix, double forcingToTemp) {
 		super();
 		this.transitionMatrix = transitionMatrix;
+		this.forcingToTemp = forcingToTemp;
 	}
 
 	@Override
 	public Temperature apply(Temperature temperature, Double forcing) {
 		// This is a bit clumsy code. We have to convert the row vector to a column vector, multiply it, then convert it back to a row.		
 		double[] temperatureNext = LinearAlgebra.multMatrixVector(transitionMatrix, temperature.getAsDoubleArray());
-		temperatureNext[0] += c1 * forcing;
+		temperatureNext[0] += forcingToTemp * forcing;
 		return new Temperature(temperatureNext);
 	}
 

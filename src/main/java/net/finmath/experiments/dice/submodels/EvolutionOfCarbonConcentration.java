@@ -5,10 +5,12 @@ import java.util.function.BiFunction;
 import net.finmath.experiments.LinearAlgebra;
 
 /**
- * the evolution of the carbon concentration.
+ * The evolution of the carbon concentration M with a given emission E.
  * \(
- * 	M(t_{i+1}) = \Phi M(t_{i}) + emission
+ * 	M(t_{i+1}) = \Phi M(t_{i}) + unitConversion * E(t_{i}) \Delta t_{i}
  * \)
+ * 
+ * Note: the emission are in GtCO2/year while the carbon concentration is in GtC.
  * 
  * Unit conversions
  * <ul>
@@ -22,7 +24,7 @@ import net.finmath.experiments.LinearAlgebra;
  */
 public class EvolutionOfCarbonConcentration implements BiFunction<CarbonConcentration, Double, CarbonConcentration> {
 
-	private static double timeStepSize = 5.0;	// time step in the original model (should become a parameter)
+	private static double conversionGtCarbonperGtCO2 = 3.0/11.0;
 
 	private static double[][] transitionMatrixDefault;
 	static {
@@ -43,7 +45,8 @@ public class EvolutionOfCarbonConcentration implements BiFunction<CarbonConcentr
 	    transitionMatrixDefault = new double[][] { new double[] { zeta11, zeta12, 0.0 }, new double[] { zeta21, zeta22, zeta23 }, new double[] { 0.0, zeta32, zeta33 } };
 	}
 	
-	private double[][] transitionMatrix;		// phi in [i][j] (i = row, j = column)
+	private final double timeStepSize;				// time step in the original model (should become a parameter)
+	private final double[][] transitionMatrix;		// phi in [i][j] (i = row, j = column)
 
 	public EvolutionOfCarbonConcentration(double timeStepSize, double[][] transitionMatrix) {
 		super();
@@ -61,13 +64,13 @@ public class EvolutionOfCarbonConcentration implements BiFunction<CarbonConcentr
 	 * Update CarbonConcentration over one time step with a given emission.
 	 * 
 	 * @param carbonConcentration The CarbonConcentration in time \( t_{i} \)
-	 * @param emissions The emissions in t CO2
+	 * @param emissions The emissions in GtCO2 / year.
 	 */
 	public CarbonConcentration apply(CarbonConcentration carbonConcentration, Double emissions) {
 		double[] carbonConcentrationNext = LinearAlgebra.multMatrixVector(transitionMatrix, carbonConcentration.getAsDoubleArray());
 
 		// Add emissions
-		carbonConcentrationNext[0] += emissions * timeStepSize / 3.666;
+		carbonConcentrationNext[0] += emissions * timeStepSize * conversionGtCarbonperGtCO2;
 		
 		return new CarbonConcentration(carbonConcentrationNext);
 	}

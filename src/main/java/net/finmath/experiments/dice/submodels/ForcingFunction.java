@@ -3,9 +3,7 @@ package net.finmath.experiments.dice.submodels;
 import java.util.function.BiFunction;
 
 /**
- * The function that maps CarbonConcentration and external forcing to forcing.
- * 
- * TODO fix time step
+ * The function that maps CarbonConcentration (in GtC) and external forcing (in W/m^2) to forcing (in W/m^2).
  * 
  * @author Christian Fries
  */

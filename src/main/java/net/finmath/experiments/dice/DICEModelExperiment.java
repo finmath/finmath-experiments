@@ -23,7 +23,7 @@ import net.finmath.plots.Plots;
  * Experiment related to the DICE model.
  * 
  * Note: The code makes some small simplification: it uses a constant savings rate and a constant external forcings.
- * It may still be usefull for illustration.
+ * It may still be useful for illustration.
  */
 public class DICEModelExperiment {
 
@@ -112,10 +112,10 @@ public class DICEModelExperiment {
 		/*
 		 * Discount rate
 		 * 
-		 * r = 0.01	 90.9091 
-		 * r = 0.05 400.0182
+		 * r = 0.01	 80.0 
+		 * r = 0.03 153.8462
 		 */
-		double r = 0.01;
+		double r = 0.03;
 
 		/*
 		 * Note: Calling default constructors for the sub-models will initialise the default parameters.

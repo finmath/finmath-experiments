@@ -16,7 +16,10 @@ public class DamageFromTemperature implements DoubleUnaryOperator {
 	private final double tempToDamage2;
 	
 	/**
-	 * Create the damage function \( T \mapsto a_{0} + a_{1} T + a_{2} T^{2} \), with \( T \) being temperature above pre-industrial.
+	 * Create the damage function
+	 * \( T \mapsto \Omega(T) = D(T) / (1+D(T)) \), with
+	 * \( D(T) = a_{0} + a_{1} T + a_{2} T^{2} \), with
+	 * \( T \) being temperature above pre-industrial.
 	 * 
 	 * @param tempToDamage0 The constant term.
 	 * @param tempToDamage1 The coefficient of the linear term.
@@ -30,7 +33,7 @@ public class DamageFromTemperature implements DoubleUnaryOperator {
 	}
 
 	/**
-	 * Create the damage function \( T \mapsto a_{0} + a_{1} T + a_{2} T^{2} \), with \( T \) being temperature above pre-industrial,
+	 * Create the damage function \( T \mapsto (a_{0} + a_{1} T + a_{2} T^{2})/(1+a_{0} + a_{1} T + a_{2} T^{2}) \), with \( T \) being temperature above pre-industrial,
 	 * using the default DICE (2016) parameters.
 	 */
 	public DamageFromTemperature() {
@@ -39,7 +42,8 @@ public class DamageFromTemperature implements DoubleUnaryOperator {
 	}
 
 	/**
-	 * @param temperature The above pre-industrial.
+	 * Get the relative damage the GDP at a given temperature above pre-industrial.
+	 * @param temperature The above pre-industrial in °K.
 	 */
 	@Override
 	public double applyAsDouble(double temperature) {

@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.finmath.cuda.montecarlo.RandomVariableCudaFactory;
 import net.finmath.exception.CalculationException;
 import net.finmath.functions.AnalyticFormulas;
 import net.finmath.montecarlo.RandomVariableFactory;
@@ -471,7 +470,10 @@ public class TermStructureMonteCarloSimulationExperiments {
 		final boolean useDiscountCurve = false;
 		final int		numberOfPaths	= 100000;
 
-		for(final RandomVariableFactory randomVariableFactory : List.of(new RandomVariableFromArrayFactory(), new RandomVariableCudaFactory(), new RandomVariableOpenCLFactory())) {
+		for(final RandomVariableFactory randomVariableFactory : List.of(
+				new RandomVariableFromArrayFactory(),
+//				new RandomVariableCudaFactory(),
+				new RandomVariableOpenCLFactory())) {
 			final long timeStart = System.currentTimeMillis();
 
 			final List<Double> strikes = new ArrayList<Double>();

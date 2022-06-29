@@ -220,12 +220,14 @@
 			<version>${finmath-plot.version}</version>
 		</dependency>
 
+		<!--
 		<dependency>
 			<groupId>net.finmath</groupId>
 			<artifactId>finmath-lib-cuda-extensions</artifactId>
 			<version>${finmath-cuda.version}</version>
 			<classifier>${finmath-cuda.classifier}</classifier>
 		</dependency>
+		-->
 
 		<dependency>
 			<groupId>net.finmath</groupId>

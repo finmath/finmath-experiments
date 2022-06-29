@@ -1,0 +1,232 @@
+package net.finmath.experiments;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.stream.DoubleStream;
+
+import net.finmath.exception.CalculationException;
+import net.finmath.montecarlo.BrownianMotion;
+import net.finmath.montecarlo.BrownianMotionFromMersenneRandomNumbers;
+import net.finmath.montecarlo.assetderivativevaluation.MonteCarloAssetModel;
+import net.finmath.montecarlo.assetderivativevaluation.models.BlackScholesModel;
+import net.finmath.montecarlo.model.ProcessModel;
+import net.finmath.montecarlo.process.EulerSchemeFromProcessModel;
+import net.finmath.montecarlo.process.MonteCarloProcess;
+import net.finmath.plots.DoubleToRandomVariableFunction;
+import net.finmath.plots.PlotProcess2D;
+import net.finmath.stochastic.RandomVariable;
+import net.finmath.time.TimeDiscretization;
+import net.finmath.time.TimeDiscretizationFromArray;
+
+/**
+ * Mimic the approximation performed by an Euler-Scheme.
+ * 
+ * We can only simulate this, because we have to time-discretize anyway.
+ * What we do is we compare two time-discretization: a fine one (representing the true stochastic process) and a coarse one
+ * one which we then create the Euler-Scheme approximation of the fine-time-discretization process.
+ * 
+ * @author fries
+ *
+ */
+public class EulerSchemeIllustrationPlot {
+
+	public static void main(String[] args) {
+
+		double timeInitial = 0.0;
+		int numberOfTimeSteps = 1600;
+		double timeStep = 0.01;
+		TimeDiscretization timeDiscretization = new TimeDiscretizationFromArray(timeInitial, numberOfTimeSteps, timeStep);
+
+		int numberOfPaths = 100;
+		int numberOfFactors = 1;
+		int seed = 3141;
+		BrownianMotion brownianMotion = new BrownianMotionFromMersenneRandomNumbers(timeDiscretization, numberOfFactors, numberOfPaths, seed);;
+
+		double initialValue = 100.0;
+		double riskFreeRate = 0.05;
+		double volatility = 0.30;
+		ProcessModel processModel = new BlackScholesModel(initialValue, riskFreeRate, volatility);
+
+		/*
+		 * The process that represents the true SDE
+		 */
+		EulerSchemeFromProcessModel scheme = new EulerSchemeFromProcessModel(processModel, brownianMotion);
+		MonteCarloAssetModel mcModel = new MonteCarloAssetModel(scheme);
+
+		/**
+		 * Consider different number of sub-steps
+		 */
+		for(int numberOfSubSteps : new int[] { 400, 100, 25, 10, 1} ) {
+
+			/* 
+			 * The Euler scheme for the lognormal SDE
+			 * 	S(t_{i+1}) = S(t_{i}) + r S(t_{i}) Delta t + sigma S(t_{i}) Delta W
+			 * on the coarse time-discretization, but using the Brownian increments that match the given Brownian motion.
+			 */
+			TimeDiscretization timeDiscretizationCoarse = new TimeDiscretizationFromArray(timeInitial, numberOfTimeSteps/numberOfSubSteps, timeStep*numberOfSubSteps);
+			BrownianMotion brownianMotionCoarse = new BrownianMotionCoarseTimeDiscretization(timeDiscretizationCoarse, brownianMotion);
+
+			ProcessModel processModelBlackScholesNormalEuler = new ProcessModel() {
+				@Override
+				public LocalDateTime getReferenceDate() {
+					return processModel.getReferenceDate();
+				}
+
+				@Override
+				public int getNumberOfComponents() {
+					return processModel.getNumberOfComponents();
+				}
+
+				@Override
+				public RandomVariable applyStateSpaceTransform(MonteCarloProcess process, int timeIndex, int componentIndex, RandomVariable randomVariable) {
+					return randomVariable;
+				}
+
+				@Override
+				public RandomVariable[] getInitialState(MonteCarloProcess process) {
+					try {
+						return scheme.getProcessValue(0);
+					} catch (CalculationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					return null;
+				}
+
+				@Override
+				public RandomVariable getNumeraire(MonteCarloProcess process, double time) throws CalculationException {
+					return processModel.getNumeraire(process, time);
+				}
+
+				@Override
+				public RandomVariable[] getDrift(MonteCarloProcess process, int timeIndex, RandomVariable[] realizationAtTimeIndex, RandomVariable[] realizationPredictor) {
+					return new RandomVariable[] { realizationAtTimeIndex[0].mult(riskFreeRate) };
+				}
+
+				@Override
+				public RandomVariable[] getFactorLoading(MonteCarloProcess process, int timeIndex, int componentIndex, RandomVariable[] realizationAtTimeIndex) {
+					return new RandomVariable[] { realizationAtTimeIndex[0].mult(volatility) };
+				}
+
+				@Override
+				public int getNumberOfFactors() {
+					return 1;
+				}
+
+				@Override
+				public RandomVariable getRandomVariableForConstant(double value) {
+					return processModel.getRandomVariableForConstant(value);
+				}
+
+				@Override
+				public ProcessModel getCloneWithModifiedData(Map<String, Object> dataModified) throws CalculationException {
+					throw new UnsupportedOperationException();
+				}			
+			};
+
+			EulerSchemeFromProcessModel schemeCoars = new EulerSchemeFromProcessModel(processModelBlackScholesNormalEuler, brownianMotionCoarse);
+			MonteCarloAssetModel mcModelEulerCoars = new MonteCarloAssetModel(schemeCoars);
+
+			/*
+			 * The stochastic process that is the true Euler-Scheme interpolation of the Euler-Scheme approximations.
+			 * 	S(t}) = S(t_{i}) + r S(t_{i}) (t-t_{i}) + sigma S(t_{i}) (W(t)-W(t_{i}))
+			 */
+			ProcessModel processModelFine = new ProcessModel() {
+
+				@Override
+				public RandomVariable[] getDrift(MonteCarloProcess process, int timeIndex, RandomVariable[] realizationAtTimeIndex, RandomVariable[] realizationPredictor) {
+					double time = timeDiscretization.getTime(timeIndex);
+					int timeIndexCoarse = timeDiscretizationCoarse.getTimeIndexNearestLessOrEqual(time);
+					double timeCoarse = timeDiscretizationCoarse.getTime(timeIndexCoarse);
+
+					// r S(t_i)
+					RandomVariable[] drift = null;
+					try {
+						drift = new RandomVariable[] { mcModelEulerCoars.getAssetValue(timeCoarse, 0).mult(riskFreeRate) };
+					} catch (CalculationException e) {
+						e.printStackTrace();
+					}
+					return drift;
+				}
+
+				@Override
+				public RandomVariable[] getFactorLoading(MonteCarloProcess process, int timeIndex, int componentIndex, RandomVariable[] realizationAtTimeIndex) {
+					double time = timeDiscretization.getTime(timeIndex);
+					int timeIndexCoarse = timeDiscretizationCoarse.getTimeIndexNearestLessOrEqual(time);
+					double timeCoarse = timeDiscretizationCoarse.getTime(timeIndexCoarse);
+
+					// sigma S(t_i)
+					RandomVariable[] factorLoading = null;
+					try {
+						factorLoading = new RandomVariable[] { mcModelEulerCoars.getAssetValue(timeCoarse, 0).mult(volatility) };
+					} catch (CalculationException e) {
+						e.printStackTrace();
+					}
+					return factorLoading;
+				}
+
+				@Override
+				public LocalDateTime getReferenceDate() {
+					return processModel.getReferenceDate();
+				}
+
+				@Override
+				public int getNumberOfComponents() {
+					return processModel.getNumberOfComponents();
+				}
+
+				@Override
+				public RandomVariable applyStateSpaceTransform(MonteCarloProcess process, int timeIndex, int componentIndex, RandomVariable randomVariable) {
+					return randomVariable;
+				}
+
+				@Override
+				public RandomVariable[] getInitialState(MonteCarloProcess process) {
+					return processModel.getInitialState(process);
+				}
+
+				@Override
+				public RandomVariable getNumeraire(MonteCarloProcess process, double time) throws CalculationException {
+					return processModel.getNumeraire(process, time);
+				}
+
+				@Override
+				public int getNumberOfFactors() {
+					return 1;
+				}
+
+				@Override
+				public RandomVariable getRandomVariableForConstant(double value) {
+					return processModel.getRandomVariableForConstant(value);
+				}
+
+				@Override
+				public ProcessModel getCloneWithModifiedData(Map<String, Object> dataModified) throws CalculationException {
+					throw new UnsupportedOperationException();
+				}			
+			};
+
+			EulerSchemeFromProcessModel schemeEuler = new EulerSchemeFromProcessModel(processModelFine, brownianMotion);
+			MonteCarloAssetModel mcModelEuler = new MonteCarloAssetModel(schemeEuler);
+
+			DoubleToRandomVariableFunction process3 = t -> { return mcModelEulerCoars.getAssetValue(mcModelEulerCoars.getTimeDiscretization().getTimeIndexNearestLessOrEqual(t), 0); };
+			PlotProcess2D plot3 = new PlotProcess2D(timeDiscretization, process3, 100);
+			plot3.setTitle("Piece-wise constant process (" + (numberOfTimeSteps/numberOfSubSteps) + " steps)");
+			plot3.setXAxisLabel("time").setYAxisLabel("value");
+			plot3.show();
+
+
+			DoubleToRandomVariableFunction process2 = t -> { return mcModelEuler.getAssetValue(t, 0); };
+			PlotProcess2D plot2 = new PlotProcess2D(timeDiscretization, process2, 100);
+			plot2.setTitle("Euler-scheme process (" + (numberOfTimeSteps/numberOfSubSteps) + " steps)");
+			plot2.setXAxisLabel("time").setYAxisLabel("value");
+			plot2.show();
+		}
+
+		DoubleToRandomVariableFunction process = t -> { return mcModel.getAssetValue(t, 0); };
+		PlotProcess2D plot1 = new PlotProcess2D(timeDiscretization, process, 100);
+		plot1.setTitle("True (time-continuous) process (" + (numberOfTimeSteps) + " steps)");
+		plot1.setXAxisLabel("time").setYAxisLabel("value");
+		plot1.show();
+	}
+}

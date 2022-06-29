@@ -177,8 +177,8 @@ public class NonlinearDiscounting {
 		final List<Point2D> valuesOptions = valuations.stream().map(mapElementToPoint.apply(Key.VOLATILITY, Key.OPTION)).collect(Collectors.toList());
 
 		final Plot plot = new Plot2D(List.of(
-				new PlotablePoints2D("risk free", valuesRiskFree, new GraphStyle(new Rectangle(3, 3)))
-				, new PlotablePoints2D("default compensated (state-dependent survival prob.)", valuesFundStateDep, new GraphStyle(new Rectangle(3, 3)))
+				new PlotablePoints2D("default compensated (state-dependent survival prob.)", valuesFundStateDep, new GraphStyle(new Rectangle(3, 3)))
+				, new PlotablePoints2D("risk free", valuesRiskFree, new GraphStyle(new Rectangle(3, 3)))
 				, new PlotablePoints2D("default compensated (constant survival prob.)", valuesFundConst, new GraphStyle(new Rectangle(3, 3)))
 				, new PlotablePoints2D("benchmark (using option)", valuesOptions, new GraphStyle(new Rectangle(5, 5)))
 				));

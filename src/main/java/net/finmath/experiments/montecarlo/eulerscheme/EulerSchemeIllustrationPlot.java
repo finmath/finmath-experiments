@@ -2,7 +2,6 @@ package net.finmath.experiments.montecarlo.eulerscheme;
 
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.stream.DoubleStream;
 
 import net.finmath.exception.CalculationException;
 import net.finmath.montecarlo.BrownianMotion;

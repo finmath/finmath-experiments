@@ -1,4 +1,4 @@
-package net.finmath.experiments;
+package net.finmath.experiments.montecarlo.eulerscheme;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -56,7 +56,7 @@ public class EulerSchemeIllustrationPlot {
 		/**
 		 * Consider different number of sub-steps
 		 */
-		for(int numberOfSubSteps : new int[] { 400, 100, 25, 10, 1} ) {
+		for(int numberOfSubSteps : new int[] { 200, 100, 10, 1} ) {
 
 			/* 
 			 * The Euler scheme for the lognormal SDE
@@ -209,24 +209,50 @@ public class EulerSchemeIllustrationPlot {
 			EulerSchemeFromProcessModel schemeEuler = new EulerSchemeFromProcessModel(processModelFine, brownianMotion);
 			MonteCarloAssetModel mcModelEuler = new MonteCarloAssetModel(schemeEuler);
 
-			DoubleToRandomVariableFunction process3 = t -> { return mcModelEulerCoars.getAssetValue(mcModelEulerCoars.getTimeDiscretization().getTimeIndexNearestLessOrEqual(t), 0); };
-			PlotProcess2D plot3 = new PlotProcess2D(timeDiscretization, process3, 100);
-			plot3.setTitle("Piece-wise constant process (" + (numberOfTimeSteps/numberOfSubSteps) + " steps)");
-			plot3.setXAxisLabel("time").setYAxisLabel("value");
-			plot3.show();
+			/*
+			 * Plot the process with piecewise constant coefficients on the coarse discretization
+			 */
+			DoubleToRandomVariableFunction processEulerScheme = t -> { return mcModelEuler.getAssetValue(t, 0); };
+			PlotProcess2D plotEuler = new PlotProcess2D(timeDiscretization, processEulerScheme, 100);
+			plotEuler.setTitle("Euler-scheme process (" + (numberOfTimeSteps/numberOfSubSteps) + " steps)");
+			plotEuler.setXAxisLabel("time").setYAxisLabel("value");
+			plotEuler.show();
 
+			/*
+			 * Plot a piecewise linear interpolation of the Euler scheme approximation on the coarse discretization
+			 */
+			DoubleToRandomVariableFunction processLinear = t -> {
+				TimeDiscretization td = mcModelEulerCoars.getTimeDiscretization();
+				int timeIndexLow = td.getTimeIndexNearestLessOrEqual(t);
+				int timeIndexHigh = timeIndexLow < td.getNumberOfTimes()-1 ? timeIndexLow+1 : timeIndexLow;
+				double weight = (t-td.getTime(timeIndexLow))/(td.getTime(timeIndexHigh)-td.getTime(timeIndexLow));
+				RandomVariable value = mcModelEulerCoars.getAssetValue(timeIndexHigh, 0).mult(weight).add(mcModelEulerCoars.getAssetValue(timeIndexLow, 0).mult(1-weight));
+				return value;
+			};
+			PlotProcess2D plotProcessLinear = new PlotProcess2D(timeDiscretization, processLinear, 100);
+			plotProcessLinear.setTitle("Piece-wise linear process (" + (numberOfTimeSteps/numberOfSubSteps) + " steps)");
+			plotProcessLinear.setXAxisLabel("time").setYAxisLabel("value");
+			plotProcessLinear.show();
 
-			DoubleToRandomVariableFunction process2 = t -> { return mcModelEuler.getAssetValue(t, 0); };
-			PlotProcess2D plot2 = new PlotProcess2D(timeDiscretization, process2, 100);
-			plot2.setTitle("Euler-scheme process (" + (numberOfTimeSteps/numberOfSubSteps) + " steps)");
-			plot2.setXAxisLabel("time").setYAxisLabel("value");
-			plot2.show();
+			/*
+			 * Plot a piecewise constant interpolation of the Euler scheme approximation on the coarse discretization
+			 */
+			DoubleToRandomVariableFunction processConstant = t -> {
+				TimeDiscretization td = mcModelEulerCoars.getTimeDiscretization();
+				int timeIndexLow = td.getTimeIndexNearestLessOrEqual(t);
+				RandomVariable value = mcModelEulerCoars.getAssetValue(timeIndexLow, 0);
+				return value;
+			};
+			PlotProcess2D plotProcessConstant = new PlotProcess2D(timeDiscretization, processConstant, 100);
+			plotProcessConstant.setTitle("Piece-wise constant process (" + (numberOfTimeSteps/numberOfSubSteps) + " steps)");
+			plotProcessConstant.setXAxisLabel("time").setYAxisLabel("value");
+			plotProcessConstant.show();
 		}
 
 		DoubleToRandomVariableFunction process = t -> { return mcModel.getAssetValue(t, 0); };
-		PlotProcess2D plot1 = new PlotProcess2D(timeDiscretization, process, 100);
-		plot1.setTitle("True (time-continuous) process (" + (numberOfTimeSteps) + " steps)");
-		plot1.setXAxisLabel("time").setYAxisLabel("value");
-		plot1.show();
+		PlotProcess2D plot = new PlotProcess2D(timeDiscretization, process, 100);
+		plot.setTitle("True (time-continuous) process (" + (numberOfTimeSteps) + " steps)");
+		plot.setXAxisLabel("time").setYAxisLabel("value");
+		plot.show();
 	}
 }

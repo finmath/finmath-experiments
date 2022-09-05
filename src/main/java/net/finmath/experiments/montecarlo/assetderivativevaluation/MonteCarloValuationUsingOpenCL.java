@@ -7,7 +7,6 @@ package net.finmath.experiments.montecarlo.assetderivativevaluation;
 
 import java.util.List;
 
-import net.finmath.cuda.montecarlo.RandomVariableCudaFactory;
 import net.finmath.exception.CalculationException;
 import net.finmath.montecarlo.BrownianMotion;
 import net.finmath.montecarlo.BrownianMotionFromMersenneRandomNumbers;
@@ -31,8 +30,8 @@ public class MonteCarloValuationUsingOpenCL {
 		 */
 		final var randomVariableFactories = List.of(
 				new RandomVariableFromArrayFactory(false),
-				new RandomVariableOpenCLFactory(),
-				new RandomVariableCudaFactory()
+//				new RandomVariableCudaFactory(),
+				new RandomVariableOpenCLFactory()
 				);
 
 		for(final RandomVariableFactory randomVariableFactory : randomVariableFactories) {

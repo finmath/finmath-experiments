@@ -23,6 +23,7 @@ public class MonteCarloSchemeTests {
 				+ "Output shows the error \u0394m (error on mean) and \u0394V (error on variance) comparing to theoretical mean and variance at time T.\n");
 
 		final double initialValue = 1.0;
+		final double mu = 0.0;
 		final double sigma = 0.5;				// Note: Try different sigmas: 0.2, 0.5, 0.7, 0.9
 		final int numberOfPath = 100000;		// Note: Try different number of path. For 10000000 you need around 6 GB (parameter is -mx6G)
 		final double lastTime = 10.0;
@@ -32,38 +33,41 @@ public class MonteCarloSchemeTests {
 			final double deltaT = lastTime/numberOfTimeSteps;
 
 			// Create an instance of the Euler scheme class
-			final LogProcessEulerScheme eulerScheme = new LogProcessEulerScheme(
+			final LognormalProcess eulerScheme = new LogProcessEulerScheme(
 					numberOfTimeSteps,	// numberOfTimeSteps
 					deltaT,				// deltaT
 					numberOfPath,		// numberOfPaths
 					initialValue,		// initialValue
-					sigma);				// sigma
+					mu,					// mu (drift)
+					sigma);				// sigma (volatility)
 
-			// Create an instance of the euler scheme class
-			final LogProcessMilsteinScheme milsteinScheme = new LogProcessMilsteinScheme(
+			// Create an instance of the Milstein scheme class
+			final LognormalProcess milsteinScheme = new LogProcessMilsteinScheme(
 					numberOfTimeSteps,	// numberOfTimeSteps
 					deltaT,				// deltaT
 					numberOfPath,		// numberOfPaths
 					initialValue,		// initialValue
-					sigma);				// sigma
+					mu,					// mu (drift)
+					sigma);				// sigma (volatility)
 
-			// Create an instance of the euler scheme class
-			final LogProcessLogEulerScheme logEulerScheme = new LogProcessLogEulerScheme(
+			// Create an instance of the Log-Euler scheme class
+			final LognormalProcess logEulerScheme = new LogProcessLogEulerScheme(
 					numberOfTimeSteps,	// numberOfTimeSteps
 					deltaT,				// deltaT
 					numberOfPath,		// numberOfPaths
 					initialValue,		// initialValue
-					sigma);				// sigma
+					mu,					// mu (drift)
+					sigma);				// sigma (volatility)
 
 			// Get start time of calculation
 			final double startMillis = System.currentTimeMillis();
 
 			final int		lastTimeIndex	= eulerScheme.getNumberOfTimeSteps();
 
-			final double	averageEuler	= eulerScheme.getAverageOfLog( lastTimeIndex );
-			final double	averageMilstein	= milsteinScheme.getAverageOfLog( lastTimeIndex );
-			final double	averageLogEuler	= logEulerScheme.getAverageOfLog( lastTimeIndex );
-			final double	averageAnalytic	= Math.log(initialValue)-(0.5 * sigma * sigma * (lastTimeIndex * deltaT) );
+			final double	averageEuler	= eulerScheme.getExpectationOfLog( lastTimeIndex );
+			final double	averageMilstein	= milsteinScheme.getExpectationOfLog( lastTimeIndex );
+			final double	averageLogEuler	= logEulerScheme.getExpectationOfLog( lastTimeIndex );
+			final double	averageAnalytic	= Math.log(initialValue) + (mu - 0.5 * sigma * sigma) * (lastTimeIndex * deltaT);
 
 			final double	varianceEuler		= eulerScheme.getVarianceOfLog( lastTimeIndex );
 			final double	varianceMilstein	= milsteinScheme.getVarianceOfLog( lastTimeIndex );

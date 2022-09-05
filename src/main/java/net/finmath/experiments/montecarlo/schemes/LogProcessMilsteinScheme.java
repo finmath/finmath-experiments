@@ -14,12 +14,13 @@ import net.finmath.time.TimeDiscretizationFromArray;
 /**
  * @author Christian Fries
  */
-public class LogProcessMilsteinScheme
+public class LogProcessMilsteinScheme implements LognormalProcess
 {
 	private final int		numberOfTimeSteps;
 	private final double	deltaT;
 	private final int		numberOfPaths;
 	private final double	initialValue;
+	private final double	mu;
 	private final double	sigma;
 
 	private RandomVariable[]	discreteProcess = null;
@@ -38,12 +39,14 @@ public class LogProcessMilsteinScheme
 			double deltaT,
 			int numberOfPaths,
 			double initialValue,
+			double mu,
 			double sigma) {
 		super();
 		this.numberOfTimeSteps = numberOfTimeSteps;
 		this.deltaT = deltaT;
 		this.numberOfPaths = numberOfPaths;
 		this.initialValue = initialValue;
+		this.mu = mu;
 		this.sigma = sigma;
 	}
 
@@ -64,14 +67,14 @@ public class LogProcessMilsteinScheme
 	 * @param timeIndex The time index
 	 * @return The average
 	 */
-	public double getAverage(int timeIndex)
+	public double getExpectation(int timeIndex)
 	{
 		// Get the random variable from the process represented by this object
 		final RandomVariable randomVariable = getProcessValue(timeIndex);
 		return randomVariable.getAverage();
 	}
 
-	public double getAverageOfLog(int timeIndex)
+	public double getExpectationOfLog(int timeIndex)
 	{
 		// Get the random variable from the process represented by this object
 		final RandomVariable randomVariable = getProcessValue(timeIndex);
@@ -123,15 +126,15 @@ public class LogProcessMilsteinScheme
 				for (int iPath = 0; iPath < numberOfPaths; iPath++ )
 				{
 					// Drift
-					final double drift = 0;
+					final double drift = mu * deltaT;
 
 					// Diffusion
 					final double diffusion = sigma * deltaW.get(iPath);
 
 					final double previousValue = previouseRealization.get(iPath);
 
-					final double newValue = previousValue + drift * previousValue * deltaT + previousValue * diffusion
-							+ 1.0/2.0 * previousValue * sigma * sigma * (deltaW.get(iPath) * deltaW.get(iPath) - deltaT);  // Milstein-Zusatz
+					final double newValue = previousValue + previousValue * drift + previousValue * diffusion	// Euler step
+							+ 1.0/2.0 * previousValue * sigma * sigma * (deltaW.get(iPath) * deltaW.get(iPath) - deltaT);  // Milstein correction
 
 					newRealization[iPath] = newValue;
 				}
@@ -169,6 +172,14 @@ public class LogProcessMilsteinScheme
 	 */
 	public int getNumberOfTimeSteps() {
 		return numberOfTimeSteps;
+	}
+
+	/**
+	 * @return Returns the mu.
+	 */
+	@Override
+	public double getDrift() {
+		return mu;
 	}
 
 	/**

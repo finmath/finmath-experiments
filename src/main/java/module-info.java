@@ -11,7 +11,6 @@ module net.finmath.experiments {
 	requires transitive net.finmath.lib;
 	requires transitive net.finmath.opencl;
 	requires transitive net.finmath.plots;
-	requires transitive net.finmath.cuda;
 
 	requires org.jfree.jfreechart;
 	requires junit;

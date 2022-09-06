@@ -1,6 +1,8 @@
 package net.finmath.experiments.timeseries.backcasting;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.DoubleUnaryOperator;
@@ -131,14 +133,16 @@ public class BackcastExperiment {
 		Plot plot = new Plot2D(List.of(
 				new PlotableFunction2D(0.0, timeHorizon, 100, pathReconstructed),
 				new PlotableFunction2D(0.0, timeHorizon, 100, pathOriginal)
-				));
-		plot
+				))
 		.setTitle("Original (green) and Reconstructed (red) Path (market correlation = " + String.format("%5.2f", correlationValue)+ ")")
 		.setXAxisLabel("time")
-		.setYAxisLabel("value")
-		.show();
-		plot.saveAsPDF(new File("backcast-" + (int)(correlationValue*100) + ".pdf"), 800, 400);
-		plot.saveAsJPG(new File("backcast-" + (int)(correlationValue*100) + ".jpg"), 800, 400);
+		.setYAxisLabel("value");
+
+		plot.show();
+
+		Files.createDirectories(Path.of("results"));
+		plot.saveAsPDF(new File("results/backcast-" + (int)(correlationValue*100) + ".pdf"), 800, 400);
+		plot.saveAsJPG(new File("results/backcast-" + (int)(correlationValue*100) + ".jpg"), 800, 400);
 	}
 
 }

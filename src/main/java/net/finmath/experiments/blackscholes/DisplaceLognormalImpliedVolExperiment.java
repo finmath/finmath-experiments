@@ -1,4 +1,4 @@
-package net.finmath.experiments.blackScholes;
+package net.finmath.experiments.blackscholes;
 
 import java.util.List;
 import java.util.function.DoubleBinaryOperator;

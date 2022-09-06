@@ -3,7 +3,7 @@
  *
  * Created on 27.01.2008
  */
-package net.finmath.experiments.blackScholes;
+package net.finmath.experiments.blackscholes;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

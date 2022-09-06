@@ -3,4 +3,4 @@
  *
  * @author Christian Fries
  */
-package net.finmath.experiments.blackScholes;
+package net.finmath.experiments.blackscholes;

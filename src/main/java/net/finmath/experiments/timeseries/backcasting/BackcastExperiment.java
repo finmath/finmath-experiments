@@ -7,9 +7,7 @@ import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
-import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.CholeskyDecomposition;
-
+import net.finmath.functions.LinearAlgebra;
 import net.finmath.montecarlo.BrownianMotion;
 import net.finmath.montecarlo.BrownianMotionFromMersenneRandomNumbers;
 import net.finmath.montecarlo.BrownianMotionView;
@@ -44,8 +42,7 @@ public class BackcastExperiment {
 			}			
 		}
 
-//		double[][] rootMatrix = LinearAlgebra.getCholeskyDecomposition(correlationCandidate);
-		double[][] rootMatrix = new CholeskyDecomposition(new Array2DRowRealMatrix(correlationCandidate)).getL().getData();
+		double[][] rootMatrix = LinearAlgebra.getCholeskyDecomposition(correlationCandidate);
 
 		
 		TimeDiscretization td = new TimeDiscretizationFromArray(0.0, timeSteps, timeHorizon/timeSteps);

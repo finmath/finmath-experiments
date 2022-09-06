@@ -5,8 +5,6 @@
  */
 package net.finmath.experiments.montecarlo.schemes;
 
-import java.text.DecimalFormat;
-
 import net.finmath.montecarlo.BrownianMotion;
 import net.finmath.montecarlo.BrownianMotionFromMersenneRandomNumbers;
 import net.finmath.montecarlo.RandomVariableFromDoubleArray;

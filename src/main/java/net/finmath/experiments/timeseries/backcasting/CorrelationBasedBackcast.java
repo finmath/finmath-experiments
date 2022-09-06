@@ -3,9 +3,7 @@ package net.finmath.experiments.timeseries.backcasting;
 import java.util.Arrays;
 import java.util.function.Function;
 
-import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.CholeskyDecomposition;
-
+import net.finmath.functions.LinearAlgebra;
 import net.finmath.plots.DoubleToRandomVariableFunction;
 import net.finmath.stochastic.RandomVariable;
 import net.finmath.stochastic.Scalar;
@@ -30,8 +28,7 @@ public class CorrelationBasedBackcast {
 		/*
 		 * From correlation extract factor matrix
 		 */
-//		double[][] rootMatrix = LinearAlgebra.getCholeskyDecomposition(correlation);
-		double[][] rootMatrix = new CholeskyDecomposition(new Array2DRowRealMatrix(correlation)).getL().getData();
+		double[][] rootMatrix = LinearAlgebra.getCholeskyDecomposition(correlation);
 
 		int dimension = rootMatrix.length;
 		

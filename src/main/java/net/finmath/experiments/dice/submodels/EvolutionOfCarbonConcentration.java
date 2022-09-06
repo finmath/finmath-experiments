@@ -2,7 +2,7 @@ package net.finmath.experiments.dice.submodels;
 
 import java.util.function.BiFunction;
 
-import net.finmath.experiments.LinearAlgebra;
+import net.finmath.functions.LinearAlgebra;
 
 /**
  * The evolution of the carbon concentration M with a given emission E.

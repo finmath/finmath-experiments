@@ -1,9 +1,7 @@
 package net.finmath.experiments.dice;
 
-import java.util.Arrays;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.UnaryOperator;
-import java.util.stream.IntStream;
 
 import net.finmath.experiments.dice.submodels.AbatementCostFunction;
 import net.finmath.experiments.dice.submodels.CarbonConcentration;
@@ -17,7 +15,6 @@ import net.finmath.experiments.dice.submodels.EvolutionOfProductivity;
 import net.finmath.experiments.dice.submodels.EvolutionOfTemperature;
 import net.finmath.experiments.dice.submodels.ForcingFunction;
 import net.finmath.experiments.dice.submodels.Temperature;
-import net.finmath.plots.Plots;
 
 /*
  * Experiment related to the DICE model.

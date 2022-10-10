@@ -20,7 +20,7 @@ import net.finmath.time.TimeDiscretizationFromArray;
  * Note: The code makes some small simplification: it uses a constant external forcings.
  * It may still be useful for illustration.
  */
-public class ClimateModelExperiment {
+public class DICEModelExperiment {
 
 	private static final double timeStep = 1.0;
 	private static final double timeHorizon = 100.0;

@@ -15,9 +15,9 @@ import net.finmath.time.TimeDiscretization;
 import net.finmath.time.TimeDiscretizationFromArray;
 
 /*
- * Experiment related to the Stochastic DICE model.
- *
- * Note: The code makes some small simplification: it uses a constant external forcings.
+ * Experiment related to the DICE model.
+ * 
+ * Note: The code makes some small simplification: it uses a constant savings rate and a constant external forcings.
  * It may still be useful for illustration.
  */
 public class DICEModelExperiment {

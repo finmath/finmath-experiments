@@ -2,7 +2,6 @@ package net.finmath.experiments.dice;
 
 import java.util.Arrays;
 import java.util.function.Function;
-import java.util.stream.IntStream;
 
 import net.finmath.climate.models.CarbonConcentration;
 import net.finmath.climate.models.ClimateModel;

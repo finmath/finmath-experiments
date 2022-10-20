@@ -20,7 +20,7 @@
 		<finmath-cuda.classifier />
 		<finmath-opencl.classifier>opencl-1.0</finmath-opencl.classifier>
 		<!-- maven plugins -->
-		<compiler-plugin.version>3.8.1</compiler-plugin.version>
+		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<surefire-plugin.version>3.0.0-M4</surefire-plugin.version>
 		<surefire-report-plugin.version>3.0.0-M4</surefire-report-plugin.version>
 		<javadoc-plugin.version>3.1.1</javadoc-plugin.version>
@@ -73,7 +73,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${compiler-plugin.version}</version>
+				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
 					<release>11</release>
 					<source>11</source>

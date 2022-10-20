@@ -7,6 +7,11 @@ import net.finmath.plots.DoubleToRandomVariableFunction;
 import net.finmath.plots.PlotProcess2D;
 import net.finmath.time.TimeDiscretizationFromArray;
 
+/**
+ * Simple program plotting paths of a Black Scholes model.
+ * 
+ * @author Christian Fries
+ */
 public class BlackSchoesModelPathsPlot {
 
 	public static void main(String[] args) {
@@ -14,6 +19,10 @@ public class BlackSchoesModelPathsPlot {
 		double modelRiskFreeRate = 0.05; 	// r
 		double modelVolatility = 0.20;		// σ
 
+		/*
+		 * Monte Carlo Simulation
+		 */
+		
 		// Create a model
 		var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility);
 
@@ -23,7 +32,11 @@ public class BlackSchoesModelPathsPlot {
 		var process = new EulerSchemeFromProcessModel(model, brownianMotion);
 
 		// Create a function, plotting paths t -> S(t)
-		DoubleToRandomVariableFunction paths = time -> process.getProcessValue(td.getTimeIndex(time), 0 /* assetIndex */);
+		DoubleToRandomVariableFunction paths = time -> process.getProcessValue(td.getTimeIndex(time), 0 /* assetIndex: 0 is S(t) */);
+
+		/*
+		 * Plot
+		 */
 
 		// Plot 100 of paths against the given time discretization.
 		var plot = new PlotProcess2D(td, paths, 100);

@@ -38,7 +38,7 @@ import net.finmath.time.businessdaycalendar.BusinessdayCalendar.DateRollConventi
  * 
  * @author Christian Fries
  */
-public class DiscountCurveExperiments {
+public class CurveExperiments {
 
 	public static void main(String[] args) throws CloneNotSupportedException {
 

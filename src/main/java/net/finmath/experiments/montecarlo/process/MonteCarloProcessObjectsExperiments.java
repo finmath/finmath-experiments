@@ -22,6 +22,20 @@ import net.finmath.stochastic.Scalar;
 import net.finmath.time.TimeDiscretization;
 import net.finmath.time.TimeDiscretizationFromArray;
 
+/**
+ * A collection of small demos (with lots of repetitions) showing
+ * how to use the basic interfaces (and some implementations) related
+ * to the Monte-Carlo Simulation of Time Discretizations of Itô stochastic
+ * processes.
+ * 
+ * The last examples will perform a Monte-Carlo valuation of an European
+ * option under a Black-Scholes model.
+ * 
+ * These building blocks can be re-used to build different and more complex
+ * models (e.g. interest rate term structure models).
+ * 
+ * @author Christian Fries
+ */
 public class MonteCarloProcessObjectsExperiments {
 
 	public static void main(String[] args) throws CalculationException {
@@ -31,7 +45,8 @@ public class MonteCarloProcessObjectsExperiments {
 		MonteCarloProcessObjectsExperiments.testBlackScholesDirectWay();
 		MonteCarloProcessObjectsExperiments.testEulerSchemeWithProcessModelDirectWay();
 		MonteCarloProcessObjectsExperiments.testEulerSchemeWithBlackScholesModel();
-		MonteCarloProcessObjectsExperiments.testValuation();		
+		MonteCarloProcessObjectsExperiments.testValuationDirectWay();
+		MonteCarloProcessObjectsExperiments.testValuationUsingProduct();
 	}
 
 	public static void testRandomVariable() {
@@ -55,7 +70,7 @@ public class MonteCarloProcessObjectsExperiments {
 		 * Since we focus on RandomVariables resulting from evaluating a stochastic process,
 		 * RandomVariables carry a time parameter (denoting the filtration time).
 		 */
-		double time = 1.0;	// No relevance in our examples
+		double time = 1.0;	// No relevance in this example. Will be useful, when considering processes
 		RandomVariable X = new RandomVariableFromDoubleArray(time , new double[] { 2.0, 3.0, 1.0, 4.0});
 
 		/*
@@ -101,7 +116,7 @@ public class MonteCarloProcessObjectsExperiments {
 		System.out.println("time " + time + " ⟶ " + "timeIndex " + timeIndex);
 
 		double timeStep = timeDiscretization.getTimeStep(timeIndex);
-		System.out.println(timeIndex + " timeStep " + timeStep);
+		System.out.println("timeIndex " + timeIndex + ": timeStep = " + timeStep);
 	}
 
 	public static void testBrownianMotion() {
@@ -137,36 +152,33 @@ public class MonteCarloProcessObjectsExperiments {
 			X[i+1] = X[i].add(deltaW);
 		}
 
-		PlotProcess2D plot = new PlotProcess2D(timeDiscretization,
-				(DoubleToRandomVariableFunction)time -> X[timeDiscretization.getTimeIndex(time)], 100);
+		// t -> X(t)
+		DoubleToRandomVariableFunction paths = time -> X[timeDiscretization.getTimeIndex(time)];
+		
+		PlotProcess2D plot = new PlotProcess2D(timeDiscretization, paths, 100);
 		plot.setTitle("Paths of a BrownianMotion").setXAxisLabel("time").setYAxisLabel("value").show();
 	}
 
 	public static void testBlackScholesDirectWay() {
 
-		/*
-		 * A Brownian Motion takes a TimeDiscretization and a RandomNumberGenerator
-		 * and creates a set of RandomVariable-s representing the increments of
-		 * a n-dimensional Brownian motion.
-		 */
-
+		// TimeDiscretization
 		double initialTime = 0.0;
 		int numberOfTimeSteps = 50;
 		double dt = 0.5;
 		TimeDiscretization timeDiscretization = new TimeDiscretizationFromArray(initialTime, numberOfTimeSteps, dt);
 
+		// BrownianMotion
 		int numberOfFactors = 1;
 		int numberOfPaths = 10000;
 		int randomNumberSeed = 3141;
-		BrownianMotion brownianMotion = new BrownianMotionFromMersenneRandomNumbers(
-				timeDiscretization, numberOfFactors, numberOfPaths, randomNumberSeed);
+		BrownianMotion brownianMotion = new BrownianMotionFromMersenneRandomNumbers(timeDiscretization, numberOfFactors, numberOfPaths, randomNumberSeed);
 
 		/*
-		 * An Euler scheme for dX = r X dt + sigma X dW
+		 * A Log-Euler scheme for dX = r X dt + σ X dW
 		 */
-		double initialValue = 100.0;
-		double riskFreeRate = 0.05;
-		double volatility = 0.10;
+		double initialValue = 100.0;	// X(0)
+		double riskFreeRate = 0.05;		// r
+		double volatility = 0.10;		// σ
 		RandomVariable[] X = new RandomVariable[timeDiscretization.getNumberOfTimes()];
 		X[0] = new Scalar(initialValue);
 		for(int i=0; i<timeDiscretization.getNumberOfTimeSteps(); i++) {
@@ -176,8 +188,10 @@ public class MonteCarloProcessObjectsExperiments {
 					(deltaW.mult(volatility).add((riskFreeRate - 0.5 * volatility*volatility) * deltaT)).exp());
 		}
 
-		PlotProcess2D plot = new PlotProcess2D(timeDiscretization,
-				(DoubleToRandomVariableFunction)time -> X[timeDiscretization.getTimeIndex(time)], 100);
+		// t -> X(t)
+		DoubleToRandomVariableFunction paths = time -> X[timeDiscretization.getTimeIndex(time)];
+		
+		PlotProcess2D plot = new PlotProcess2D(timeDiscretization, paths, 100);
 		plot.setTitle("Paths of a Black-Scholes Model\n(using direct spec of Euler scheme)").setXAxisLabel("time").setYAxisLabel("value").show();
 
 	}
@@ -189,17 +203,13 @@ public class MonteCarloProcessObjectsExperiments {
 		System.out.println(EulerSchemeFromProcessModel.class.getTypeName());
 		System.out.println("_".repeat(79));
 
-		/*
-		 * A Brownian Motion takes a TimeDiscretization and a RandomNumberGenerator
-		 * and creates a set of RandomVariable-s representing the increments of
-		 * a n-dimensional Brownian motion.
-		 */
-
+		// TimeDiscretization
 		double initialTime = 0.0;
 		int numberOfTimeSteps = 50;
 		double dt = 0.5;
 		TimeDiscretization timeDiscretization = new TimeDiscretizationFromArray(initialTime, numberOfTimeSteps, dt);
 
+		// BrownianMotion
 		int numberOfFactors = 1;
 		int numberOfPaths = 10000;
 		int randomNumberSeed = 3141;
@@ -207,22 +217,22 @@ public class MonteCarloProcessObjectsExperiments {
 				timeDiscretization, numberOfFactors, numberOfPaths, randomNumberSeed);
 
 		/*
-		 * An Euler scheme for dX = r X dt + sigma X dW
-		 * dY = (r - 0.5 sigma^2) dt + sigma dW, f = exp
+		 * Model specification for dX = r X dt + σ X dW discretized using
+		 * X = f(Y), f = exp, dY = (r - 0.5 σ²) dt + σ dW, Y(0) = log(X(0))
 		 */
-		double initialValue = 100.0;
-		double riskFreeRate = 0.05;
-		double volatility = 0.10;
+		double initialValue = 100.0;		// X(0)
+		double riskFreeRate = 0.05;			// r
+		double volatility = 0.10;			// σ
 
 		ProcessModel processModel = new ProcessModel() {
 			@Override
 			public LocalDateTime getReferenceDate() {
-				return LocalDateTime.now();
+				return LocalDateTime.now();		// the date associated with t=0 (not used)
 			}
 
 			@Override
 			public int getNumberOfComponents() {
-				return 1;
+				return 1;						// dimension of the process: d
 			}
 
 			@Override
@@ -266,6 +276,7 @@ public class MonteCarloProcessObjectsExperiments {
 			}
 		};
 
+		// Use EulerSchemeFromProcessModel to generate the time-discrete process
 		MonteCarloProcess process = new EulerSchemeFromProcessModel(processModel, brownianMotion);
 
 		DoubleToRandomVariableFunction paths = time -> process.getProcessValue(timeDiscretization.getTimeIndex(time))[0];
@@ -274,32 +285,27 @@ public class MonteCarloProcessObjectsExperiments {
 	}
 
 	public static void testEulerSchemeWithBlackScholesModel() {
-		/*
-		 * A Brownian Motion takes a TimeDiscretization and a RandomNumberGenerator
-		 * and creates a set of RandomVariable-s representing the increments of
-		 * a n-dimensional Brownian motion.
-		 */
 
+		// TimeDiscretization
 		double initialTime = 0.0;
 		int numberOfTimeSteps = 50;
 		double dt = 0.5;
 		TimeDiscretization timeDiscretization = new TimeDiscretizationFromArray(initialTime, numberOfTimeSteps, dt);
 
+		// BrownianMotion
 		int numberOfFactors = 1;
 		int numberOfPaths = 10000;
 		int randomNumberSeed = 3141;
 		BrownianMotion brownianMotion = new BrownianMotionFromMersenneRandomNumbers(
 				timeDiscretization, numberOfFactors, numberOfPaths, randomNumberSeed);
 
-		/*
-		 * An Euler scheme for dX = r X dt + sigma X dW
-		 * dY = (r - 0.5 sigma^2) dt + sigma dW, f = exp
-		 */
-		double initialValue = 100.0;
-		double riskFreeRate = 0.05;
-		double volatility = 0.10;
-
+		// Model X - BlackScholesModel Parameters
+		double initialValue = 100.0;		// X(0)
+		double riskFreeRate = 0.05;			// r
+		double volatility = 0.10;			// σ
 		ProcessModel processModel = new BlackScholesModel(initialValue, riskFreeRate, volatility);
+
+		// Time Discrete Process X
 		MonteCarloProcess process = new EulerSchemeFromProcessModel(processModel, brownianMotion);
 
 		DoubleToRandomVariableFunction paths = time -> process.getProcessValue(timeDiscretization.getTimeIndex(time))[0];
@@ -307,39 +313,44 @@ public class MonteCarloProcessObjectsExperiments {
 		plot.setTitle("Paths of a Black-Scholes Model\n(using EulerSchemeFromProcessModel and BlackScholesModel)").setXAxisLabel("time").setYAxisLabel("value").show();		
 	}
 
-	public static void testValuation() throws CalculationException {
+	public static void testValuationDirectWay() throws CalculationException {
 
 		System.out.println("\n");
-		System.out.println("Valuation:");
+		System.out.println("Valuation (direct way):");
 		System.out.println("_".repeat(79));
 
-		/*
-		 * Use implementation providing a BlackScholesModel
-		 */
-		double initialValue = 100.0;
-		double riskFreeRate = 0.05;
-		double sigma = 0.3;
+		// Model X - BlackScholesModel Parameters
+		double initialValue = 100.0;		// X(0)
+		double riskFreeRate = 0.05;			// r
+		double sigma = 0.30;			// σ
 		ProcessModel processModel = new BlackScholesModel(initialValue, riskFreeRate, sigma);
 
+		// TimeDiscretization
 		double initialTime = 0.0;
 		int numberOfTimeSteps = 50;
 		double dt = 0.5;
 		TimeDiscretization timeDiscretization = new TimeDiscretizationFromArray(initialTime, numberOfTimeSteps, dt);
 
+		// BrownianMotion
 		int numberOfFactors = 1;
 		int numberOfPaths = 100000;
 		int randomNumberSeed = 3141;
 		BrownianMotion brownianMotion = new BrownianMotionFromMersenneRandomNumbers(timeDiscretization, numberOfFactors, numberOfPaths, randomNumberSeed);
 
+		// Time discrete process (Euler Scheme)
 		MonteCarloProcess process = new EulerSchemeFromProcessModel(processModel, brownianMotion);
 
-		double maturity = 10.0;
-		double strike = 160.0;
-		RandomVariable underlying = process.getProcessValue(process.getTimeIndex(maturity))[0];
-		RandomVariable payoff = underlying.sub(strike).floor(0.0);
-		RandomVariable numeraireAtPayment = processModel.getNumeraire(process, maturity);
-		RandomVariable numeraireAtValuation = processModel.getNumeraire(process, initialTime);
-		
+		/*
+		 * Valuation of paying max(S(T)-K,0) in T
+		 */
+		double maturity = 10.0;	// T
+		double strike = 160.0;	// K
+		RandomVariable underlying = process.getProcessValue(process.getTimeIndex(maturity))[0];	// S(T)
+		RandomVariable payoff = underlying.sub(strike).floor(0.0);								// V(T)
+		RandomVariable numeraireAtPayment = processModel.getNumeraire(process, maturity);		// N(T)
+		RandomVariable numeraireAtValuation = processModel.getNumeraire(process, initialTime);	// N(0)
+
+		// V(0) = E( V(T) / N(T) * N(0) )
 		double value = payoff.div(numeraireAtPayment).mult(numeraireAtValuation).average().doubleValue();
 		double valueAnalytic = AnalyticFormulas.blackScholesOptionValue(initialValue, riskFreeRate, sigma, maturity, strike);
 		
@@ -350,5 +361,49 @@ public class MonteCarloProcessObjectsExperiments {
 		MonteCarloProduct product = new EuropeanOption(maturity, strike);
 		double value2 = product.getValue(model);
 		System.out.println("value...............: " + value2);
+	}
+
+	public static void testValuationUsingProduct() throws CalculationException {
+
+		System.out.println("\n");
+		System.out.println("Valuation (using product):");
+		System.out.println("_".repeat(79));
+
+		// Model X - BlackScholesModel Parameters
+		double initialValue = 100.0;		// X(0)
+		double riskFreeRate = 0.05;			// r
+		double sigma = 0.30;			// σ
+		ProcessModel processModel = new BlackScholesModel(initialValue, riskFreeRate, sigma);
+
+		// TimeDiscretization
+		double initialTime = 0.0;
+		int numberOfTimeSteps = 50;
+		double dt = 0.5;
+		TimeDiscretization timeDiscretization = new TimeDiscretizationFromArray(initialTime, numberOfTimeSteps, dt);
+
+		// BrownianMotion
+		int numberOfFactors = 1;
+		int numberOfPaths = 100000;
+		int randomNumberSeed = 3141;
+		BrownianMotion brownianMotion = new BrownianMotionFromMersenneRandomNumbers(timeDiscretization, numberOfFactors, numberOfPaths, randomNumberSeed);
+
+		// Time discrete process (Euler Scheme)
+		MonteCarloProcess process = new EulerSchemeFromProcessModel(processModel, brownianMotion);
+
+		/*
+		 * Valuation of paying max(S(T)-K,0) in T
+		 */
+		double maturity = 10.0;	// T
+		double strike = 160.0;	// K
+
+		MonteCarloAssetModel model = new MonteCarloAssetModel(process);
+		MonteCarloProduct product = new EuropeanOption(maturity, strike);
+		double value = product.getValue(model);
+
+		double valueAnalytic = AnalyticFormulas.blackScholesOptionValue(initialValue, riskFreeRate, sigma, maturity, strike);
+		
+		System.out.println("value...............: " + value);
+		System.out.println("value analytic......: " + valueAnalytic);
+		
 	}
 }

@@ -50,6 +50,11 @@ public class CurveExperiments {
 		testSchedule();
 	}
 
+	/**
+	 * A simple playground to visualize different interpolation methods on different interpolation entities.
+	 * 
+	 * @throws CloneNotSupportedException
+	 */
 	private static void testCurve() throws CloneNotSupportedException {
 		Curve curve = new CurveInterpolation("curve", null,
 				InterpolationMethod.PIECEWISE_CONSTANT,
@@ -66,7 +71,10 @@ public class CurveExperiments {
 		
 		(new Plot2D(0.0, 15.0, interpolation)).show();
 	}
-	
+
+	/**
+	 * A simple playground creating two curves.
+	 */
 	private static void testSwapLeg() {
 		final LocalDate referenceDate = LocalDate.of(2022, 11, 23);
 		

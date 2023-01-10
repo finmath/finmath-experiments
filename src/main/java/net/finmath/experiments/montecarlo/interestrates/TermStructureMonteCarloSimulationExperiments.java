@@ -81,7 +81,7 @@ public class TermStructureMonteCarloSimulationExperiments {
 		final boolean useDiscountCurve = false;
 		final double volatility = 0.20;					// constant volatility
 		final double localVolNormalityBlend = 0.0;		// Lognormal model
-		final double correlationDecayParam = 0.03;		// one factor, correlation of all drivers is 1
+		final double correlationDecayParam = 0.03;		// only matters if numberOfFactors > 1
 		final double simulationTimeStep = periodLength;
 		final String measure = "terminal";
 		final int	 numberOfPaths	= 50000;
@@ -101,6 +101,7 @@ public class TermStructureMonteCarloSimulationExperiments {
 				numberOfPaths, seed);
 	
 		DoubleToRandomVariableFunction curves = periodStart -> simulationModel.getForwardRate(time, periodStart, periodStart+periodLength);
+		
 		PlotProcess2D plot = new PlotProcess2D(new TimeDiscretizationFromArray(time, 20, periodLength), curves, 100);
 		plot.setTitle("Forward curves T ⟼ L(T,T+∆T;t) (t = " + time + ", factors: " + numberOfFactors + ", measure: " + measure + ")").setXAxisLabel("period start T").setYAxisLabel("forward rate L").setYAxisNumberFormat(new DecimalFormat("#.##%")).show();
 		plot.show();
@@ -142,7 +143,7 @@ public class TermStructureMonteCarloSimulationExperiments {
 			System.out.println(String.format("\nZero Bond Approximation Errors (measure=%s, discount curve control=%s)", measure, useDiscountCurve));
 			System.out.println(String.format("%15s \t %15s \t %25s", "maturity", "value", "error"));
 			System.out.println("_".repeat(79));
-			for(double maturity = 0.5; maturity <= 20; maturity += 0.5) {
+			for(double maturity = 0.5; maturity <= timeHorizon; maturity += periodLength) {
 				final TermStructureMonteCarloProduct product = new Bond(maturity);
 				final double value = product.getValue(simulationModel);
 				final double yieldMonteCarlo = -Math.log(value)/maturity;

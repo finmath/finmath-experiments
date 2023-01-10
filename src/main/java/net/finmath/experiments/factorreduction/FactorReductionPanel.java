@@ -390,27 +390,27 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		 * Create the time discretization of the processes
 		 */
 		final double lastTime = 25.0, dt = 0.25;
-		final double[] liborPeriodDiscretization = new double[(int)(lastTime/dt)+1];
+		final double[] tenorTimeDiscretization = new double[(int)(lastTime/dt)+1];
 		for(int i=0; i<(lastTime/dt)+1; i++) {
-			liborPeriodDiscretization[i] = i * dt;
+			tenorTimeDiscretization[i] = i * dt;
 		}
 
 		/*
 		 * Create instanteaneous correlation matrix
 		 */
-		final double[][] originalCorrelationMatrix = createCorrelationMatirxFromFunctionalForm(
-				liborPeriodDiscretization,
+		final double[][] originalCorrelationMatrix = createCorrelationMatrixFromFunctionalForm(
+				tenorTimeDiscretization,
 				correlationParameter);
 
 		/*
-		 * Get the full factor matrix
+		 * Get the reduced factor and the full factor matrix
 		 */
-		final double[][] factorMatrixReduced	= LinearAlgebra.factorReduction(originalCorrelationMatrix, numberOfFactors);
-		final double[][] factorMatrixFull		= LinearAlgebra.factorReduction(originalCorrelationMatrix, originalCorrelationMatrix.length);
-		final double[][] reducedCorrelationMatrix = LinearAlgebra.multMatrices(factorMatrixReduced, LinearAlgebra.transpose(factorMatrixReduced));
+		final double[][] factorMatrixReduced		= LinearAlgebra.factorReduction(originalCorrelationMatrix, numberOfFactors);
+		final double[][] factorMatrixFull			= LinearAlgebra.factorReduction(originalCorrelationMatrix, originalCorrelationMatrix.length);
+		final double[][] reducedCorrelationMatrix	= LinearAlgebra.multMatrices(factorMatrixReduced, LinearAlgebra.transpose(factorMatrixReduced));
 
 		/*
-		 * Buid datasets
+		 * Buid datasets for plot
 		 */
 		final int		numberOfValues	= originalCorrelationMatrix.length * originalCorrelationMatrix.length;
 		final double[]	xValues			= new double[numberOfValues];
@@ -476,7 +476,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 	 * @param parameterA The parameter a
 	 * @return The correlation matrix.
 	 */
-	public static double[][] createCorrelationMatirxFromFunctionalForm(
+	public static double[][] createCorrelationMatrixFromFunctionalForm(
 			double[]    tenorTimeDiscretization,
 			double      parameterA) {
 

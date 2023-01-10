@@ -17,6 +17,7 @@ import net.finmath.montecarlo.process.EulerSchemeFromProcessModel;
 import net.finmath.montecarlo.process.MonteCarloProcess;
 import net.finmath.plots.DoubleToRandomVariableFunction;
 import net.finmath.plots.PlotProcess2D;
+import net.finmath.plots.Plots;
 import net.finmath.stochastic.RandomVariable;
 import net.finmath.stochastic.Scalar;
 import net.finmath.time.TimeDiscretization;
@@ -39,14 +40,22 @@ import net.finmath.time.TimeDiscretizationFromArray;
 public class MonteCarloProcessObjectsExperiments {
 
 	public static void main(String[] args) throws CalculationException {
-		MonteCarloProcessObjectsExperiments.testRandomVariable();
-		MonteCarloProcessObjectsExperiments.testTimeDiscretization();
-		MonteCarloProcessObjectsExperiments.testBrownianMotion();
-		MonteCarloProcessObjectsExperiments.testBlackScholesDirectWay();
-		MonteCarloProcessObjectsExperiments.testEulerSchemeWithProcessModelDirectWay();
-		MonteCarloProcessObjectsExperiments.testEulerSchemeWithBlackScholesModel();
-		MonteCarloProcessObjectsExperiments.testValuationDirectWay();
-		MonteCarloProcessObjectsExperiments.testValuationUsingProduct();
+//		testRandomVariable();
+//		testTimeDiscretization();
+
+//		testBrownianMotion();
+		
+//		testBlackScholesDirectWay();
+		
+		// Euler Scheme
+//		testEulerSchemeWithProcessModelDirectWay();
+		
+		// Euler Scheme with Model		
+		testEulerSchemeWithBlackScholesModel();
+		
+		// Valuation
+//		testValuationDirectWay();
+//		testValuationUsingProduct();
 	}
 
 	public static void testRandomVariable() {
@@ -78,7 +87,7 @@ public class MonteCarloProcessObjectsExperiments {
 		 * Methods provided by a RandomVariable are basic arithmetic operations.
 		 * RandomVariables are immutable: The result of such a method is a new random variable.
 		 */
-
+		
 		RandomVariable Z = X.mult(Y);
 
 		RandomVariable V = Z.average();
@@ -109,14 +118,21 @@ public class MonteCarloProcessObjectsExperiments {
 		 * Method to obtain time step sizes &Delta; t_i = t_{i+1}-t_{i}
 		 */
 
-		TimeDiscretization timeDiscretization = new TimeDiscretizationFromArray(0.0, 1.0, 2.0, 3.0);
+		TimeDiscretization timeDiscretization1 = new TimeDiscretizationFromArray(0.0, 1.0, 3.0, 5.0);
+		System.out.println("timeDiscretization1: " + timeDiscretization1);
 
 		double time = 1.5;
-		int timeIndex = timeDiscretization.getTimeIndexNearestLessOrEqual(time);
-		System.out.println("time " + time + " ⟶ " + "timeIndex " + timeIndex);
+		int timeIndex = timeDiscretization1.getTimeIndexNearestLessOrEqual(time);
+		System.out.println("time " + time + " ⟶ " + "timeIndex (m(t)) " + timeIndex);
 
-		double timeStep = timeDiscretization.getTimeStep(timeIndex);
+		double timeStep = timeDiscretization1.getTimeStep(timeIndex);
 		System.out.println("timeIndex " + timeIndex + ": timeStep = " + timeStep);
+		
+		/*
+		 * 20 time steps of size 0.5, starting in 0.0
+		 */
+		TimeDiscretization timeDiscretization2 = new TimeDiscretizationFromArray(0.0, 20, 0.5);
+		System.out.println("timeDiscretization2: " + timeDiscretization2);
 	}
 
 	public static void testBrownianMotion() {
@@ -142,8 +158,10 @@ public class MonteCarloProcessObjectsExperiments {
 		BrownianMotion brownianMotion = new BrownianMotionFromMersenneRandomNumbers(
 				timeDiscretization, numberOfFactors, numberOfPaths, randomNumberSeed);
 
+		System.out.println("brownianMotion: " + brownianMotion);
+		
 		/*
-		 * An Euler scheme for dX = dW
+		 * An Euler scheme for dX = dW - that is: create W(t_{i}), i = 0, 1, ...
 		 */
 		RandomVariable[] X = new RandomVariable[timeDiscretization.getNumberOfTimes()];
 		X[0] = new Scalar(0.0);
@@ -174,7 +192,8 @@ public class MonteCarloProcessObjectsExperiments {
 		BrownianMotion brownianMotion = new BrownianMotionFromMersenneRandomNumbers(timeDiscretization, numberOfFactors, numberOfPaths, randomNumberSeed);
 
 		/*
-		 * A Log-Euler scheme for dX = r X dt + σ X dW
+		 * A Log-Euler scheme for dX = r X dt + σ X dW,   X(t_{i}) = X[i]
+		 * X[i+1] = X|i] exp( (r-1/2 σ^2) Delta t_{i} + σ Delta W(t_{i})
 		 */
 		double initialValue = 100.0;	// X(0)
 		double riskFreeRate = 0.05;		// r

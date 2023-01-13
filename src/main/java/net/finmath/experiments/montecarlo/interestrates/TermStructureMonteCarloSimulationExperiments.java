@@ -69,7 +69,7 @@ public class TermStructureMonteCarloSimulationExperiments {
 //		experiments.testForwardRateUnderMeasure();
 
 		// Caplet implied volatility as a function of strike (aka "smile")
-		experiments.testCapletSmileIsFlat();
+//		experiments.testCapletSmileIsFlat();
 //		experiments.testCapletSmileForLognormalToNormal();
 		
 		// Caplet implied volatility as a function of maturity
@@ -78,7 +78,7 @@ public class TermStructureMonteCarloSimulationExperiments {
 //		experiments.testCapletATMImpliedVolInterpolation();
 
 		// Terminal correlation
-//		experiments.plotTerminalCorrelations();
+		experiments.plotTerminalCorrelations();
 
 //		experiments.testShortRate();
 //		experiments.testCapletSmilesOnGPU();
@@ -285,11 +285,11 @@ public class TermStructureMonteCarloSimulationExperiments {
 			/*
 			 * Value different products
 			 */
-			final double maturity = 5.0;
+			final double maturity = 5.0;		// T_{i} = 5.0
 			final List<Double> strikes = new ArrayList<Double>();
 			final List<Double> impliedVolatilities = new ArrayList<Double>();
 
-			for(double strike = 0.025; strike < 0.10; strike += 0.0025) {
+			for(double strike = 0.025; strike < 0.10; strike += 0.0025) {		// K
 
 				final TermStructureMonteCarloProduct product = new Caplet(maturity, periodLength, strike);
 				final double value = product.getValue(lmm);
@@ -298,7 +298,7 @@ public class TermStructureMonteCarloSimulationExperiments {
 				 * Conversion to implied volatility
 				 */
 				// Determine the zero bond at payment (numerically)
-				final TermStructureMonteCarloProduct bondAtPayment = new Bond(maturity+periodLength);
+				final TermStructureMonteCarloProduct bondAtPayment = new Bond(maturity+periodLength);  // P(T_{i+1};0)
 				final double discountFactor = bondAtPayment.getValue(lmm);
 
 				// Determine the forward rate at fixing (numerically)
@@ -661,7 +661,7 @@ public class TermStructureMonteCarloSimulationExperiments {
 		final boolean useDiscountCurve = false;
 		final double volatility = 0.30;					// constant volatility - see below
 		final double localVolNormalityBlend = 1.0;		// Lognormal (0) or normal (1)
-		final double correlationDecayParam = numberOfFactors == 1 ? 0.0 : 5.0;		// one factor or stong de-correlation
+		final double correlationDecayParam = numberOfFactors == 1 ? 0.0 : 5.0;		// one factor or strong de-correlation
 		final double simulationTimeStep = periodLength;
 		final String measure = "spot";
 		final int	 numberOfPaths	= 1000;

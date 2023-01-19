@@ -3,11 +3,13 @@
  */
 package net.finmath.experiments.factorreduction;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Paint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
@@ -24,6 +26,7 @@ import javax.swing.SwingConstants;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.renderer.PaintScale;
 import org.jfree.chart.renderer.xy.XYBlockRenderer;
 import org.jfree.data.xy.DefaultXYZDataset;
 import org.jfree.data.xy.XYSeries;
@@ -204,7 +207,14 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		final NumberAxis xAxis = new NumberAxis("column");
 		final NumberAxis yAxis = new NumberAxis("row");
 		final NumberAxis zAxis = new NumberAxis("correlation");
-		final HuePaintScale paintScale = new HuePaintScale(-1.0,1.0);
+		final HuePaintScale paintScale = new HuePaintScale(-1.0, 1.0) {
+			@Override
+			public Paint getPaint(double value) {
+				if(value > getUpperBound() || value < getLowerBound() || Double.isNaN(value)) {
+					return Color.GRAY;
+				}
+				return Color.getHSBColor((float) ((-value-getLowerBound()) / (getUpperBound()-getLowerBound()) * 240.0/360.0), 1.0f, 1.0f);
+			}};
 
 		final JPanel correlationPlotFull = new JPanel();
 		correlationPlotFull.setLayout(new BoxLayout(correlationPlotFull, BoxLayout.X_AXIS));
@@ -383,7 +393,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		/*
 		 * Create the time discretization of the processes
 		 */
-		final double lastTime = 25.0, dt = 0.25;
+		final double lastTime = 100.0, dt = 1.0;
 		final double[] tenorTimeDiscretization = new double[(int)(lastTime/dt)+1];
 		for(int i=0; i<(lastTime/dt)+1; i++) {
 			tenorTimeDiscretization[i] = i * dt;

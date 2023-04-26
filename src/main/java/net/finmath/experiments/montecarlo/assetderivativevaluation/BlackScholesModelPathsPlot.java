@@ -1,24 +1,10 @@
 package net.finmath.experiments.montecarlo.assetderivativevaluation;
 
-import java.awt.Color;
-import java.awt.Rectangle;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-
 import net.finmath.montecarlo.BrownianMotionFromMersenneRandomNumbers;
 import net.finmath.montecarlo.assetderivativevaluation.models.BlackScholesModel;
 import net.finmath.montecarlo.process.EulerSchemeFromProcessModel;
 import net.finmath.plots.DoubleToRandomVariableFunction;
-import net.finmath.plots.GraphStyle;
-import net.finmath.plots.Named;
-import net.finmath.plots.Plot2D;
 import net.finmath.plots.PlotProcess2D;
-import net.finmath.plots.Plotable2D;
-import net.finmath.plots.PlotableFunction2D;
 import net.finmath.time.TimeDiscretizationFromArray;
 
 public class BlackScholesModelPathsPlot {

@@ -13,14 +13,14 @@
 		<src.test.kotlin.dir>src/test/kotlin</src.test.kotlin.dir>
 		<kotlin.version>1.2.0</kotlin.version>
 		<junit.version>4.13.1</junit.version>
-		<finmath-lib.version>6.0.2</finmath-lib.version>
-		<finmath-plot.version>0.4.5</finmath-plot.version>
+		<finmath-lib.version>6.0.10</finmath-lib.version>
+		<finmath-plot.version>0.4.8</finmath-plot.version>
 		<finmath-opencl.version>5.1.3</finmath-opencl.version>
 		<finmath-cuda.version>5.1.3</finmath-cuda.version>
 		<finmath-cuda.classifier />
 		<finmath-opencl.classifier>opencl-1.0</finmath-opencl.classifier>
 		<!-- maven plugins -->
-		<compiler-plugin.version>3.8.1</compiler-plugin.version>
+		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<surefire-plugin.version>3.0.0-M4</surefire-plugin.version>
 		<surefire-report-plugin.version>3.0.0-M4</surefire-report-plugin.version>
 		<javadoc-plugin.version>3.1.1</javadoc-plugin.version>
@@ -73,7 +73,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${compiler-plugin.version}</version>
+				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
 					<release>11</release>
 					<source>11</source>

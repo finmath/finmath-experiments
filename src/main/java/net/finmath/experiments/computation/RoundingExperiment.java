@@ -1,5 +1,10 @@
 package net.finmath.experiments.computation;
 
+/**
+ * Simple experiment illustrating 1 + epsilon = 1
+ * 
+ * @author Christian Fries
+ */
 public class RoundingExperiment {
 
 	public static void main(String[] args) {

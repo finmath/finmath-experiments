@@ -1,13 +1,15 @@
 /*
- * Created on 03.06.2004
+ * Created on 03.06.2004, 10.01.2023
  */
 package net.finmath.experiments.factorreduction;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Paint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
@@ -24,6 +26,7 @@ import javax.swing.SwingConstants;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.renderer.PaintScale;
 import org.jfree.chart.renderer.xy.XYBlockRenderer;
 import org.jfree.data.xy.DefaultXYZDataset;
 import org.jfree.data.xy.XYSeries;
@@ -43,23 +46,17 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 	private static final long serialVersionUID = 2852737071726359012L;
 
 	// Some formatters used
-	private static DecimalFormat formatterInt			= new DecimalFormat("0");
+	private static DecimalFormat formatterInt		= new DecimalFormat("0");
 	private static DecimalFormat formatterReal3		= new DecimalFormat("0.000");
-	private static DecimalFormat formatterMaturity		= new DecimalFormat("0.00");
-	private static DecimalFormat formatterPrice		= new DecimalFormat("  0.000%; -0.000%");
-	private static DecimalFormat formatterLIBOR		= new DecimalFormat(" ####.###%;-#####.###%");
-	private static DecimalFormat formatterVolatility	= new DecimalFormat("0.000%");
-	private static DecimalFormat formatterDeviation	= new DecimalFormat(" 0.00000E00;-0.00000E00");
-	private static DecimalFormat formatterPercent		= new DecimalFormat("##0%");
 
 	/*
 	 * Data of this applet
 	 */
 
-	private int		numberOfFactors		= 3;
-	private double	correlationParameter	= 0.1;
+	private int		numberOfFactors				= 3;
+	private double	correlationDecayParameter	= 0.1;
 
-	private Thread		calculationThread		= null;
+	private Thread	calculationThread		= null;
 
 	private final JTextField	numberOfFactorsLabel	= new JTextField("3");
 
@@ -210,7 +207,14 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		final NumberAxis xAxis = new NumberAxis("column");
 		final NumberAxis yAxis = new NumberAxis("row");
 		final NumberAxis zAxis = new NumberAxis("correlation");
-		final HuePaintScale paintScale = new HuePaintScale(-1.0,1.0);
+		final HuePaintScale paintScale = new HuePaintScale(-1.0, 1.0) {
+			@Override
+			public Paint getPaint(double value) {
+				if(value > getUpperBound() || value < getLowerBound() || Double.isNaN(value)) {
+					return Color.GRAY;
+				}
+				return Color.getHSBColor((float) ((-value-getLowerBound()) / (getUpperBound()-getLowerBound()) * 240.0/360.0), 1.0f, 1.0f);
+			}};
 
 		final JPanel correlationPlotFull = new JPanel();
 		correlationPlotFull.setLayout(new BoxLayout(correlationPlotFull, BoxLayout.X_AXIS));
@@ -301,8 +305,8 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 
 		// Read GUI
 		try {
-			numberOfFactors			= formatterInt.parse(numberOfFactorsLabel.getText()).intValue();
-			correlationParameter		= formatterReal3.parse(correlationParameterA.getText()).doubleValue();
+			numberOfFactors				= formatterInt.parse(numberOfFactorsLabel.getText()).intValue();
+			correlationDecayParameter	= formatterReal3.parse(correlationParameterA.getText()).doubleValue();
 		}
 		catch(final Exception exception) {
 		}
@@ -319,23 +323,23 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		}
 		else if(commandString.equals("Scenario 1")) {
 			numberOfFactors = 1;
-			correlationParameter = 0.1;
+			correlationDecayParameter = 0.1;
 		}
 		else if(commandString.equals("Scenario 2")) {
 			numberOfFactors = 2;
-			correlationParameter = 0.1;
+			correlationDecayParameter = 0.1;
 		}
 		else if(commandString.equals("Scenario 3")) {
 			numberOfFactors = 5;
-			correlationParameter = 0.1;
+			correlationDecayParameter = 0.1;
 		}
 		else if(commandString.equals("Scenario 4")) {
 			numberOfFactors = 2;
-			correlationParameter = 0.005;
+			correlationDecayParameter = 0.005;
 		}
 		else if(commandString.equals("Scenario 5")) {
 			numberOfFactors = 5;
-			correlationParameter = 0.005;
+			correlationDecayParameter = 0.005;
 		}
 
 		// Apply constrains
@@ -348,7 +352,7 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 
 		// Update GUI
 		numberOfFactorsLabel.setText(formatterInt.format(numberOfFactors));
-		correlationParameterA.setText(formatterReal3.format(correlationParameter));
+		correlationParameterA.setText(formatterReal3.format(correlationDecayParameter));
 
 		setContainerEnabled(inputPanel,false);
 		calculationThread = new Thread(this);
@@ -389,28 +393,28 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 		/*
 		 * Create the time discretization of the processes
 		 */
-		final double lastTime = 25.0, dt = 0.25;
-		final double[] liborPeriodDiscretization = new double[(int)(lastTime/dt)+1];
+		final double lastTime = 100.0, dt = 1.0;
+		final double[] tenorTimeDiscretization = new double[(int)(lastTime/dt)+1];
 		for(int i=0; i<(lastTime/dt)+1; i++) {
-			liborPeriodDiscretization[i] = i * dt;
+			tenorTimeDiscretization[i] = i * dt;
 		}
 
 		/*
 		 * Create instanteaneous correlation matrix
 		 */
-		final double[][] originalCorrelationMatrix = createCorrelationMatirxFromFunctionalForm(
-				liborPeriodDiscretization,
-				correlationParameter);
+		final double[][] originalCorrelationMatrix = createCorrelationMatrixFromFunctionalForm(
+				tenorTimeDiscretization,
+				correlationDecayParameter);
 
 		/*
-		 * Get the full factor matrix
+		 * Get the reduced factor and the full factor matrix
 		 */
-		final double[][] factorMatrixReduced	= LinearAlgebra.factorReduction(originalCorrelationMatrix, numberOfFactors);
-		final double[][] factorMatrixFull		= LinearAlgebra.factorReduction(originalCorrelationMatrix, originalCorrelationMatrix.length);
-		final double[][] reducedCorrelationMatrix = LinearAlgebra.multMatrices(factorMatrixReduced, LinearAlgebra.transpose(factorMatrixReduced));
+		final double[][] factorMatrixReduced		= LinearAlgebra.factorReduction(originalCorrelationMatrix, numberOfFactors);
+		final double[][] factorMatrixFull			= LinearAlgebra.factorReduction(originalCorrelationMatrix, originalCorrelationMatrix.length);
+		final double[][] reducedCorrelationMatrix	= LinearAlgebra.multMatrices(factorMatrixReduced, LinearAlgebra.transpose(factorMatrixReduced));
 
 		/*
-		 * Buid datasets
+		 * Buid datasets for plot
 		 */
 		final int		numberOfValues	= originalCorrelationMatrix.length * originalCorrelationMatrix.length;
 		final double[]	xValues			= new double[numberOfValues];
@@ -472,19 +476,19 @@ public class FactorReductionPanel extends JPanel implements ActionListener, Runn
 	 * This method creates an instanteaneous correlation matrix according to the functional form
 	 *  \( rho(i,j) = exp(-a * abs(T_{i}-T_{j}) ) \).
 	 *
-	 * @param tenorTimeDiscretization The maturity discretization of the yield curve.
-	 * @param parameterA The parameter a
+	 * @param tenorTimeDiscretization The maturity discretization of the interest rate curve.
+	 * @param correlationDecayParameter The parameter a
 	 * @return The correlation matrix.
 	 */
-	public static double[][] createCorrelationMatirxFromFunctionalForm(
-			double[]    tenorTimeDiscretization,
-			double      parameterA) {
+	public static double[][] createCorrelationMatrixFromFunctionalForm(
+			double[]	tenorTimeDiscretization,
+			double		correlationDecayParameter) {
 
 		final double[][] correlation = new double[tenorTimeDiscretization.length][tenorTimeDiscretization.length];
 		for(int row=0; row<tenorTimeDiscretization.length; row++) {
 			for(int col=0; col<tenorTimeDiscretization.length; col++) {
 				// Exponentially decreasing instanteaneous correlation
-				correlation[row][col] = Math.exp(-parameterA * Math.abs(tenorTimeDiscretization[row]-tenorTimeDiscretization[col]));
+				correlation[row][col] = Math.exp(-correlationDecayParameter * Math.abs(tenorTimeDiscretization[row]-tenorTimeDiscretization[col]));
 			}
 		}
 		return correlation;

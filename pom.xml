@@ -19,6 +19,7 @@
 		<finmath-cuda.version>5.1.3</finmath-cuda.version>
 		<finmath-cuda.classifier />
 		<finmath-opencl.classifier>opencl-1.0</finmath-opencl.classifier>
+		<openjfx.javafx.version>17.0.7</openjfx.javafx.version>
 		<!-- maven plugins -->
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<surefire-plugin.version>3.0.0-M4</surefire-plugin.version>
@@ -194,12 +195,12 @@
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-base</artifactId>
-			<version>11.0.2</version>
+			<version>${openjfx.javafx.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-controls</artifactId>
-			<version>11.0.2</version>
+			<version>17.0.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openjfx</groupId>

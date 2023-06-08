@@ -40,22 +40,22 @@ import net.finmath.time.TimeDiscretizationFromArray;
 public class MonteCarloProcessObjectsExperiments {
 
 	public static void main(String[] args) throws CalculationException {
-//		testRandomVariable();
-//		testTimeDiscretization();
+		testRandomVariable();
+		testTimeDiscretization();
 
-//		testBrownianMotion();
+		testBrownianMotion();
 		
-//		testBlackScholesDirectWay();
+		testBlackScholesDirectWay();
 		
 		// Euler Scheme
-//		testEulerSchemeWithProcessModelDirectWay();
+		testEulerSchemeWithProcessModelDirectWay();
 		
 		// Euler Scheme with Model		
 		testEulerSchemeWithBlackScholesModel();
 		
 		// Valuation
-//		testValuationDirectWay();
-//		testValuationUsingProduct();
+		testValuationDirectWay();
+		testValuationUsingProduct();
 	}
 
 	public static void testRandomVariable() {

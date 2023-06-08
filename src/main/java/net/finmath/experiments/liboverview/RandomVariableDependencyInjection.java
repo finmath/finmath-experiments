@@ -6,6 +6,11 @@ import net.finmath.montecarlo.automaticdifferentiation.RandomVariableDifferentia
 import net.finmath.montecarlo.automaticdifferentiation.backward.RandomVariableDifferentiableAADFactory;
 import net.finmath.stochastic.RandomVariable;
 
+/**
+ * Demonstrate RandomVariable and dependency injection via different implementations of RandomVariable operations.
+ * 
+ * @author Christian Fries
+ */
 public class RandomVariableDependencyInjection {
 
 	public static void main(String[] args) {
@@ -17,7 +22,7 @@ public class RandomVariableDependencyInjection {
 
 	public static RandomVariable someFunction(RandomVariable x) {
 
-		// y = exp(-0.5 x^2)
+		// y = exp(-0.5 * x * x)
 		RandomVariable y = x.squared().mult(-0.5).exp();
 
 		return y;
@@ -37,6 +42,7 @@ public class RandomVariableDependencyInjection {
 		System.out.println("E(f(x)).......: " + y.average().doubleValue());
 
 		double epsilon = 1E-7;
+		// (f(x+e)-f(x)) / e
 		RandomVariable dydx = someFunction(x.add(epsilon)).sub(someFunction(x)).div(epsilon);
 
 		System.out.println("d/dx E(f(x))..: " + dydx.average().doubleValue());

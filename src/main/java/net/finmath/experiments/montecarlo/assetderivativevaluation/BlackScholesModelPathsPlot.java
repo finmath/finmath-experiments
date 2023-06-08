@@ -18,15 +18,15 @@ public class BlackScholesModelPathsPlot {
 		var model = new BlackScholesModel(modelInitialValue, modelRiskFreeRate, modelVolatility);
 
 		// Create a corresponding MC process from the model
-		var td = new TimeDiscretizationFromArray(0.0, 500, 0.01);
-		var brownianMotion = new BrownianMotionFromMersenneRandomNumbers(td, 1, 10000, 3231);
+		var timeDiscretization = new TimeDiscretizationFromArray(0.0, 500, 0.01);
+		var brownianMotion = new BrownianMotionFromMersenneRandomNumbers(timeDiscretization, 1, 10000, 3231);
 		var process = new EulerSchemeFromProcessModel(model, brownianMotion);
 
 		// Create a function, plotting paths t -> S(t)
-		DoubleToRandomVariableFunction paths = time -> process.getProcessValue(td.getTimeIndex(time), 0 /* assetIndex */);
+		DoubleToRandomVariableFunction paths = time -> process.getProcessValue(timeDiscretization.getTimeIndex(time), 0 /* assetIndex */);
 
 		// Plot 100 of paths against the given time discretization.
-		var plot = new PlotProcess2D(td, paths, 100);
+		var plot = new PlotProcess2D(timeDiscretization, paths, 100);
 		plot.setTitle("Black Scholes model paths t -> S(t, \u03c9\u1D62)").setXAxisLabel("time").setYAxisLabel("value");
 		plot.show();
 	}

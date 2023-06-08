@@ -52,36 +52,36 @@ public class TermStructureMonteCarloSimulationExperiments {
 		TermStructureMonteCarloSimulationExperiments experiments = new TermStructureMonteCarloSimulationExperiments();
 
 		// The dynamic of the forward rate curve in a 1 factor model under Q
-//		experiments.plotForwardCurvesAtTime(0.0 /* observation time */, 1 /* number of factors */);
-//		experiments.plotForwardCurvesAtTime(1.0 /* observation time */, 1 /* number of factors */);
-//		experiments.plotForwardCurvesAtTime(5.0 /* observation time */, 1 /* number of factors */);
+		experiments.plotForwardCurvesAtTime(0.0 /* observation time */, 1 /* number of factors */);
+		experiments.plotForwardCurvesAtTime(1.0 /* observation time */, 1 /* number of factors */);
+		experiments.plotForwardCurvesAtTime(5.0 /* observation time */, 1 /* number of factors */);
 
 		// Approximation error of the zero coupon bond, dependency on the measure
-//		experiments.testBondUnderMeasure(0.5 /* simulationTimeStep */, 10000 /* numberOfPaths */, false /* useDiscountCurve */);
-//		experiments.testBondUnderMeasure(0.5 /* simulationTimeStep */, 50000 /* numberOfPaths */, false /* useDiscountCurve */);
-//		experiments.testBondUnderMeasure(0.5 /* simulationTimeStep */, 250000 /* numberOfPaths */, false /* useDiscountCurve */);
-//		experiments.testBondUnderMeasure(0.1 /* simulationTimeStep */, 50000 /* numberOfPaths */, false /* useDiscountCurve */);
+		experiments.testBondUnderMeasure(0.5 /* simulationTimeStep */, 10000 /* numberOfPaths */, false /* useDiscountCurve */);
+		experiments.testBondUnderMeasure(0.5 /* simulationTimeStep */, 50000 /* numberOfPaths */, false /* useDiscountCurve */);
+		experiments.testBondUnderMeasure(0.5 /* simulationTimeStep */, 250000 /* numberOfPaths */, false /* useDiscountCurve */);
+		experiments.testBondUnderMeasure(0.1 /* simulationTimeStep */, 50000 /* numberOfPaths */, false /* useDiscountCurve */);
 
 		// Approximation error of the zero coupon bond, using a discount curve as a control variate
-//		experiments.testBondUnderMeasure(0.5 /* simulationTimeStep */, 50000 /* numberOfPaths */, true /* useDiscountCurve */);
+		experiments.testBondUnderMeasure(0.5 /* simulationTimeStep */, 50000 /* numberOfPaths */, true /* useDiscountCurve */);
 		
 		// Approximation error of the forward rates
-//		experiments.testForwardRateUnderMeasure();
+		experiments.testForwardRateUnderMeasure();
 
 		// Caplet implied volatility as a function of strike (aka "smile")
-//		experiments.testCapletSmileIsFlat();
-//		experiments.testCapletSmileForLognormalToNormal();
+		experiments.testCapletSmileIsFlat();
+		experiments.testCapletSmileForLognormalToNormal();
 		
 		// Caplet implied volatility as a function of maturity
-//		experiments.testCapletATMImpliedVol(0.5);		// changing maturity in steps of 0.5
-//		experiments.testCapletATMImpliedVol(0.01);
-//		experiments.testCapletATMImpliedVolInterpolation();
+		experiments.testCapletATMImpliedVol(0.5);		// changing maturity in steps of 0.5
+		experiments.testCapletATMImpliedVol(0.01);
+		experiments.testCapletATMImpliedVolInterpolation();
 
 		// Terminal correlation
 		experiments.plotTerminalCorrelations();
 
-//		experiments.testShortRate();
-//		experiments.testCapletSmilesOnGPU();
+		experiments.testShortRate();
+		experiments.testCapletSmilesOnGPU();
 	}
 
 	public TermStructureMonteCarloSimulationExperiments() throws CalculationException {}

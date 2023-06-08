@@ -9,12 +9,15 @@ import net.finmath.montecarlo.BrownianMotion;
 import net.finmath.montecarlo.BrownianMotionFromMersenneRandomNumbers;
 import net.finmath.montecarlo.RandomVariableFromDoubleArray;
 import net.finmath.stochastic.RandomVariable;
+import net.finmath.time.TimeDiscretization;
 import net.finmath.time.TimeDiscretizationFromArray;
 
 /**
- * This is an experiment to test the quality of the random number generator
- * and the discretization scheme.
+ * Monte-Carlo simulation of a time-discrete process.
+ * Time discretization of a log-normal process using the Euler scheme.
  *
+ * Note: We do not use RandomVariable for the arithmetics. This is just for didactical reasons.
+ * 
  * @author Christian Fries
  */
 public class LogProcessEulerScheme implements LognormalProcess
@@ -34,7 +37,7 @@ public class LogProcessEulerScheme implements LognormalProcess
 	 * @param numberOfTimeSteps The number of time steps.
 	 * @param deltaT The time step size.
 	 * @param numberOfPaths The number of Monte-Carlo paths.
-	 * @param initialValue The inital value.
+	 * @param initialValue The initial value.
 	 * @param mu The parameter mu (the drift).
 	 * @param sigma The parameter sigma.
 	 */
@@ -71,12 +74,11 @@ public class LogProcessEulerScheme implements LognormalProcess
 	 */
 	private void doPrecalculateProcess() {
 
-		final BrownianMotion	brownianMotion	= new BrownianMotionFromMersenneRandomNumbers(
-				new TimeDiscretizationFromArray(0.0, getNumberOfTimeSteps(), getDeltaT()),
-				1,						// numberOfFactors
-				getNumberOfPaths(),
-				31415					// seed
-				);
+		final TimeDiscretization	timeDiscretization = new TimeDiscretizationFromArray(
+				0.0 /* initial */, getNumberOfTimeSteps(), getDeltaT());
+
+		final BrownianMotion		brownianMotion	= new BrownianMotionFromMersenneRandomNumbers(
+				timeDiscretization, 1 /* numberOfFactors */, getNumberOfPaths(), 31415 /* seed */);
 
 		// Allocate Memory
 		discreteProcess = new RandomVariable[getNumberOfTimeSteps()+1];
@@ -125,9 +127,10 @@ public class LogProcessEulerScheme implements LognormalProcess
 		}
 	}
 
-
 	/**
-	 * @return Returns the deltaT.
+	 * Returns the time step size deltaT.
+	 * 
+	 * @return the time step size deltaT.
 	 */
 	@Override
 	public double getDeltaT() {
@@ -135,7 +138,9 @@ public class LogProcessEulerScheme implements LognormalProcess
 	}
 
 	/**
-	 * @return Returns the initialValue.
+	 * Returns the initial value.
+	 * 
+	 * @return the initial value.
 	 */
 	@Override
 	public double getInitialValue() {
@@ -143,7 +148,9 @@ public class LogProcessEulerScheme implements LognormalProcess
 	}
 
 	/**
-	 * @return Returns the nPaths.
+	 * Returns the number of paths.
+	 * 
+	 * @return the number of paths.
 	 */
 	@Override
 	public int getNumberOfPaths() {
@@ -151,7 +158,9 @@ public class LogProcessEulerScheme implements LognormalProcess
 	}
 
 	/**
-	 * @return Returns the numberOfTimeSteps.
+	 * Returns the number of time steps.
+	 *
+	 * @return the number of time steps.
 	 */
 	@Override
 	public int getNumberOfTimeSteps() {
@@ -159,7 +168,9 @@ public class LogProcessEulerScheme implements LognormalProcess
 	}
 
 	/**
-	 * @return Returns the mu.
+	 * Returns the log-normal drift &mu;.
+	 * 
+	 * @return the log-normal drift &mu;.
 	 */
 	@Override
 	public double getDrift() {
@@ -167,7 +178,9 @@ public class LogProcessEulerScheme implements LognormalProcess
 	}
 
 	/**
-	 * @return Returns the sigma.
+	 * Returns the log-normal volatiltiy &sigma;.
+	 * 
+	 * @return the log-normal volatiltiy &sigma;.
 	 */
 	@Override
 	public double getSigma() {

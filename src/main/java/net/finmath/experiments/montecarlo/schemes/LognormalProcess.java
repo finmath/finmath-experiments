@@ -30,7 +30,7 @@ public interface LognormalProcess {
 	RandomVariable getProcessValue(int timeIndex);
 
 	/**
-	 * Returns the average of the random variable given by the process at the given time index
+	 * Returns E(X(t_i)) - the average of the random variable given by the process at the given time index.
 	 *
 	 * @param timeIndex The time index
 	 * @return The average
@@ -39,10 +39,22 @@ public interface LognormalProcess {
 		return getProcessValue(timeIndex).getAverage();
 	}
 
+	/**
+	 * Returns E(log(X(t_i)))
+	 *
+	 * @param timeIndex The time index
+	 * @return The average of log(X)
+	 */
 	default double getExpectationOfLog(int timeIndex) {
 		return getProcessValue(timeIndex).log().getAverage();
 	}
 
+	/**
+	 * Returns Variance(log(X(t_i)))
+	 *
+	 * @param timeIndex The time index
+	 * @return The variance of log(X)
+	 */
 	default double getVarianceOfLog(int timeIndex) {
 		return getProcessValue(timeIndex).log().getVariance();
 	}

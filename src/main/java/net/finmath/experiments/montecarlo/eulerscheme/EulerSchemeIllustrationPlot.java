@@ -49,7 +49,7 @@ public class EulerSchemeIllustrationPlot {
 		/*
 		 * The process that represents the true SDE
 		 */
-		EulerSchemeFromProcessModel scheme = new EulerSchemeFromProcessModel(processModel, brownianMotion);
+		MonteCarloProcess scheme = new EulerSchemeFromProcessModel(processModel, brownianMotion);
 		MonteCarloAssetModel mcModel = new MonteCarloAssetModel(scheme);
 
 		/**
@@ -57,14 +57,17 @@ public class EulerSchemeIllustrationPlot {
 		 */
 		for(int numberOfSubSteps : new int[] { 200, 100, 10, 1} ) {
 
-			/* 
-			 * The Euler scheme for the lognormal SDE
-			 * 	S(t_{i+1}) = S(t_{i}) + r S(t_{i}) Delta t + sigma S(t_{i}) Delta W
-			 * on the coarse time-discretization, but using the Brownian increments that match the given Brownian motion.
+			/*
+			 * A coarse time discretization (with less time steps)
 			 */
 			TimeDiscretization timeDiscretizationCoarse = new TimeDiscretizationFromArray(timeInitial, numberOfTimeSteps/numberOfSubSteps, timeStep*numberOfSubSteps);
 			BrownianMotion brownianMotionCoarse = new BrownianMotionCoarseTimeDiscretization(timeDiscretizationCoarse, brownianMotion);
 
+			/* 
+			 * The Euler scheme for the lognormal SDE on the coarse time discretization
+			 * 	S(t_{i+1}) = S(t_{i}) + r S(t_{i}) Delta t + sigma S(t_{i}) Delta W
+			 * on the coarse time-discretization, but using the Brownian increments that match the given Brownian motion.
+			 */
 			ProcessModel processModelBlackScholesNormalEuler = new ProcessModel() {
 				@Override
 				public LocalDateTime getReferenceDate() {
@@ -85,11 +88,7 @@ public class EulerSchemeIllustrationPlot {
 				public RandomVariable[] getInitialState(MonteCarloProcess process) {
 					try {
 						return scheme.getProcessValue(0);
-					} catch (CalculationException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					return null;
+					} catch (CalculationException e) { throw new RuntimeException(e); }
 				}
 
 				@Override
@@ -129,6 +128,7 @@ public class EulerSchemeIllustrationPlot {
 			/*
 			 * The stochastic process that is the true Euler-Scheme interpolation of the Euler-Scheme approximations.
 			 * 	S(t}) = S(t_{i}) + r S(t_{i}) (t-t_{i}) + sigma S(t_{i}) (W(t)-W(t_{i}))
+			 * Defined on the fine time discretization, using piecewise const. coefficients from the coarse time discretization.
 			 */
 			ProcessModel processModelFine = new ProcessModel() {
 
@@ -142,9 +142,7 @@ public class EulerSchemeIllustrationPlot {
 					RandomVariable[] drift = null;
 					try {
 						drift = new RandomVariable[] { mcModelEulerCoars.getAssetValue(timeCoarse, 0).mult(riskFreeRate) };
-					} catch (CalculationException e) {
-						e.printStackTrace();
-					}
+					} catch (CalculationException e) { throw new RuntimeException(e); }
 					return drift;
 				}
 
@@ -158,9 +156,7 @@ public class EulerSchemeIllustrationPlot {
 					RandomVariable[] factorLoading = null;
 					try {
 						factorLoading = new RandomVariable[] { mcModelEulerCoars.getAssetValue(timeCoarse, 0).mult(volatility) };
-					} catch (CalculationException e) {
-						e.printStackTrace();
-					}
+					} catch (CalculationException e) { throw new RuntimeException(e); }
 					return factorLoading;
 				}
 
@@ -209,7 +205,7 @@ public class EulerSchemeIllustrationPlot {
 			MonteCarloAssetModel mcModelEuler = new MonteCarloAssetModel(schemeEuler);
 
 			/*
-			 * Plot the process with piecewise constant coefficients on the coarse discretization
+			 * Plot Euler-Scheme process - the process with piecewise constant coefficients on the coarse discretization
 			 */
 			DoubleToRandomVariableFunction processEulerScheme = t -> { return mcModelEuler.getAssetValue(t, 0); };
 			PlotProcess2D plotEuler = new PlotProcess2D(timeDiscretization, processEulerScheme, 100);

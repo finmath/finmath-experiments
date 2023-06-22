@@ -44,8 +44,8 @@ public class DeltaHedgeSimulation {
 		System.out.println("\n\nT E S T   o f   C a l i b r a t i o n   a n d   H e d g e \n");
 
 		// Test parameters
-		final double initialValue		= 100;
-		final double riskFreeRate		= 0.05;
+		final double initialValue	= 100;
+		final double riskFreeRate	= 0.05;
 		final double volatility		= 0.32;
 		final int numberOfPaths		= 1000;
 		final int numberOfTimeSteps	= 100;

@@ -92,7 +92,7 @@ public class BermudanOptionExerciseInMonteCarloBlackScholesPlot {
 				.setYAxisLabel("V\u2081(T\u2081), V\u2082(T\u2081), V\u2082(T\u2082)")
 				.setTitle("Time T\u2081 and T\u2082 values related to a Bermudan option with exercises in T\u2081 and T\u2082.");
 		plotBermudanExercise.show();
-		plotBermudanExercise.saveAsSVG(new File("BermudanExerciseAdmissible.svg"),900,600);
+//		plotBermudanExercise.saveAsSVG(new File("BermudanExerciseAdmissible.svg"),900,600);
 
 		final Plot plotBermudanExerciseWithForesight = new Plot2D(
 				List.of(
@@ -107,6 +107,6 @@ public class BermudanOptionExerciseInMonteCarloBlackScholesPlot {
 				.setYAxisLabel("V\u2081(T\u2081), V\u2082(T\u2081), V\u2082(T\u2082)")
 				.setTitle("Time T\u2081 and T\u2082 values related to a Bermudan option with exercises in T\u2081 and T\u2082.");
 		plotBermudanExerciseWithForesight.show();
-		plotBermudanExerciseWithForesight.saveAsSVG(new File("BermudanExerciseForesight.svg"),900,600);
+//		plotBermudanExerciseWithForesight.saveAsSVG(new File("BermudanExerciseForesight.svg"),900,600);
 	}
 }

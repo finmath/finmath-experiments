@@ -156,9 +156,6 @@ public class BermudanOptionExerciseInMonteCarloPrimalDualMethodExperiments {
 		final RandomVariable valueRelativeOption1InT1 = valueOption1InT1.div(model.getNumeraire(maturity1));
 		final RandomVariable valueRelativeOption2InT1 = valueOption2InT1.div(model.getNumeraire(maturity1));
 
-		RandomVariable payoffT2 = stockInT2.sub(strike2).floor(0.0).div(model.getNumeraire(maturity2));
-		RandomVariable payoffT1 = stockInT1.sub(strike1).floor(0.0).div(model.getNumeraire(maturity1));
-
 		RandomVariable[] martingaleInclrementForDualMethod = new RandomVariable[3];
 		martingaleInclrementForDualMethod[2] = model.getRandomVariableForConstant(0.0);
 		martingaleInclrementForDualMethod[1] = valueRelativeOption2InT2.sub(valueRelativeOption2InT1);
@@ -168,9 +165,9 @@ public class BermudanOptionExerciseInMonteCarloPrimalDualMethodExperiments {
 		martingale[0] = martingaleInclrementForDualMethod[0];
 		martingale[1] = martingale[0].add(martingaleInclrementForDualMethod[1]);
 
-		RandomVariable exerciseCriteria = payoffT2.sub(martingale[1]).sub(payoffT1.sub(martingale[0]));
+		RandomVariable exerciseCriteria = valueRelativeOption2InT2.sub(martingale[1]).sub(valueRelativeOption1InT1.sub(martingale[0]));
 
-		RandomVariable value = exerciseCriteria.choose(payoffT2.sub(martingale[1]), payoffT1.sub(martingale[0]));
+		RandomVariable value = exerciseCriteria.choose(valueRelativeOption2InT2.sub(martingale[1]), valueRelativeOption1InT1.sub(martingale[0]));
 
 		System.out.println(String.format("Bermudan value dual method with analytic conditional expectation....: %10.8f ± %10.8f", value.getAverage(), value.getStandardError()));
 	}
@@ -229,11 +226,6 @@ public class BermudanOptionExerciseInMonteCarloPrimalDualMethodExperiments {
 		// Calculate conditional expectation on numeraire relative quantity.
 		final RandomVariable valueRelativeOption2InT1 = valueRelativeOption2InT2.getConditionalExpectation(condExpEstimator);
 
-
-
-		RandomVariable payoffT2 = stockInT2.sub(strike2).floor(0.0).div(model.getNumeraire(maturity2));
-		RandomVariable payoffT1 = stockInT1.sub(strike1).floor(0.0).div(model.getNumeraire(maturity1));
-
 		RandomVariable[] martingaleInclrementForDualMethod = new RandomVariable[3];
 		martingaleInclrementForDualMethod[2] = model.getRandomVariableForConstant(0.0);
 		martingaleInclrementForDualMethod[1] = valueRelativeOption2InT2.sub(valueRelativeOption2InT1);
@@ -242,8 +234,6 @@ public class BermudanOptionExerciseInMonteCarloPrimalDualMethodExperiments {
 		RandomVariable[] martingale = new RandomVariable[2];
 		martingale[0] = martingaleInclrementForDualMethod[0];
 		martingale[1] = martingale[0].add(martingaleInclrementForDualMethod[1]);
-
-		RandomVariable value = null;
 
 		long timeStart, timeEnd;
 		
@@ -261,9 +251,9 @@ public class BermudanOptionExerciseInMonteCarloPrimalDualMethodExperiments {
 					martingale[0] = stockInT1.div(model.getNumeraire(maturity1)).sub(initialValue).mult(lambda1).add(stockInT1.log().sub(Math.log(initialValue)+(riskFreeRate - 0.5 * volatility * volatility) * maturity1).mult(lambda2));
 					martingale[1] = stockInT2.div(model.getNumeraire(maturity2)).sub(initialValue).mult(lambda1).add(stockInT2.log().sub(Math.log(initialValue)+(riskFreeRate - 0.5 * volatility * volatility) * maturity2).mult(lambda2));
 
-					RandomVariable exerciseCriteria = payoffT2.sub(martingale[1]).sub(payoffT1.sub(martingale[0]));
+					RandomVariable exerciseCriteria = valueRelativeOption2InT2.sub(martingale[1]).sub(valueRelativeOption1InT1.sub(martingale[0]));
 
-					RandomVariable value = exerciseCriteria.choose(payoffT2.sub(martingale[1]), payoffT1.sub(martingale[0]));
+					RandomVariable value = exerciseCriteria.choose(valueRelativeOption2InT2.sub(martingale[1]), valueRelativeOption1InT1.sub(martingale[0]));
 					System.out.print(String.format("\rBermudan value dual method with optimization........................: %10.8f ± %10.8f (%8.5f,%8.5f)  ", value.getAverage(), value.getStandardError(), lambda1, lambda2));
 					values[0] = value.getAverage();
 				}
@@ -286,9 +276,9 @@ public class BermudanOptionExerciseInMonteCarloPrimalDualMethodExperiments {
 		martingale[0] = stockInT1.div(model.getNumeraire(maturity1)).sub(initialValue).mult(lambda1).add(stockInT1.log().sub(Math.log(initialValue)+(riskFreeRate - 0.5 * volatility * volatility) * maturity1).mult(lambda2));
 		martingale[1] = stockInT2.div(model.getNumeraire(maturity2)).sub(initialValue).mult(lambda1).add(stockInT2.log().sub(Math.log(initialValue)+(riskFreeRate - 0.5 * volatility * volatility) * maturity2).mult(lambda2));
 
-		RandomVariable exerciseCriteria = payoffT2.sub(martingale[1]).sub(payoffT1.sub(martingale[0]));
+		RandomVariable exerciseCriteria = valueRelativeOption2InT2.sub(martingale[1]).sub(valueRelativeOption1InT1.sub(martingale[0]));
 
-		return exerciseCriteria.choose(payoffT2.sub(martingale[1]), payoffT1.sub(martingale[0])).getAverage();
+		return exerciseCriteria.choose(valueRelativeOption2InT2.sub(martingale[1]), valueRelativeOption1InT1.sub(martingale[0])).getAverage();
 	}
 
 	private void valueWithUpperBoundWithEstimatedCondExp(MonteCarloAssetModel model) throws Exception {
@@ -311,9 +301,6 @@ public class BermudanOptionExerciseInMonteCarloPrimalDualMethodExperiments {
 		// Calculate conditional expectation on numeraire relative quantity.
 		final RandomVariable valueRelativeOption2InT1 = valueRelativeOption2InT2.getConditionalExpectation(condExpEstimator);
 
-		RandomVariable payoffT2 = stockInT2.sub(strike2).floor(0.0).div(model.getNumeraire(maturity2));
-		RandomVariable payoffT1 = stockInT1.sub(strike1).floor(0.0).div(model.getNumeraire(maturity1));
-
 		RandomVariable[] martingaleInclrementForDualMethod = new RandomVariable[3];
 		martingaleInclrementForDualMethod[2] = model.getRandomVariableForConstant(0.0);
 		martingaleInclrementForDualMethod[1] = valueRelativeOption2InT2.sub(valueRelativeOption2InT1);
@@ -323,9 +310,9 @@ public class BermudanOptionExerciseInMonteCarloPrimalDualMethodExperiments {
 		martingale[0] = martingaleInclrementForDualMethod[0];
 		martingale[1] = martingale[0].add(martingaleInclrementForDualMethod[1]);
 
-		RandomVariable exerciseCriteria = payoffT2.sub(martingale[1]).sub(payoffT1.sub(martingale[0]));
+		RandomVariable exerciseCriteria = valueRelativeOption2InT2.sub(martingale[1]).sub(valueRelativeOption1InT1.sub(martingale[0]));
 
-		RandomVariable value = exerciseCriteria.choose(payoffT2.sub(martingale[1]), payoffT1.sub(martingale[0]));
+		RandomVariable value = exerciseCriteria.choose(valueRelativeOption2InT2.sub(martingale[1]), valueRelativeOption1InT1.sub(martingale[0]));
 		System.out.println(String.format("Bermudan value dual method using martingale with estimated cond. exp: %10.8f ± %10.8f", value.getAverage(), value.getStandardError()));
 	}
 

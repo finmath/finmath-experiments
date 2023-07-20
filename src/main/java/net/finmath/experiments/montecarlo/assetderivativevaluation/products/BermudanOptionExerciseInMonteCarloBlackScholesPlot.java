@@ -2,7 +2,6 @@ package net.finmath.experiments.montecarlo.assetderivativevaluation.products;
 
 import java.awt.Color;
 import java.awt.Rectangle;
-import java.io.File;
 import java.util.List;
 
 import net.finmath.functions.AnalyticFormulas;

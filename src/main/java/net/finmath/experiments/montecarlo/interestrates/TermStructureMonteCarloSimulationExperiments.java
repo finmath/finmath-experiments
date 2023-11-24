@@ -78,10 +78,10 @@ public class TermStructureMonteCarloSimulationExperiments {
 		experiments.testCapletATMImpliedVolInterpolation();
 
 		// Terminal correlation
-		experiments.plotTerminalCorrelations();
+//		experiments.plotTerminalCorrelations();
 
 		experiments.testShortRate();
-		experiments.testCapletSmilesOnGPU();
+//		experiments.testCapletSmilesOnGPU();
 	}
 
 	public TermStructureMonteCarloSimulationExperiments() throws CalculationException {}
@@ -436,15 +436,11 @@ public class TermStructureMonteCarloSimulationExperiments {
 				
 				PlotProcess2D plot = new PlotProcess2D(new TimeDiscretizationFromArray(forwardRateModel.getTimeDiscretization().getAsArrayList().subList(0, forwardRateModel.getTimeDiscretization().getNumberOfTimes()-1)),
 						shortRateProcess, 100);
-				plot.setTitle("Paths of the (discretized) short rate T ⟼ L(T,T+\u0394T;T) (" + measure + ", vol decay: " + volatilityExponentialDecay + ")").setXAxisLabel("time").setYAxisLabel("forward rate").setYAxisNumberFormat(new DecimalFormat("#.##%")).show();
-
-				/*
-				final String filename = "ForwardRateDiscretizationError-measure-" + measure + (useDiscountCurve ? "-with-control" : "");
-				plot.saveAsSVG(new File(filename + ".svg"), 900, 400);
-				plot.saveAsPDF(new File(filename + ".pdf"), 900, 400);
-
+				plot.setTitle("Paths of the (discretized) short rate T ⟼ L(T,T+\u0394T;T) (" + measure + ", vol decay: " + volatilityExponentialDecay + ")").setXAxisLabel("time").setYAxisLabel("forward rate").setYAxisNumberFormat(new DecimalFormat("#.##%"));
 				plot.show();
-				*/
+
+				final String filename = "ShortRateMeanReversion-measure-" + measure + "-voldecay-" + ((int)(volatilityExponentialDecay*100));
+				plot.saveAsPDF(new File(filename + ".pdf"), 900, 400);
 			}
 		}
 	}

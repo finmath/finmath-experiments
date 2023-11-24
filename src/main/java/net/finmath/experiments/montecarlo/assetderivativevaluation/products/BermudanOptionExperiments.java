@@ -39,11 +39,16 @@ public class BermudanOptionExperiments {
 
 	public static void main(String[] args) throws Exception {
 
+		// Polynomial basis functions: 1, S, S^2, S^3, ...
 		(new BermudanOptionExperiments()).ananlyseBermudan(1, false);
 		(new BermudanOptionExperiments()).ananlyseBermudan(2, false);
 		(new BermudanOptionExperiments()).ananlyseBermudan(4, false);
 		(new BermudanOptionExperiments()).ananlyseBermudan(5, false);
 		(new BermudanOptionExperiments()).ananlyseBermudan(10, false);
+		
+		System.out.println();
+		
+		// Binning: Indicator basis functions:1_Bin1, 1_Bin2, 1_Bin3, ....
 		(new BermudanOptionExperiments()).ananlyseBermudan(10, true);
 		(new BermudanOptionExperiments()).ananlyseBermudan(20, true);
 		(new BermudanOptionExperiments()).ananlyseBermudan(100, true);

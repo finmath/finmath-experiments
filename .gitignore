@@ -1,2 +1,4 @@
 /target/
 /results/
+/.settings
+release.properties

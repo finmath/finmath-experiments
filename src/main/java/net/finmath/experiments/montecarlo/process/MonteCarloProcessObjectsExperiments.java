@@ -17,7 +17,6 @@ import net.finmath.montecarlo.process.EulerSchemeFromProcessModel;
 import net.finmath.montecarlo.process.MonteCarloProcess;
 import net.finmath.plots.DoubleToRandomVariableFunction;
 import net.finmath.plots.PlotProcess2D;
-import net.finmath.plots.Plots;
 import net.finmath.stochastic.RandomVariable;
 import net.finmath.stochastic.Scalar;
 import net.finmath.time.TimeDiscretization;

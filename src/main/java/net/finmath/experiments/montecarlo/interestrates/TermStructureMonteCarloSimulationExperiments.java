@@ -30,8 +30,6 @@ import net.finmath.plots.Plot;
 import net.finmath.plots.PlotProcess2D;
 import net.finmath.plots.Plots;
 import net.finmath.stochastic.RandomVariable;
-import net.finmath.stochastic.RandomVariableArray;
-import net.finmath.stochastic.RandomVariableArrayImplementation;
 import net.finmath.time.TimeDiscretizationFromArray;
 
 /**

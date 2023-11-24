@@ -43,12 +43,13 @@ import net.finmath.montecarlo.interestrate.CalibrationProduct;
 import net.finmath.montecarlo.interestrate.LIBORMarketModel;
 import net.finmath.montecarlo.interestrate.LIBORModelMonteCarloSimulationModel;
 import net.finmath.montecarlo.interestrate.LIBORMonteCarloSimulationFromLIBORModel;
-import net.finmath.montecarlo.interestrate.models.FundingCapacity;
 import net.finmath.montecarlo.interestrate.models.LIBORMarketModelFromCovarianceModel;
 import net.finmath.montecarlo.interestrate.models.LIBORMarketModelFromCovarianceModel.Measure;
 import net.finmath.montecarlo.interestrate.models.covariance.LIBORCorrelationModelExponentialDecay;
 import net.finmath.montecarlo.interestrate.models.covariance.LIBORCovarianceModelFromVolatilityAndCorrelation;
 import net.finmath.montecarlo.interestrate.models.covariance.LIBORVolatilityModelFromGivenMatrix;
+import net.finmath.montecarlo.interestrate.models.funding.FundingCapacity;
+import net.finmath.montecarlo.interestrate.models.funding.FundingCapacityWithMemory;
 import net.finmath.montecarlo.interestrate.products.SwapLegWithFundingProvider;
 import net.finmath.montecarlo.interestrate.products.components.Notional;
 import net.finmath.montecarlo.interestrate.products.components.NotionalFromConstant;
@@ -157,8 +158,8 @@ public class NonlinearDiscounting {
 						final Map<Key, Double> value = Map.of(
 								Key.VOLATILITY, newVolatility,
 								Key.RISK_FREE, valueRiskFree,
-								Key.FUNDING_CONSTANT, new ForwardAgreementWithFundingRequirement(maturity, forwardValue, 0, new FundingCapacity(currency, new Scalar(0.0), instSurvivalProbConst)).getValue(newModel),
-								Key.FUNDING_STATE_DEP, new ForwardAgreementWithFundingRequirement(maturity, forwardValue, 0, new FundingCapacity(currency, new Scalar(0.0), instSurvivalProb)).getValue(newModel),
+								Key.FUNDING_CONSTANT, new ForwardAgreementWithFundingRequirement(maturity, forwardValue, 0, new FundingCapacityWithMemory(currency, new Scalar(0.0), instSurvivalProbConst)).getValue(newModel),
+								Key.FUNDING_STATE_DEP, new ForwardAgreementWithFundingRequirement(maturity, forwardValue, 0, new FundingCapacityWithMemory(currency, new Scalar(0.0), instSurvivalProb)).getValue(newModel),
 								Key.OPTION, valueRiskFree+(1.0/0.75-1.0)*valueOption
 								);
 						return value;
@@ -221,8 +222,8 @@ public class NonlinearDiscounting {
 		instSurvivalProbConst.put(0.0, 0.75);
 		instSurvivalProbConst.put(Double.MAX_VALUE, 0.75);
 
-		final FundingCapacity fundingCapacity = new FundingCapacity("EUR", new Scalar(0.0), instSurvivalProb);
-		final FundingCapacity fundingCapacityConstant = new FundingCapacity("EUR", new Scalar(0.0), instSurvivalProbConst);
+		final FundingCapacity fundingCapacity = new FundingCapacityWithMemory("EUR", new Scalar(0.0), instSurvivalProb);
+		final FundingCapacity fundingCapacityConstant = new FundingCapacityWithMemory("EUR", new Scalar(0.0), instSurvivalProbConst);
 
 		final Stream<Map<String, Double>> values = IntStream.range(0, 20).mapToDouble(x -> x*0.5).mapToObj(
 				maturity -> {
@@ -317,7 +318,7 @@ public class NonlinearDiscounting {
 		final TimeDiscretization simulationTimes = model.getTimeDiscretization();
 
 		final List<Point2D> valuations = new ArrayList<Point2D>();
-		final FundingCapacity fundingCapacity = new FundingCapacity("EUR", new Scalar(0.0), probsExponential);
+		final FundingCapacity fundingCapacity = new FundingCapacityWithMemory("EUR", new Scalar(0.0), probsExponential);
 
 
 		final RandomVariable value = new Scalar(0.0);
@@ -404,7 +405,7 @@ public class NonlinearDiscounting {
 							final double spread = -optimizer.getNextPoint();
 							Arrays.fill(spreads, spread);
 
-							final FundingCapacity fundingCapacity = new FundingCapacity(currency, new Scalar(0.0), probsOne);
+							final FundingCapacity fundingCapacity = new FundingCapacityWithMemory(currency, new Scalar(0.0), probsOne);
 							final SwapLegWithFundingProvider leg = new SwapLegWithFundingProvider(legSchedule, notionals, index, spreads, fundingCapacity);
 
 							/*
@@ -420,7 +421,7 @@ public class NonlinearDiscounting {
 							final double spread = -optimizer2.getNextPoint();
 							Arrays.fill(spreads, spread);
 
-							final FundingCapacity fundingCapacity = new FundingCapacity(currency, new Scalar(0.0), probs);
+							final FundingCapacity fundingCapacity = new FundingCapacityWithMemory(currency, new Scalar(0.0), probs);
 							final SwapLegWithFundingProvider leg2 = new SwapLegWithFundingProvider(legSchedule, notionals, index, spreads, fundingCapacity);
 
 							final double value = leg2.getValue(model);
@@ -538,7 +539,7 @@ public class NonlinearDiscounting {
 						final double spread = -optimizer2.getNextPoint();
 						Arrays.fill(spreads, spread);
 
-						final FundingCapacity fundingCapacity = new FundingCapacity(currency, new Scalar(0.0), probs);
+						final FundingCapacity fundingCapacity = new FundingCapacityWithMemory(currency, new Scalar(0.0), probs);
 						final SwapLegWithFundingProvider leg2 = new SwapLegWithFundingProvider(legSchedule, notionals, index, spreads, fundingCapacity);
 
 						double value = leg2.getValue(model);

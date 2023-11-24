@@ -45,7 +45,7 @@ public class FactorMatrixExperiment {
 				correlationDecayParameter );
 
 		/*
-		 * Get the reduced factor and the full factor matrix
+		 * Get the reduced factor and the full factor matrix - F
 		 */
 		final double[][] factorMatrixReduced		= LinearAlgebra.factorReduction(originalCorrelationMatrix, numberOfFactors);
 		final double[][] factorMatrixFull			= LinearAlgebra.factorReduction(originalCorrelationMatrix, originalCorrelationMatrix.length);

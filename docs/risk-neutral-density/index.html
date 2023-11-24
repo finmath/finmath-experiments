@@ -104,7 +104,7 @@
 				DoubleUnaryOperator value = strike -> AnalyticFormulas.blackScholesOptionValue(100.0, 0.05, 0.20, 2.0, strike);
 
 				double h = 1E-2;
-				DoubleUnaryOperator secondDerivative = strike -> (value.applyAsDouble(strike+h) - 2*value.applyAsDouble(strike) + value.applyAsDouble(strike-h))/(2*h);
+				DoubleUnaryOperator secondDerivative = strike -> (value.applyAsDouble(strike+h) - 2*value.applyAsDouble(strike) + value.applyAsDouble(strike-h))/(h*h);
 
 				Plot2D plot = new Plot2D(0.0, 300.0, 100, secondDerivative);
 				plot.setYAxisNumberFormat(new java.text.DecimalFormat("0.0E00"));

@@ -24,8 +24,7 @@ import net.finmath.time.TimeDiscretizationFromArray;
  * What we do is we compare two time-discretization: a fine one (representing the true stochastic process) and a coarse one
  * one which we then create the Euler-Scheme approximation of the fine-time-discretization process.
  * 
- * @author fries
- *
+ * @author Christian Fries
  */
 public class EulerSchemeIllustrationPlot {
 

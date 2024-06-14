@@ -22,7 +22,6 @@ import net.finmath.experiments.montecarlo.randomnumbers.HaltonSequence;
  */
 public class MonteCarloIntegrationParallelizedExperiment {
 
-
 	/**
 	 * Main program to run the experiment.
 	 *
@@ -46,7 +45,7 @@ public class MonteCarloIntegrationParallelizedExperiment {
 		 */
 		System.out.print("Distributing tasks...");
 		final ExecutorService				executor	= Executors.newFixedThreadPool(numberOfThreads);
-		final ArrayList<Future<Double>>	results		= new ArrayList<Future<Double>>();
+		final ArrayList<Future<Double>>		results		= new ArrayList<Future<Double>>();
 		for(int taskIndex=0; taskIndex<numberOfTask; taskIndex++) {
 
 			final long startIndex					=  taskIndex * numberOfSimulationsPerTask;

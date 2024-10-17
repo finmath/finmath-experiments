@@ -2,3 +2,5 @@
 /results/
 /.settings
 release.properties
+/.project
+/.classpath

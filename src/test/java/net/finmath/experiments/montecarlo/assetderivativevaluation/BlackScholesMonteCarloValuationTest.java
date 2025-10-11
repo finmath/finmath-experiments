@@ -5,7 +5,7 @@
  */
 package net.finmath.experiments.montecarlo.assetderivativevaluation;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import net.finmath.exception.CalculationException;
 import net.finmath.experiments.montecarlo.assetderivativevaluation.products.EuropeanOption2;

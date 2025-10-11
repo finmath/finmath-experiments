@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import net.finmath.exception.CalculationException;
 import net.finmath.functions.AnalyticFormulas;
@@ -525,12 +525,12 @@ public class LIBORMarketModelCalibrationATMTest {
 		final String[]	daycountConventionsFloat	= (String[]) parameters.get("floatLegDaycountConventions");
 		final double[]	rates						= (double[]) parameters.get("rates");
 
-		Assert.assertEquals(maturities.length, frequency.length);
-		Assert.assertEquals(maturities.length, daycountConventions.length);
-		Assert.assertEquals(maturities.length, rates.length);
+		Assertions.assertEquals(maturities.length, frequency.length);
+		Assertions.assertEquals(maturities.length, daycountConventions.length);
+		Assertions.assertEquals(maturities.length, rates.length);
 
-		Assert.assertEquals(frequency.length, frequencyFloat.length);
-		Assert.assertEquals(daycountConventions.length, daycountConventionsFloat.length);
+		Assertions.assertEquals(frequency.length, frequencyFloat.length);
+		Assertions.assertEquals(daycountConventions.length, daycountConventionsFloat.length);
 
 		final int		spotOffsetDays = 2;
 		final String	forwardStartPeriod = "0D";
@@ -600,7 +600,7 @@ public class LIBORMarketModelCalibrationATMTest {
 			System.out.println("Solver reported acccurary....: " + solver.getAccuracy());
 		}
 
-		Assert.assertEquals("Calibration accurarcy", 0.0, solver.getAccuracy(), 1E-3);
+		Assertions.assertEquals(0.0, solver.getAccuracy(), 1E-3, "Calibration accurarcy");
 
 		// Get best parameters
 		final double[] parametersBest = calibratedModel.getDiscountCurve(discountCurveInterpolation.getName()).getParameter();

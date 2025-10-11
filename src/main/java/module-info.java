@@ -13,11 +13,12 @@ module net.finmath.experiments {
 	requires transitive net.finmath.plots;
 
 	requires org.jfree.jfreechart;
-	requires junit;
 
-	requires javafx.controls;
+	requires transitive javafx.controls;
+	requires javafx.graphics;
+	requires java.prefs;
 	requires javafx.base;
-	requires transitive javafx.graphics;
+	
 	requires javafx.swing;
 
 	requires java.logging;

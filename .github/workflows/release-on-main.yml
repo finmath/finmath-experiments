@@ -77,10 +77,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   windows-msi:
-    name: Build & Package (Windows, MSI + debug)
+    name: Build & Package (Windows, MSI + debug, clean input)
     runs-on: windows-latest
-    # optional: run only on tags
-    # if: ${{ startsWith(github.ref, 'refs/tags/') }}
 
     steps:
       - uses: actions/checkout@v4
@@ -91,27 +89,20 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      # Accept newer WiX if present; don't fail the job
-      - name: Ensure WiX available (prefer 3.14.1, accept newer)
+      # Accept preinstalled/newer WiX; just ensure it's on PATH
+      - name: Ensure WiX available
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Continue'
           choco install wixtoolset --version=3.14.1 -y --no-progress
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host "A newer WiX is already installed; proceeding with the existing version."
-          }
-          # Ensure WiX bin is on PATH
+          if ($LASTEXITCODE -ne 0) { Write-Host "Using preinstalled WiX."; }
           $wixRoot = Get-ChildItem -Path "C:\Program Files (x86)\" -Directory -Filter "WiX Toolset v3.*" -ErrorAction SilentlyContinue | Sort-Object FullName -Descending | Select-Object -First 1
           if ($wixRoot) {
             $wixBin = Join-Path $wixRoot.FullName "bin"
-            Write-Host "Using WiX path: $wixBin"
             $wixBin | Out-File -FilePath $env:GITHUB_PATH -Append
-          } else {
-            Write-Error "WiX not found after install."
-            exit 1
-          }
-          where.exe light.exe
-          where.exe candle.exe
+            where.exe light.exe
+            where.exe candle.exe
+          } else { Write-Error "WiX not found"; exit 1 }
 
       - name: Tool versions
         shell: pwsh
@@ -123,12 +114,39 @@ jobs:
       - name: Build (debug)
         run: mvn -B -e -X -DskipTests clean package
 
-      - name: Package MSI with jpackage (verbose, fixed temp)
+      # Copy runtime dependencies into a separate folder (no target/classes/)
+      - name: Prepare clean jpackage input
+        shell: pwsh
+        run: |
+          mvn -B -q -DincludeScope=runtime -DoutputDirectory=target\jpdeps dependency:copy-dependencies
+          $finalName = mvn -q -DforceStdout help:evaluate -Dexpression=project.build.finalName
+          $version   = mvn -q -DforceStdout help:evaluate -Dexpression=project.version
+          $artifact  = mvn -q -DforceStdout help:evaluate -Dexpression=project.artifactId
+          "APP_JAR=$finalName.jar" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "APP_VERSION=$version"   | Out-File -FilePath $env:GITHUB_ENV -Append
+          "APP_NAME=$artifact"     | Out-File -FilePath $env:GITHUB_ENV -Append
+
+          New-Item -ItemType Directory -Force -Path target\jpinput | Out-Null
+          Copy-Item "target\$finalName.jar" target\jpinput\
+          Copy-Item "target\jpdeps\*.jar"   target\jpinput\ -Force
+
+      # Run jpackage directly with the clean input; let it jlink a runtime
+      - name: jpackage MSI (verbose, fixed temp)
         shell: pwsh
         run: |
           $temp = "D:\a\_wix_tmp"
           New-Item -ItemType Directory -Force -Path $temp | Out-Null
-          mvn -B -e -X -DskipTests -Djpackage.verbose=true -Djpackage.temp="$temp" jpackage:jpackage
+          jpackage `
+            --name "$env:APP_NAME" `
+            --type msi `
+            --app-version "$env:APP_VERSION" `
+            --dest "target\dist" `
+            --input "target\jpinput" `
+            --main-jar "$env:APP_JAR" `
+            --main-class "net.finmath.experiments.ui.StartUI" `
+            --vendor "finmath.net" `
+            --verbose `
+            --temp "$temp"
 
       - name: Upload installers (MSI/EXE)
         if: always()
@@ -138,8 +156,6 @@ jobs:
           path: |
             **\target\dist\*.msi
             **\target\dist\*.exe
-            **\target\*.msi
-            **\target\*.exe
           if-no-files-found: warn
 
       - name: Upload WiX & jpackage temps

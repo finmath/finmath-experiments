@@ -312,9 +312,11 @@
 					<removeDestination>true</removeDestination>
 					<type>${pack.type}</type>
 					<additionalOptions>
-						<option>--vendor</option>
-						<option>finmath.net</option>
-						<option>--verbose</option>
+						<additionalOption>--vendor</additionalOption>
+						<additionalOption>finmath.net</additionalOption>
+						<additionalOption>--verbose</additionalOption>
+						<additionalOption>--temp</additionalOption>
+						<additionalOption>D:\t</additionalOption>
 					</additionalOptions>
 				</configuration>
 				<executions>

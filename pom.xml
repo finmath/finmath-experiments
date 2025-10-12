@@ -205,6 +205,7 @@
 		<finalName>${project.artifactId}-${project.version}</finalName>
 		<sourceDirectory>${src.main.java.dir}</sourceDirectory>
 		<testSourceDirectory>${src.test.java.dir}</testSourceDirectory>
+		<!--
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -213,6 +214,7 @@
 				</excludes>
 			</resource>
 		</resources>
+		-->
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>

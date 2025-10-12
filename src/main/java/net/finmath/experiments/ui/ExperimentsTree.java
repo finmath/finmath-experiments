@@ -131,10 +131,13 @@ public class ExperimentsTree extends Application {
 	 * MODEL of experiments
 	 */
 	private final Map<String, Object> model = mapOf(
-			"DICE Model (Climate School)", mapOf(
-					"Info", (Supplier<Parent>) () -> getInfo()
-					//,
-					//					"One Parametric Abatement Model (new Window)", DICEAbatementTimeExperimentUI.class
+			"Info", (Supplier<Parent>) () -> getInfo(),
+//			"DICE Model (Climate School)", mapOf(
+//					//,
+//					//					"One Parametric Abatement Model (new Window)", DICEAbatementTimeExperimentUI.class
+//					),
+			"Heston Model", mapOf(
+					"Heston Model Greeks (analytic)", new ExperimentApplication(() -> new HestonModelGreeksAnalytic(), 1)
 					),
 			"Interest Rates", mapOf(
 					"Simulation of Hull White Paths", new ExperimentApplication(() -> new InterestRatesHullWhiteSimulationPathOfShortRate(), 1),
@@ -217,7 +220,7 @@ public class ExperimentsTree extends Application {
 
 		root.setCenter(splitPane);
 
-		Scene scene = new Scene(root, 1024, 520);
+		Scene scene = new Scene(root, 1200, 675);
 		stage.setScene(scene);
 		stage.setTitle("finmath Numerical Experiments");
 

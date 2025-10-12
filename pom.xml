@@ -304,11 +304,16 @@
 					<appVersion>${project.version}</appVersion>
 					<input>${project.build.directory}</input>
 					<mainJar>${project.build.finalName}.jar</mainJar>
-					<mainClass>net.finmath.climateschool.ui.StartUI</mainClass>
+					<mainClass>net.finmath.experiments.ui.StartUI</mainClass>
 					<runtimeImage>${java.home}</runtimeImage>
 					<destination>${project.build.directory}/dist</destination>
 					<removeDestination>true</removeDestination>
 					<type>${pack.type}</type>
+					<additionalOptions>
+						<option>--vendor</option>
+						<option>finmath.net</option>
+						<option>--verbose</option>
+					</additionalOptions>
 				</configuration>
 				<executions>
 					<execution>

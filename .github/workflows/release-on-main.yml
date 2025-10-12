@@ -79,8 +79,8 @@ jobs:
   windows-msi:
     name: Build & Package (Windows, MSI + debug)
     runs-on: windows-latest
-    # optional: run only for tags; remove if you want every push/PR
-    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    # optional: run only on tags
+    # if: ${{ startsWith(github.ref, 'refs/tags/') }}
 
     steps:
       - uses: actions/checkout@v4
@@ -91,11 +91,27 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Install WiX 3.14.1
+      # Accept newer WiX if present; don't fail the job
+      - name: Ensure WiX available (prefer 3.14.1, accept newer)
         shell: pwsh
         run: |
-          choco install wixtoolset --version=3.14.1 -y
-          echo "C:\Program Files (x86)\WiX Toolset v3.14\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+          $ErrorActionPreference = 'Continue'
+          choco install wixtoolset --version=3.14.1 -y --no-progress
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "A newer WiX is already installed; proceeding with the existing version."
+          }
+          # Ensure WiX bin is on PATH
+          $wixRoot = Get-ChildItem -Path "C:\Program Files (x86)\" -Directory -Filter "WiX Toolset v3.*" -ErrorAction SilentlyContinue | Sort-Object FullName -Descending | Select-Object -First 1
+          if ($wixRoot) {
+            $wixBin = Join-Path $wixRoot.FullName "bin"
+            Write-Host "Using WiX path: $wixBin"
+            $wixBin | Out-File -FilePath $env:GITHUB_PATH -Append
+          } else {
+            Write-Error "WiX not found after install."
+            exit 1
+          }
+          where.exe light.exe
+          where.exe candle.exe
 
       - name: Tool versions
         shell: pwsh
@@ -103,8 +119,6 @@ jobs:
           mvn -version
           Write-Host "JAVA_HOME: $env:JAVA_HOME"
           jpackage --version
-          Write-Host "WiX (light.exe):"; where.exe light.exe
-          Write-Host "WiX (candle.exe):"; where.exe candle.exe
 
       - name: Build (debug)
         run: mvn -B -e -X -DskipTests clean package
@@ -152,3 +166,4 @@ jobs:
             **\build.log
             **\surefire-reports\**
           if-no-files-found: ignore
+

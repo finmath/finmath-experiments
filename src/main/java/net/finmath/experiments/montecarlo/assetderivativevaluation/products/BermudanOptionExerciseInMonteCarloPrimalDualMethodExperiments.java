@@ -16,12 +16,10 @@ import net.finmath.montecarlo.process.EulerSchemeFromProcessModel;
 import net.finmath.montecarlo.process.MonteCarloProcess;
 import net.finmath.optimizer.Optimizer;
 import net.finmath.optimizer.Optimizer.ObjectiveFunction;
-import net.finmath.optimizer.OptimizerFactory;
 import net.finmath.optimizer.OptimizerFactoryCMAES;
 import net.finmath.optimizer.SolverException;
 import net.finmath.stochastic.ConditionalExpectationEstimator;
 import net.finmath.stochastic.RandomVariable;
-import net.finmath.stochastic.Scalar;
 import net.finmath.time.TimeDiscretizationFromArray;
 
 public class BermudanOptionExerciseInMonteCarloPrimalDualMethodExperiments {

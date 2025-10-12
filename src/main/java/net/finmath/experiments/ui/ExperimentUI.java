@@ -5,6 +5,11 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BooleanSupplier;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
@@ -28,6 +33,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import javafx.util.converter.NumberStringConverter;
@@ -46,29 +52,50 @@ public abstract class ExperimentUI extends Application {
 		return t;
 	});
 	private Future<?> currentJob;
+	private final AtomicLong currentEpoch = new AtomicLong(0);
 
 	private final PauseTransition debounce = new PauseTransition(Duration.millis(300));
 	private final DecimalFormat df = new DecimalFormat("#.####");
+
+	private Parent content;
 
 	public ExperimentUI(List<Parameter> parameters) {
 		this.parameters = parameters;
 	}
 
+	/*
+	 * Three methods to be overridden by derived experiments
+	 */
 	abstract public String getTitle();
-	abstract public void runCalculation();
+
+	abstract public void runCalculation(BooleanSupplier isCancelled);
+
+	protected void onClose() {
+		debounce.stop();
+		currentEpoch.incrementAndGet();
+		if (currentJob != null && !currentJob.isDone()) {
+			currentJob.cancel(true);
+		}
+		pool.shutdownNow();
+	}
 
 	public void runCalculationAsync() {
 		System.out.println("Starting calculation.");
+
+		long taskEpoch = currentEpoch.incrementAndGet();
+		
 		// cancel running calculation
 		if (currentJob != null && !currentJob.isDone()) {
 			System.out.println("Cancel previous calculation.");
 			currentJob.cancel(true);
 		}
 
+		BooleanSupplier isCancelled = () -> taskEpoch < currentEpoch.get();
+		
 		Task<Double> task = new Task<>() {
 			@Override
 			protected Double call() throws Exception {
-				runCalculation();
+				runCalculation(isCancelled);
 				return 0.0;
 			}
 		};
@@ -84,17 +111,33 @@ public abstract class ExperimentUI extends Application {
 	 * UI Part
 	 */
 
-	// Für eigenständigen Start (Fallback):
+	// For standalone start (fallback)
 	@Override
 	public void start(Stage stage) {
+		System.out.println("ExperimentUI statring.");
+
 		stage.setTitle("finmath Experiment (Window)");
-		stage.setScene(new Scene(createContent()));
-		// Achtung: Hier KEIN Platform.exit() im onCloseRequest!
+		stage.setScene(new Scene(getContent()));
+
+		// React on Close/Hiding
+		stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, e -> onClose());
+
 		stage.show();
 	}
 
-	// Für EMBEDDING im Host:
-	public Parent createContent() {
+	@Override
+	public void stop() {
+		onClose();
+	}
+
+	public final void dispose() {
+		onClose();
+	}
+
+	// For embedding in host
+	public synchronized Parent getContent() {
+		if(content != null) return content;
+		
 		GridPane grid = new GridPane();
 		grid.setHgap(12);
 		grid.setVgap(10);
@@ -120,15 +163,15 @@ public abstract class ExperimentUI extends Application {
 		buttons.getChildren().addAll(btnReset, btnCompute);
 		buttons.setAlignment(Pos.CENTER_LEFT);
 
-		VBox content = new VBox(12, grid, buttons);
-		content.setPadding(new Insets(14));
+		VBox vbox = new VBox(12, grid, buttons);
+		vbox.setPadding(new Insets(14));
 
-		TitledPane group = new TitledPane(getTitle(), content);
-		group.setCollapsible(false);
-		group.setAnimated(false);
-		group.setMaxWidth(Double.MAX_VALUE);
+		TitledPane content = new TitledPane(getTitle(), vbox);
+		content.setCollapsible(false);
+		content.setAnimated(false);
+		content.setMaxWidth(Double.MAX_VALUE);
 
-		return group;
+		return content;
 	}
 
 	/**

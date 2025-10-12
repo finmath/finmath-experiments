@@ -2,7 +2,6 @@ package net.finmath.experiments.ui;
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.prefs.Preferences;
 
@@ -38,53 +37,92 @@ public class ExperimentsTree extends Application {
 	 */
 	class ExperimentApplication {
 
-		private static final int maxCacheDepth = 20;
+		private static final int maxCacheDepth = 6;
 
-		/** LRU-Cache (accessOrder=true). */
-		private static final LinkedHashMap<String, Parent> cache = new LinkedHashMap<>(16, 0.75f, true) {
-			private static final long serialVersionUID = -3650668979377727071L;
+		/**
+		 * LRU-Cache (accessOrder=true)
+		 */
+		private static final LinkedHashMap<String, ExperimentUI> cache =
+				new LinkedHashMap<String, ExperimentUI>(16, 0.75f, true) {
+			private static final long serialVersionUID = 1L;
 
-			@Override protected boolean removeEldestEntry(Map.Entry<String, Parent> eldest) {
-				// LRU cache eviction
-				return size() > maxCacheDepth;
+			private void close(ExperimentUI experimentUI) {
+				if (experimentUI == null) return;
+				try {
+					experimentUI.dispose(); 
+				} catch (Exception ignore) { /* no-op */ }
+			}
+
+			@Override
+			protected boolean removeEldestEntry(Map.Entry<String, ExperimentUI> eldest) {
+				if (size() > maxCacheDepth) {
+					close(eldest.getValue());
+					return true;
+				}
+				return false;
+			}
+
+			@Override
+			public ExperimentUI remove(Object key) {
+				ExperimentUI prev = super.remove(key);
+				close(prev);
+				return prev;
+			}
+
+			@Override
+			public boolean remove(Object key, Object value) {
+				boolean removed = super.remove(key, value);
+				if (removed && value instanceof ExperimentUI ui) close(ui);
+				return removed;
+			}
+
+			@Override
+			public void clear() {
+				// alle noch vorhandenen schließen
+				for (ExperimentUI ui : values()) close(ui);
+				super.clear();
+			}
+
+			@Override
+			public ExperimentUI put(String key, ExperimentUI value) {
+				// Ersatz eines bestehenden Eintrags -> alten schließen
+				ExperimentUI old = super.put(key, value);
+				if (old != null && old != value) close(old);
+				return old;
+			}
+
+			@Override
+			public void putAll(Map<? extends String, ? extends ExperimentUI> m) {
+				// optional: sauberes Schließen bei Ersetzungen in bulk
+				for (Map.Entry<? extends String, ? extends ExperimentUI> e : m.entrySet()) {
+					ExperimentUI old = super.put(e.getKey(), e.getValue());
+					if (old != null && old != e.getValue()) close(old);
+				}
 			}
 		};
 
-		/**
-		 * Factory generating a UI component.
-		 */
-		private final Supplier<Parent> factory;
+		/** Factory */
+		private final Supplier<ExperimentUI> factory;
 
-		/**
-		 * Cache weight - currently only 0 = no caching and > 0 caching
-		 */
+		/** Cache weight - currently only 0 = no caching and > 0 caching */
 		private final int cacheDepth;
 
-		/**
-		 * Create an experiment.
-		 */
-		public ExperimentApplication(Supplier<Parent> factory, int cacheDepth) {
-			this.factory = Objects.requireNonNull(factory, "factory");
+		public ExperimentApplication(Supplier<ExperimentUI> factory, int cacheDepth) {
+			this.factory = factory;
 			this.cacheDepth = Math.max(0, cacheDepth);
 		}
 
-		/** 
-		 * Returns an instance from the cache for a given name, otherwise creates it with the factory.
-		 */
 		public synchronized Parent getView(String name) {
-			Parent p = cache.get(name);
-			if (p != null) return p;
-			p = factory.get();
-			if(cacheDepth > 0) cache.put(name, p); // may trigger cache evict
-			return p;
+			ExperimentUI experiment = cache.get(name);
+			if (experiment == null) {
+				experiment = factory.get();
+				if (cacheDepth > 0) cache.put(name, experiment); // kann Eviction triggern -> dispose() passiert oben
+			}
+			return experiment.getContent();
 		}
 
-		/* 
-		 * Cache utilities
-		 */
-
-		public synchronized void invalidate(String name) { cache.remove(name); }
-		public synchronized void clear() { cache.clear(); }
+		public synchronized void invalidate(String name) { cache.remove(name); } // schließt via override
+		public synchronized void clear() { cache.clear(); }                      // schließt via override
 		public synchronized int cachedCount() { return cache.size(); }
 		public int getCacheDepth() { return cacheDepth; }
 	}
@@ -99,7 +137,7 @@ public class ExperimentsTree extends Application {
 					//					"One Parametric Abatement Model (new Window)", DICEAbatementTimeExperimentUI.class
 					),
 			"Interest Rates", mapOf(
-					"Simulation of Hull White Paths", new ExperimentApplication(() -> new InterestRatesHullWhiteSimulationPathOfShortRate().createContent(), 1),
+					"Simulation of Hull White Paths", new ExperimentApplication(() -> new InterestRatesHullWhiteSimulationPathOfShortRate(), 1),
 					"(tba)", (Runnable) () -> System.out.println("Will be added soon.")
 					)
 			);
@@ -182,7 +220,13 @@ public class ExperimentsTree extends Application {
 		Scene scene = new Scene(root, 1024, 520);
 		stage.setScene(scene);
 		stage.setTitle("finmath Numerical Experiments");
+
 		stage.show();
+	}
+
+	@Override
+	public void stop() {
+		ExperimentApplication.cache.clear();
 	}
 
 	/**

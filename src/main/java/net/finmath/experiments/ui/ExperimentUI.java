@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleConsumer;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
@@ -21,6 +22,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -52,6 +55,7 @@ public abstract class ExperimentUI extends Application {
 	private final AtomicLong currentEpoch = new AtomicLong(0);
 
 	private final PauseTransition debounce = new PauseTransition(Duration.millis(300));
+	private final ProgressBar progressIndicator = new ProgressBar();
 	private final DecimalFormat df = new DecimalFormat("#.####");
 
 	private Parent content;
@@ -65,7 +69,7 @@ public abstract class ExperimentUI extends Application {
 	 */
 	abstract public String getTitle();
 
-	abstract public void runCalculation(BooleanSupplier isCancelled);
+	abstract public void runCalculation(BooleanSupplier isCancelled, DoubleConsumer progress);
 
 	protected void onClose() {
 		debounce.stop();
@@ -89,14 +93,23 @@ public abstract class ExperimentUI extends Application {
 
 		BooleanSupplier isCancelled = () -> taskEpoch < currentEpoch.get();
 		
-		Task<Double> task = new Task<>() {
+		Task<Void> task = new Task<>() {
 			@Override
-			protected Double call() throws Exception {
-				runCalculation(isCancelled);
-				return 0.0;
+			protected Void call() throws Exception {
+				updateProgress(-1, 1);
+				DoubleConsumer process = p -> { if(taskEpoch == currentEpoch.get()) this.updateProgress(p, 1.0); };				
+				runCalculation(isCancelled, process);
+				updateProgress(1.0, 1.0);
+				return null;
 			}
 		};
 
+		// Bind the progressIndicator to this task
+		progressIndicator.progressProperty().unbind();
+		progressIndicator.visibleProperty().unbind();
+		progressIndicator.visibleProperty().bind(task.runningProperty());
+		progressIndicator.progressProperty().bind(task.progressProperty());
+		
 		currentJob = pool.submit(task);
 	}
 
@@ -157,9 +170,14 @@ public abstract class ExperimentUI extends Application {
 		btnReset.setOnAction(e -> resetToDefaults());
 		Button btnCompute = new Button("Calculate");
 		btnCompute.setOnAction(e -> runCalculationAsync());
-		buttons.getChildren().addAll(btnReset, btnCompute);
+
+//		progressIndicator.setPrefSize(18, 18);
+		progressIndicator.setVisible(false);
+
+		buttons.getChildren().addAll(btnReset, btnCompute, progressIndicator);
 		buttons.setAlignment(Pos.CENTER_LEFT);
 
+		
 		VBox vbox = new VBox(12, grid, buttons);
 		vbox.setPadding(new Insets(14));
 

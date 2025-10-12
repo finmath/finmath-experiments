@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleConsumer;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -49,7 +50,7 @@ public class InterestRatesHullWhiteSimulationPathOfShortRate extends ExperimentU
 
 	public String getTitle() { return "Hull White Model - Simulation of Interest Rate (Short Rate)"; }
 
-	public void runCalculation(BooleanSupplier isCancelled) {
+	public void runCalculation(BooleanSupplier isCancelled, DoubleConsumer progress) {
 		Map<String, Object> currentParameterSet = getExperimentParameters().stream().collect(Collectors.toMap(p -> p.getBindableValue().getName(), p -> p.getBindableValue().getValue()));
 
 		System.out.println("Calculation with Parameters: " + currentParameterSet);
@@ -90,11 +91,7 @@ public class InterestRatesHullWhiteSimulationPathOfShortRate extends ExperimentU
 			};
 		};
 
-		final String titleSpec = "\u03c3="
-				+String.format("%-10.3f",shortRateVolatility*100).trim() + "%, "
-				+"a="
-				+String.format("%-10.3f",shortRateMeanreversion*100).trim() + "%, "
-				+ "";
+		final String titleSpec = "\u03c3=" + numberPercent2.format(shortRateVolatility) + ", a=" + numberPercent2.format(shortRateMeanreversion);
 
 		int dotSize = 1;
 		int numberOfPathsToShow = 50;
@@ -107,6 +104,7 @@ public class InterestRatesHullWhiteSimulationPathOfShortRate extends ExperimentU
 			} catch (Exception e) {
 				valueSlices.add(Scalar.of(Double.NaN));
 			}
+			progress.accept((double)j/timeDiscretization.getNumberOfTimes()/2);
 		}
 
 		List<Plotable2D> plotables = new ArrayList<Plotable2D>();
@@ -117,6 +115,7 @@ public class InterestRatesHullWhiteSimulationPathOfShortRate extends ExperimentU
 				series.add(new Point2D(time, valueSlices.get(j).get(i)));
 			}
 			plotables.add(new PlotablePoints2D("Scatter", series, new GraphStyle(new Rectangle(dotSize, dotSize), new BasicStroke(), null)));
+			progress.accept(0.5+(double)i/numberOfPathsToShow/2);
 		}
 
 		synchronized(this) {
@@ -124,10 +123,11 @@ public class InterestRatesHullWhiteSimulationPathOfShortRate extends ExperimentU
 				if(plot == null) {
 					plot = new Plot2D(plotables);
 					plot.setTitle("Short Rate (" + titleSpec + ")").setXAxisLabel("time (years)").setYAxisLabel("Short Rate (r)");
-					plot.setYRange(-0.02, 0.10);
+					plot.setYRange(-0.02, 0.20);
 					plot.show();
 				}
 				else {
+					plot.setTitle("Short Rate (" + titleSpec + ")").setXAxisLabel("time (years)").setYAxisLabel("Short Rate (r)");
 					plot.update(plotables);
 				}
 			}

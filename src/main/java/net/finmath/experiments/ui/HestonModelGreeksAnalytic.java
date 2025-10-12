@@ -8,12 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleConsumer;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import net.finmath.climateschool.utilities.ModelFactory;
 import net.finmath.climateschool.utilities.RandomOperators;
+import net.finmath.experiments.ui.parameter.BooleanParameter;
 import net.finmath.experiments.ui.parameter.DoubleParameter;
 import net.finmath.montecarlo.interestrate.TermStructureMonteCarloSimulationModel;
 import net.finmath.plots.DoubleToRandomVariableFunction;
@@ -39,7 +41,9 @@ public class HestonModelGreeksAnalytic extends ExperimentUI {
 	private final DecimalFormat numberDigit2 = new DecimalFormat("#.00");
 	private final DecimalFormat numberPercent1 = new DecimalFormat("#.0%");
 
-	Plot2D plot = null;
+	Plot2D plotDelta = null;
+	Plot2D plotGamma = null;
+	Plot2D plotVega = null;
 
 	final static String RISK_FREE_RATE = "Risk Free Rate";
 	final static String DIVIDEND_YIELD = "Dividend Yield";
@@ -61,13 +65,16 @@ public class HestonModelGreeksAnalytic extends ExperimentUI {
 				new DoubleParameter(V0, 0.0423, 0.0001, 2.0),
 				new DoubleParameter(RHO, -0.4, -1.0, 1.0),
 				new DoubleParameter(OPTION_MATURIY, 0.2, 0.01, 5.0),
-				new DoubleParameter(OPTION_STRIKE, 50, 90, 250)
+				new DoubleParameter(OPTION_STRIKE, 50, 90, 250),
+				new BooleanParameter("Show Delta", true),
+				new BooleanParameter("Show Gamma", false),
+				new BooleanParameter("Show Vega", false)
 				));
 	}
 
 	public String getTitle() { return "Heston Model - Greeks (Analytic)"; }
 
-	public void runCalculation(BooleanSupplier isCancelled) {
+	public void runCalculation(BooleanSupplier isCancelled, DoubleConsumer progress) {
 		Map<String, Object> currentParameterSet = getExperimentParameters().stream().collect(Collectors.toMap(p -> p.getBindableValue().getName(), p -> p.getBindableValue().getValue()));
 
 		System.out.println("Calculation with Parameters: " + currentParameterSet);
@@ -82,6 +89,15 @@ public class HestonModelGreeksAnalytic extends ExperimentUI {
 		final double optionMaturity = (Double)currentParameterSet.get(OPTION_MATURIY);
 		final double optionStrike = (Double)currentParameterSet.get(OPTION_STRIKE);
 
+		String titleSpec = "r="+numberPercent1.format(riskFreeRate) + ", q="+numberPercent1.format(dividendYield) +
+				", 𝜅=" + numberDigit2.format(kappa) +
+				", 𝜃=" + numberDigit2.format(theta) +
+				", 𝜎=" + numberDigit2.format(sigma) +
+				", v₀=" + numberDigit2.format(v0) +
+				", 𝜌=" + numberDigit2.format(rho) +
+				", T=" + numberDigit2.format(optionMaturity) +
+				", K=" + numberDigit2.format(optionStrike);
+
 		DoubleUnaryOperator deltaFun = (stock) -> HestonModel.hestonOptionDelta(
 				stock,
 				riskFreeRate,
@@ -94,50 +110,115 @@ public class HestonModelGreeksAnalytic extends ExperimentUI {
 				optionMaturity,
 				optionStrike);
 
-		DoubleUnaryOperator deltaFunBS = (stock) -> {
-			return AnalyticFormulas.blackScholesOptionDelta(
+		DoubleUnaryOperator gammaFun = (stock) -> HestonModel.hestonOptionGamma(
+				stock,
+				riskFreeRate,
+				dividendYield,
+				kappa, 
+				theta, 
+				sigma, 
+				v0, 
+				rho,
+				optionMaturity,
+				optionStrike);
+
+		DoubleUnaryOperator vegaFun = (stock) -> HestonModel.hestonOptionVega1(
+				stock,
+				riskFreeRate,
+				dividendYield,
+				kappa, 
+				theta, 
+				sigma, 
+				v0, 
+				rho,
+				optionMaturity,
+				optionStrike);
+
+		DoubleUnaryOperator deltaFunBS = (stock) -> { return AnalyticFormulas.blackScholesOptionDelta(
 				stock,
 				riskFreeRate-dividendYield,
 				Math.sqrt(v0),
 				optionMaturity,
-				optionStrike) * Math.exp(-dividendYield * optionMaturity); };
+				optionStrike) * Math.exp(-dividendYield * optionMaturity);
+		};
 
-		List<Plotable2D> plotables = List.of(
-				new PlotableFunction2D(0, 300, 200, new Named<DoubleUnaryOperator>("Heston", deltaFun), new GraphStyle(null, new BasicStroke(), Color.blue)),
-				new PlotableFunction2D(0, 300, 200, new Named<DoubleUnaryOperator>("Black Scholes", deltaFunBS), new GraphStyle(null, new BasicStroke(), Color.RED))
-				);
-
-		String titleSpec = "r="+numberPercent1.format(riskFreeRate) + ", q="+numberPercent1.format(dividendYield) +
-				", 𝜅=" + numberDigit2.format(kappa) +
-				", 𝜃=" + numberDigit2.format(theta) +
-				", 𝜎=" + numberDigit2.format(sigma) +
-				", v₀=" + numberDigit2.format(v0) +
-				", 𝜌=" + numberDigit2.format(rho) +
-				", T=" + numberDigit2.format(optionMaturity) +
-				", K=" + numberDigit2.format(optionStrike);
-
-		String nameOfGreek = "Delta";
+		DoubleUnaryOperator gammaFunBS = (stock) -> { return AnalyticFormulas.blackScholesOptionGamma(
+				stock,
+				riskFreeRate-dividendYield,
+				Math.sqrt(v0),
+				optionMaturity,
+				optionStrike) * Math.exp(-dividendYield * optionMaturity);
+		};
+		
+		DoubleUnaryOperator vegaFunBS = (stock) -> { return AnalyticFormulas.blackScholesOptionVega(
+				stock,
+				riskFreeRate-dividendYield,
+				Math.sqrt(v0),
+				optionMaturity,
+				optionStrike) * Math.exp(-dividendYield * optionMaturity);
+		};
 
 		synchronized(this) {
 			if(!Thread.currentThread().isInterrupted() && !isCancelled.getAsBoolean()) {
-				if(plot == null) {
-					try {
-						plot = new Plot2D(plotables);
-						plot.setTitle("Heston vs Black Scholes Option " + nameOfGreek + "\n(" + titleSpec + ")").setXAxisLabel("Spot").setYAxisLabel(nameOfGreek);
-						plot.setIsLegendVisible(true);
-						//					plot.setYRange(-0.02, 0.10);
-						plot.show();
-					}
-					catch(Exception e) {
-						e.printStackTrace();
+				if((Boolean)currentParameterSet.get("Show Delta"))
+				plotDelta = plot(plotDelta, "Delta", titleSpec, deltaFunBS, deltaFun);
+				else {
+					if(plotDelta != null) {
+						plotDelta.close();
+						plotDelta = null;
 					}
 				}
+			}
+			if(!Thread.currentThread().isInterrupted() && !isCancelled.getAsBoolean()) {
+				if((Boolean)currentParameterSet.get("Show Gamma"))
+				plotGamma = plot(plotGamma, "Gamma", titleSpec, gammaFunBS, gammaFun);
 				else {
-					plot.setTitle("Heston vs Black Scholes Option " + nameOfGreek + "\n(" + titleSpec + ")").setXAxisLabel("Spot").setYAxisLabel(nameOfGreek);
-					plot.update(plotables);
+					if(plotGamma != null) {
+						plotGamma.close();
+						plotGamma = null;
+					}
+
+				}
+			}
+			if(!Thread.currentThread().isInterrupted() && !isCancelled.getAsBoolean()) {
+				if((Boolean)currentParameterSet.get("Show Vega"))
+				plotVega = plot(plotVega, "Vega", titleSpec, vegaFunBS, vegaFun);
+				else {
+					if(plotVega != null) {
+						plotVega.close();
+						plotVega = null;
+					}
 				}
 			}
 		}
+		
+		progress.accept(1.0);
+	}
+
+	private Plot2D plot(Plot2D plot, String nameOfGreek, String titleSpec, DoubleUnaryOperator greekBlackScholes, DoubleUnaryOperator greekHeston) {
+		List<Plotable2D> plotables = List.of(
+				new PlotableFunction2D(0, 300, 200, new Named<DoubleUnaryOperator>("Heston", greekHeston), new GraphStyle(null, new BasicStroke(), Color.blue)),
+				new PlotableFunction2D(0, 300, 200, new Named<DoubleUnaryOperator>("Black Scholes", greekBlackScholes), new GraphStyle(null, new BasicStroke(), Color.RED))
+				);
+
+		if(plot == null) {
+			try {
+				plot = new Plot2D(plotables);
+				plot.setTitle("Heston vs Black Scholes Option " + nameOfGreek + "\n(" + titleSpec + ")").setXAxisLabel("Spot").setYAxisLabel(nameOfGreek);
+				plot.setIsLegendVisible(true);
+				//					plot.setYRange(-0.02, 0.10);
+				plot.show();
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			plot.setTitle("Heston vs Black Scholes Option " + nameOfGreek + "\n(" + titleSpec + ")").setXAxisLabel("Spot").setYAxisLabel(nameOfGreek);
+			plot.update(plotables);
+		}
+
+		return plot;
 	}
 
 	@Override
@@ -145,9 +226,17 @@ public class HestonModelGreeksAnalytic extends ExperimentUI {
 		synchronized (this) {
 			super.onClose();
 			System.out.println("Closing plot");
-			if(plot != null) {
-				plot.close();
-				plot = null;
+			if(plotDelta != null) {
+				plotDelta.close();
+				plotDelta = null;
+			}
+			if(plotGamma != null) {
+				plotGamma.close();
+				plotGamma = null;
+			}
+			if(plotVega != null) {
+				plotVega.close();
+				plotVega = null;
 			}
 		}
 	}

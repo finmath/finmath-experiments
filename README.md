@@ -5,6 +5,19 @@ Experiments and demos based on finmath lib.
 
 See also http://finmath.github.io/finmath-experiments/
 
+---
+
+**Note**: As of October 12, 2025 the master branch has been renamed to main. In case you have an existing clone on master you may consider doing
+
+```
+git fetch origin
+git branch -m master main           # if you still have 'master'
+git branch -u origin/main main
+git remote set-head origin -a
+```
+
+---
+
 Projects
 --------
 

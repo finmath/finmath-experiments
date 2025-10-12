@@ -3,7 +3,7 @@
 
 	<groupId>net.finmath</groupId>
 	<artifactId>finmath-experiments</artifactId>
-	<version>1.0.10-SNAPSHOT</version>
+	<version>1.0.11-SNAPSHOT</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -473,6 +473,39 @@
 				<pack.type>DEB</pack.type>
 			</properties>
 		</profile>
+
+		<profile>
+			<id>windows-only-temp</id>
+			<activation>
+				<os>
+					<family>Windows</family>
+				</os>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.panteleyev</groupId>
+						<artifactId>jpackage-maven-plugin</artifactId>
+						<version>1.7.1</version>
+						<executions>
+							<execution>
+								<id>make-installer</id>
+								<configuration>
+									<additionalOptions>
+										<additionalOption>--vendor</additionalOption>
+										<additionalOption>finmath.net</additionalOption>
+										<additionalOption>--verbose</additionalOption>
+										<additionalOption>--temp</additionalOption>
+										<additionalOption>D:\t</additionalOption>
+									</additionalOptions>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
 	</profiles>
 
 	<repositories>
@@ -488,7 +521,7 @@
 		<url>https://github.com/finmath/finmath-experiments</url>
 		<connection>scm:git:https://github.com/finmath/finmath-experiments.git</connection>
 		<developerConnection>scm:git:https://github.com/finmath/finmath-experiments.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>v1.0.10</tag>
 	</scm>
 
 </project>

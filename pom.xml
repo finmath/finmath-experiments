@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>net.finmath</groupId>
 	<artifactId>finmath-experiments</artifactId>
-	<version>0.1.1-SNAPSHOT</version>
+	<version>1.0.3</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -13,13 +12,24 @@
 		<src.main.kotlin.dir>src/main/kotlin</src.main.kotlin.dir>
 		<src.test.kotlin.dir>src/test/kotlin</src.test.kotlin.dir>
 		<kotlin.version>1.2.0</kotlin.version>
-		<junit.version>4.12</junit.version>
-		<finmath-lib.version>5.1.1</finmath-lib.version>
-		<finmath-plot.version>0.4.0</finmath-plot.version>
-		<finmath-cuda.version>4.1.7</finmath-cuda.version>
-		<finmath-cuda.classifier></finmath-cuda.classifier>
+		<maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
+
+		<junit.version>5.6.2</junit.version>
+		<finmath-lib.version>6.0.25</finmath-lib.version>
+		<finmath-plot.version>0.5.7</finmath-plot.version>
+		<finmath-opencl.version>5.1.3</finmath-opencl.version>
+		<finmath-cuda.version>5.1.3</finmath-cuda.version>
+		<finmath-cuda.classifier />
+		<finmath-opencl.classifier>opencl-1.0</finmath-opencl.classifier>
+
+		<!-- JavaFX -->
+		<javafx.version>21.0.5</javafx.version>
+		<!-- Fallback - overwrite by profile -->
+		<javafx.platform>mac-aarch64</javafx.platform>
+
 		<!-- maven plugins -->
-		<compiler-plugin.version>3.8.1</compiler-plugin.version>
+		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<surefire-plugin.version>3.0.0-M4</surefire-plugin.version>
 		<surefire-report-plugin.version>3.0.0-M4</surefire-report-plugin.version>
 		<javadoc-plugin.version>3.1.1</javadoc-plugin.version>
@@ -28,6 +38,9 @@
 		<site-plugin.version>3.8.2</site-plugin.version>
 		<checkstyle-plugin.version>3.1.1</checkstyle-plugin.version>
 		<clover-plugin.version>4.4.1</clover-plugin.version>
+		<maven-bnd-plugin.version>5.3.0</maven-bnd-plugin.version>
+		<!-- skip tests by default -->
+		<skipTests>true</skipTests>
 	</properties>
 
 	<licenses>
@@ -53,6 +66,140 @@
 		</developer>
 	</developers>
 
+	<dependencies>
+		<!-- libs -->
+		<dependency>
+			<groupId>net.finmath</groupId>
+			<artifactId>finmath-lib</artifactId>
+			<version>${finmath-lib.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.finmath</groupId>
+			<artifactId>finmath-lib-plot-extensions</artifactId>
+			<version>${finmath-plot.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>net.finmath</groupId>
+					<artifactId>finmath-lib</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-base</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-graphics</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-controls</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-swing</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!--
+		<dependency>
+			<groupId>net.finmath</groupId>
+			<artifactId>finmath-lib-cuda-extensions</artifactId>
+			<version>${finmath-cuda.version}</version>
+			<classifier>${finmath-cuda.classifier}</classifier>
+		</dependency>
+		-->
+
+		<dependency>
+			<groupId>net.finmath</groupId>
+			<artifactId>finmath-lib-opencl-extensions</artifactId>
+			<version>${finmath-opencl.version}</version>
+			<classifier>${finmath-opencl.classifier}</classifier>
+		</dependency>
+
+		<!-- JavaFX (classifier via profile) -->
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-base</artifactId>
+			<version>${javafx.version}</version>
+			<classifier>${javafx.platform}</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-graphics</artifactId>
+			<version>${javafx.version}</version>
+			<classifier>${javafx.platform}</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-controls</artifactId>
+			<version>${javafx.version}</version>
+			<classifier>${javafx.platform}</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-swing</artifactId>
+			<version>${javafx.version}</version>
+			<classifier>${javafx.platform}</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-fxml</artifactId>
+			<version>${javafx.version}</version>
+			<classifier>${javafx.platform}</classifier>
+		</dependency>
+
+		<!-- apache commons -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>3.6.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.10</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.4</version>
+		</dependency>
+
+		<!-- Tests -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+ <dependency>
+    <groupId>org.junit.jupiter</groupId>
+    <artifactId>junit-jupiter-params</artifactId>
+			<version>${junit.version}</version>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
+    <groupId>junit</groupId>
+    <artifactId>junit</artifactId>
+    <version>4.13.2</version>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
+    <groupId>org.junit.vintage</groupId>
+    <artifactId>junit-vintage-engine</artifactId>
+    <version>5.10.3</version>
+    <scope>test</scope>
+  </dependency>
+   	</dependencies>
+
 	<build>
 		<defaultGoal>clean install jshell:run</defaultGoal>
 		<finalName>${project.artifactId}-${project.version}</finalName>
@@ -69,11 +216,31 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${compiler-plugin.version}</version>
+				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
-					<release>11</release>
-					<source>11</source>
-					<target>11</target>
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
+					<compilerVersion>${maven.compiler.source}</compilerVersion>
+				</configuration>
+			</plugin>
+
+			<!-- Start via exec:java -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>3.3.0</version>
+				<configuration>
+					<mainClass>net.finmath.experiments.ui.StartUI</mainClass>
+				</configuration>
+			</plugin>
+
+			<!-- javafx-maven-plugin -->
+			<plugin>
+				<groupId>org.openjfx</groupId>
+				<artifactId>javafx-maven-plugin</artifactId>
+				<version>0.0.8</version>
+				<configuration>
+					<mainClass>net.finmath.experiments.ui.StartUI</mainClass>
 				</configuration>
 			</plugin>
 
@@ -83,6 +250,7 @@
 				<version>${surefire-plugin.version}</version>
 				<configuration>
 					<argLine>-mx5G</argLine>
+					<skipTests>${skipTests}</skipTests>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -105,6 +273,65 @@
 				<version>${javadoc-plugin.version}</version>
 			</plugin>
 
+			<!-- Dependencies for jpackage in target/ -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.6.1</version>
+				<executions>
+					<execution>
+						<id>copy-runtime-deps</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<includeScope>runtime</includeScope>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- jpackage -->
+			<plugin>
+				<groupId>org.panteleyev</groupId>
+				<artifactId>jpackage-maven-plugin</artifactId>
+				<version>1.7.1</version>
+				<!-- top level config (if called via mvn jpackage:jpackage -->
+				<configuration>
+					<name>${project.name}</name>
+					<appVersion>${project.version}</appVersion>
+					<input>${project.build.directory}</input>
+					<mainJar>${project.build.finalName}.jar</mainJar>
+					<mainClass>net.finmath.climateschool.ui.StartUI</mainClass>
+					<runtimeImage>${java.home}</runtimeImage>
+					<destination>${project.build.directory}/dist</destination>
+					<removeDestination>true</removeDestination>
+					<type>${pack.type}</type>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-installer</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jpackage</goal>
+						</goals>
+						<configuration>
+							<name>${project.name}</name>
+							<appVersion>${project.version}</appVersion>
+							<input>${project.build.directory}</input>
+							<mainJar>${project.build.finalName}.jar</mainJar>
+							<mainClass>net.finmath.experiments.ui.StartUI</mainClass>
+							<runtimeImage>${java.home}</runtimeImage>
+							<destination>${project.build.directory}/dist</destination>
+							<removeDestination>true</removeDestination>
+							<type>${pack.type}</type>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
@@ -116,6 +343,19 @@
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
+				</configuration>
+			</plugin>
+			
+			<!-- Maven Release Plugin: create v<version>; Tag-Push triggers GitHub Action -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>3.0.1</version>
+				<configuration>
+					<tagNameFormat>v@{project.version}</tagNameFormat>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<pushChanges>true</pushChanges>
+					<arguments>-DskipTests</arguments>
 				</configuration>
 			</plugin>
 
@@ -169,73 +409,62 @@
 				<finmath-cuda.classifier>cuda-${cuda.version}</finmath-cuda.classifier>
 			</properties>
 		</profile>
+		<profile>
+			<id>mac-aarch64</id>
+			<activation>
+				<os>
+					<family>mac</family>
+					<arch>aarch64</arch>
+				</os>
+			</activation>
+			<properties>
+				<javafx.platform>mac-aarch64</javafx.platform>
+				<pack.type>DMG</pack.type>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>mac-x64</id>
+			<activation>
+				<os>
+					<family>mac</family>
+					<arch>x86_64</arch>
+				</os>
+			</activation>
+			<properties>
+				<javafx.platform>mac</javafx.platform>
+				<pack.type>DMG</pack.type>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>win-x64</id>
+			<activation>
+				<os>
+					<family>windows</family>
+					<arch>amd64</arch>
+				</os>
+			</activation>
+			<properties>
+				<javafx.platform>win</javafx.platform>
+				<pack.type>MSI</pack.type>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>linux-x64</id>
+			<activation>
+				<os>
+					<family>unix</family>
+					<arch>amd64</arch>
+				</os>
+			</activation>
+			<properties>
+				<javafx.platform>linux</javafx.platform>
+				<pack.type>DEB</pack.type>
+			</properties>
+		</profile>
 	</profiles>
-
-	<dependencies>
-		<!-- Java FX -->
-		<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-base -->
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-base</artifactId>
-			<version>11.0.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-controls</artifactId>
-			<version>11.0.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-swing</artifactId>
-			<version>11.0.2</version>
-		</dependency>
-
-		<!-- finmath-lib -->
-		<dependency>
-			<groupId>net.finmath</groupId>
-			<artifactId>finmath-lib</artifactId>
-			<version>${finmath-lib.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>net.finmath</groupId>
-			<artifactId>finmath-lib-plot-extensions</artifactId>
-			<version>${finmath-plot.version}</version>
-		</dependency>
-
-		<!-- 
-		<dependency>
-			<groupId>net.finmath</groupId>
-			<artifactId>finmath-lib-cuda-extensions</artifactId>
-			<version>${finmath-cuda.version}</version>
-			<classifier>${finmath-cuda.classifier}</classifier>
-		</dependency>
-		 -->
-
-		<!-- apache commons -->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math3</artifactId>
-			<version>3.6.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.10</version>
-		</dependency>		
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-csv</artifactId>
-			<version>1.4</version>
-		</dependency>
-
-		<!-- junit -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
-		</dependency>
-	</dependencies>
 
 	<repositories>
 		<repository>

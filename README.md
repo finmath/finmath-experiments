@@ -18,6 +18,18 @@ git remote set-head origin -a
 
 ---
 
+Graphical User Interface to the Experiments
+--------
+
+We provide a binary version of the experiments for
+
+- Windows (file ending .msi)
+- MacOS (file ending .dmg)
+- Linux (file ending .deb)
+
+on the [finmath Experiments Releases Page](https://github.com/finmath/finmath-experiments/releases).
+
+
 Projects
 --------
 

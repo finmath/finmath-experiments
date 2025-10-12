@@ -2,39 +2,23 @@ package net.finmath.experiments.ui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Rectangle;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleUnaryOperator;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import net.finmath.climateschool.utilities.ModelFactory;
-import net.finmath.climateschool.utilities.RandomOperators;
 import net.finmath.experiments.ui.parameter.BooleanParameter;
 import net.finmath.experiments.ui.parameter.DoubleParameter;
-import net.finmath.montecarlo.interestrate.TermStructureMonteCarloSimulationModel;
-import net.finmath.plots.DoubleToRandomVariableFunction;
+import net.finmath.functions.AnalyticFormulas;
+import net.finmath.functions.HestonModel;
 import net.finmath.plots.GraphStyle;
 import net.finmath.plots.Named;
 import net.finmath.plots.Plot2D;
-import net.finmath.plots.Plotable;
 import net.finmath.plots.Plotable2D;
 import net.finmath.plots.PlotableFunction2D;
-import net.finmath.plots.PlotablePoints2D;
-import net.finmath.plots.Point2D;
-import net.finmath.stochastic.RandomOperator;
-import net.finmath.stochastic.RandomVariable;
-import net.finmath.stochastic.Scalar;
-import net.finmath.time.TimeDiscretization;
-import net.finmath.time.TimeDiscretizationFromArray;
-
-import net.finmath.functions.HestonModel;
-import net.finmath.functions.AnalyticFormulas;
 
 public class HestonModelGreeksAnalytic extends ExperimentUI {
 

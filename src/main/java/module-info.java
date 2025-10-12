@@ -8,6 +8,7 @@ module net.finmath.experiments {
 	exports net.finmath.experiments.montecarlo.interestrates;
 	exports net.finmath.experiments.reproduction;
 	exports net.finmath.experiments.ui;
+	exports net.finmath.experiments.ui.parameter;
 	
 	requires transitive net.finmath.lib;
 	requires transitive net.finmath.opencl;

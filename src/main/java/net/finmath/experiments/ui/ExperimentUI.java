@@ -23,7 +23,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -81,8 +80,6 @@ public abstract class ExperimentUI extends Application {
 	}
 
 	public void runCalculationAsync() {
-		System.out.println("Starting calculation.");
-
 		long taskEpoch = currentEpoch.incrementAndGet();
 		
 		// cancel running calculation

@@ -137,7 +137,7 @@ public class ExperimentsTree extends Application {
 //					//					"One Parametric Abatement Model (new Window)", DICEAbatementTimeExperimentUI.class
 //					),
 			"Heston Model", mapOf(
-					"Heston Model Greeks (analytic)", new ExperimentApplication(() -> new HestonModelGreeksAnalytic(), 1)
+					"Heston Model Greeks (analytic)", new ExperimentApplication(() -> new HestonModelGreeks(), 1)
 					),
 			"Interest Rates", mapOf(
 					"Simulation of Hull White Paths", new ExperimentApplication(() -> new InterestRatesHullWhiteSimulationPathOfShortRate(), 1),

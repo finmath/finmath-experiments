@@ -104,8 +104,6 @@ public class DICEModelPlots {
 	}
 
 	public void plotCost(ClimateModel climateModel, double discountRate, String paramSpec) {
-		System.out.println("Generating plots for " + climateModel);
-
 		final double timeHorizonInPlot = 400;
 
 		final TimeDiscretization timeDiscretization = climateModel.getTimeDiscretization();

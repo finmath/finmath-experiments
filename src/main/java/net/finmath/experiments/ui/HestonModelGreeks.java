@@ -20,7 +20,7 @@ import net.finmath.plots.Plot2D;
 import net.finmath.plots.Plotable2D;
 import net.finmath.plots.PlotableFunction2D;
 
-public class HestonModelGreeksAnalytic extends ExperimentUI {
+public class HestonModelGreeks extends ExperimentUI {
 
 	private final DecimalFormat numberDigit2 = new DecimalFormat("#.00");
 	private final DecimalFormat numberPercent1 = new DecimalFormat("#.0%");
@@ -29,9 +29,9 @@ public class HestonModelGreeksAnalytic extends ExperimentUI {
 	Plot2D plotGamma = null;
 	Plot2D plotVega = null;
 
-	final static String RISK_FREE_RATE = "r (risk free rate)";
-	final static String DIVIDEND_YIELD = "q (dividend yield)";
-	final static String SIGMA = "𝜎 (sigma), √(v₀))";
+	final static String RISK_FREE_RATE = "rᶜ (risk free rate (r-q))";
+	final static String DISCOUNT_RATE = "rᵈ (discount rate)";
+	final static String SIGMA = "𝜎 (sigma, √(v₀))";
 	final static String THETA = "𝜃 (theta)";
 	final static String KAPPA = "𝜅 (kappa)";
 	final static String XI = "𝜉 (xi)";
@@ -39,17 +39,17 @@ public class HestonModelGreeksAnalytic extends ExperimentUI {
 	final static String OPTION_MATURIY = "T (option maturity)";
 	final static String OPTION_STRIKE = "K (option strike)";
 
-	public HestonModelGreeksAnalytic() {
+	public HestonModelGreeks() {
 		super(List.of(
-				new DoubleParameter(RISK_FREE_RATE, 0.03, 0.00, 0.10),
-				new DoubleParameter(DIVIDEND_YIELD, 0.03, 0.00, 0.10),
+				new DoubleParameter(RISK_FREE_RATE, 0.03, 0.00, 0.20),
+				new DoubleParameter(DISCOUNT_RATE, 0.03, 0.00, 0.20),
 				new DoubleParameter(SIGMA, 0.20, 0.0, 1.0),
 				new DoubleParameter(THETA, 0.0818, 0.0001, 2.0),
 				new DoubleParameter(KAPPA, 0.8455, 0.001, 2.0),
 				new DoubleParameter(XI, 0.4639, 0.0001, 2.0),
 				new DoubleParameter(RHO, -0.4, -1.0, 1.0),
 				new DoubleParameter(OPTION_MATURIY, 0.2, 0.01, 5.0),
-				new DoubleParameter(OPTION_STRIKE, 50, 90, 250),
+				new DoubleParameter(OPTION_STRIKE, 90, 50, 250),
 				new BooleanParameter("Show Delta", true),
 				new BooleanParameter("Show Gamma", false),
 				new BooleanParameter("Show Vega", false)
@@ -64,7 +64,7 @@ public class HestonModelGreeksAnalytic extends ExperimentUI {
 		System.out.println("Calculation with Parameters: " + currentParameterSet);
 
 		final double riskFreeRate = (Double)currentParameterSet.get(RISK_FREE_RATE);
-		final double dividendYield = (Double)currentParameterSet.get(DIVIDEND_YIELD);
+		final double discountRate = (Double)currentParameterSet.get(DISCOUNT_RATE);
 		final double sigma = (Double)currentParameterSet.get(SIGMA);
 		final double theta =(Double)currentParameterSet.get(THETA);
 		final double kappa = (Double)currentParameterSet.get(KAPPA);
@@ -73,7 +73,7 @@ public class HestonModelGreeksAnalytic extends ExperimentUI {
 		final double optionMaturity = (Double)currentParameterSet.get(OPTION_MATURIY);
 		final double optionStrike = (Double)currentParameterSet.get(OPTION_STRIKE);
 
-		String titleSpec = "r="+numberPercent1.format(riskFreeRate) + ", q="+numberPercent1.format(dividendYield) +
+		String titleSpec = "rᶜ="+numberPercent1.format(riskFreeRate) + ", rᵈ="+numberPercent1.format(discountRate) +
 				", 𝜎=" + numberDigit2.format(sigma) +
 				", 𝜃=" + numberDigit2.format(theta) +
 				", 𝜅=" + numberDigit2.format(kappa) +
@@ -85,7 +85,7 @@ public class HestonModelGreeksAnalytic extends ExperimentUI {
 		DoubleUnaryOperator deltaFun = (stock) -> HestonModel.hestonOptionDelta(
 				stock,
 				riskFreeRate,
-				dividendYield,
+				discountRate,
 				sigma, 
 				theta, 
 				kappa, 
@@ -97,7 +97,7 @@ public class HestonModelGreeksAnalytic extends ExperimentUI {
 		DoubleUnaryOperator gammaFun = (stock) -> HestonModel.hestonOptionGamma(
 				stock,
 				riskFreeRate,
-				dividendYield,
+				discountRate,
 				sigma, 
 				theta, 
 				kappa, 
@@ -106,10 +106,10 @@ public class HestonModelGreeksAnalytic extends ExperimentUI {
 				optionMaturity,
 				optionStrike);
 
-		DoubleUnaryOperator vegaFun = (stock) -> HestonModel.hestonOptionVega1(
+		DoubleUnaryOperator vegaFun = (stock) -> HestonModel.hestonOptionVega(
 				stock,
 				riskFreeRate,
-				dividendYield,
+				discountRate,
 				sigma,
 				theta, 
 				kappa, 
@@ -120,26 +120,26 @@ public class HestonModelGreeksAnalytic extends ExperimentUI {
 
 		DoubleUnaryOperator deltaFunBS = (stock) -> { return AnalyticFormulas.blackScholesOptionDelta(
 				stock,
-				riskFreeRate-dividendYield,
+				riskFreeRate,
 				sigma, 
 				optionMaturity,
-				optionStrike) * Math.exp(-dividendYield * optionMaturity);
+				optionStrike) * Math.exp((riskFreeRate-discountRate) * optionMaturity);
 		};
 
 		DoubleUnaryOperator gammaFunBS = (stock) -> { return AnalyticFormulas.blackScholesOptionGamma(
 				stock,
-				riskFreeRate-dividendYield,
+				riskFreeRate,
 				sigma, 
 				optionMaturity,
-				optionStrike) * Math.exp(-dividendYield * optionMaturity);
+				optionStrike) * Math.exp((riskFreeRate-discountRate) * optionMaturity);
 		};
 		
 		DoubleUnaryOperator vegaFunBS = (stock) -> { return AnalyticFormulas.blackScholesOptionVega(
 				stock,
-				riskFreeRate-dividendYield,
+				riskFreeRate,
 				sigma, 
 				optionMaturity,
-				optionStrike) * Math.exp(-dividendYield * optionMaturity);
+				optionStrike) * Math.exp((riskFreeRate-discountRate) * optionMaturity);
 		};
 
 		synchronized(this) {

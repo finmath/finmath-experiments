@@ -245,7 +245,7 @@ public abstract class ExperimentUI extends Application {
 			sliderBox.setAlignment(Pos.CENTER_LEFT);
 
 			// constrain Labels
-			Label constrainLabel = new Label("in (" + df.format(lo) + "," + df.format(hi)+ ")");
+			Label constrainLabel = new Label("∊ (" + df.format(lo) + "," + df.format(hi)+ ")");
 
 			// Bidirektionales Binding (mit robuster Konvertierung)
 			StringConverter<Number> conv = new NumberStringConverter(df);

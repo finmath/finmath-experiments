@@ -168,9 +168,6 @@ public abstract class ExperimentUI extends Application {
 		Button btnCompute = new Button("Calculate");
 		btnCompute.setOnAction(e -> runCalculationAsync());
 
-//		progressIndicator.setPrefSize(18, 18);
-		progressIndicator.setVisible(false);
-
 		buttons.getChildren().addAll(btnReset, btnCompute, progressIndicator);
 		buttons.setAlignment(Pos.CENTER_LEFT);
 
@@ -183,6 +180,7 @@ public abstract class ExperimentUI extends Application {
 		content.setAnimated(false);
 		content.setMaxWidth(Double.MAX_VALUE);
 
+		this.content = content;
 		return content;
 	}
 

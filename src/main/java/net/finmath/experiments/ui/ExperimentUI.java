@@ -162,17 +162,21 @@ public abstract class ExperimentUI extends Application {
 		debounce.setOnFinished(e -> runCalculationAsync());
 
 		// Buttons
-		HBox buttons = new HBox(10);
-		Button btnReset = new Button("Reset");
-		btnReset.setOnAction(e -> resetToDefaults());
-		Button btnCompute = new Button("Calculate");
-		btnCompute.setOnAction(e -> runCalculationAsync());
+		Button buttonRest = new Button("Reset");
+		buttonRest.setOnAction(e -> resetToDefaults());
+		Button buttonCalculate = new Button("Calculate");
+		buttonCalculate.setOnAction(e -> runCalculationAsync());
 
-		buttons.getChildren().addAll(btnReset, btnCompute, progressIndicator);
-		buttons.setAlignment(Pos.CENTER_LEFT);
-
+		// Progress Indicator
+		if(progressIndicator.visibleProperty().isBound()) progressIndicator.visibleProperty().unbind();
+		progressIndicator.setVisible(false);
 		
-		VBox vbox = new VBox(12, grid, buttons);
+		// Controls
+		HBox controls = new HBox(10);
+		controls.getChildren().addAll(buttonRest, buttonCalculate, progressIndicator);
+		controls.setAlignment(Pos.CENTER_LEFT);
+		
+		VBox vbox = new VBox(12, grid, controls);
 		vbox.setPadding(new Insets(14));
 
 		TitledPane content = new TitledPane(getTitle(), vbox);

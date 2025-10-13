@@ -3,7 +3,7 @@
 
 	<groupId>net.finmath</groupId>
 	<artifactId>finmath-experiments</artifactId>
-	<version>1.0.13</version>
+	<version>1.0.14-SNAPSHOT</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -519,7 +519,7 @@
 		<url>https://github.com/finmath/finmath-experiments</url>
 		<connection>scm:git:https://github.com/finmath/finmath-experiments.git</connection>
 		<developerConnection>scm:git:https://github.com/finmath/finmath-experiments.git</developerConnection>
-		<tag>v1.0.13</tag>
+		<tag>v1.0.10</tag>
 	</scm>
 
 </project>

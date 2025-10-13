@@ -152,10 +152,11 @@ public class ExperimentsTree extends Application {
 	private Parent getInfo() {
 		VBox box = new VBox(
 				new Label("Collection of Parameter Experiments based on Models from finmath lib"),
-				new Label("Version 2025-10-12"),
+				new Label("Version 2025-10-12b"),
 				new Label("Select a topic on the left; set the parameters or select calculate.")
 				);
 		box.setAlignment(Pos.CENTER);
+		box.setSpacing(10);
 		box.setPadding(new Insets(12));
 		return box;
 	}

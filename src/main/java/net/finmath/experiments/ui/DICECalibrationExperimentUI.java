@@ -70,6 +70,8 @@ public class DICECalibrationExperimentUI extends ExperimentUI {
 			Arrays.fill(initialParameters, -Math.log(-Math.log(0.8)));
 		}
 
+		final int maxIterations = 500;
+		
 		final AdamOptimizerUsingFiniteDifferences optimizer = new AdamOptimizerUsingFiniteDifferences(initialParameters, 800, 0.05, GradientMethod.AVERAGE) {
 			private int iteration = 0;
 			@Override
@@ -114,6 +116,8 @@ public class DICECalibrationExperimentUI extends ExperimentUI {
 					else {
 						plots.closeCost();
 					}
+					
+					progress.accept((double)getIteration()/maxIterations);
 				}
 				iteration++;
 

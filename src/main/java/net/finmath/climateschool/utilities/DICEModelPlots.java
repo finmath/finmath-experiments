@@ -7,6 +7,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 import net.finmath.climate.models.CarbonConcentration;
@@ -212,8 +213,31 @@ public class DICEModelPlots {
 		}
 	}
 
+	private static void closePlot(Plot2D plot) {
+		if(plot != null) plot.close();
+	}
+
+	public void close() {
+		closePlot(plotTemperature);
+		closePlot(plotCarbon);
+		closePlot(plotEmission);
+		closePlot(plotOutput);
+		closePlot(plotAbatement);
+
+		plotTemperature = null;
+		plotCarbon = null;
+		plotEmission = null;
+		plotOutput = null;
+		plotAbatement = null;
+
+		closeCost();
+	}
+
 	public void closeCost() {
-		if(plotCostDiscounted != null) plotCostDiscounted.close();
-		if(plotCostPerGDP != null) plotCostPerGDP.close();
+		closePlot(plotCostDiscounted);
+		plotCostDiscounted = null;
+
+		closePlot(plotCostPerGDP);
+		plotCostPerGDP = null;
 	}
 }

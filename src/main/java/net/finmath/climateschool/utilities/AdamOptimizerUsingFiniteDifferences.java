@@ -30,11 +30,13 @@ public abstract class AdamOptimizerUsingFiniteDifferences {
 	private final GradientMethod gradientMethod;
 
 	private final int iterations;
-	private boolean runnning = false;
 	private double[] learningRate ;
 	private final double eps ;
 	private final double[] betas ;
 
+	private boolean runnning = false;
+	private int iteration;
+	
 	private final RandomVariableDifferentiable[] parameters ;
 	private RandomVariableDifferentiable[] bestFitParameters;
 	private double bestValue = Double.MAX_VALUE;
@@ -92,7 +94,7 @@ public abstract class AdamOptimizerUsingFiniteDifferences {
 			final double[] m = new double[parameters.length];
 			final double[] v = new double[parameters.length];
 
-			for(int k=0; k<iterations && runnning; k++) {
+			for(iteration=0; iteration<iterations && runnning; iteration++) {
 				final RandomVariable value = setValue(parameters);
 				if (value.getAverage() < bestValue || bestFitParameters == null) {
 					bestValue = value.getAverage();
@@ -113,18 +115,18 @@ public abstract class AdamOptimizerUsingFiniteDifferences {
 					m[i] = (betas[0]*m[i] + (1-betas[0])*gradient);
 					v[i] = (betas[1]*v[i] + (1-betas[1])*gradient*gradient);
 
-					final double update_m = m[i] / (1-Math.pow(betas[0],k+1));
-					final double update_v = v[i] / (1-Math.pow(betas[1],k+1));
+					final double update_m = m[i] / (1-Math.pow(betas[0], iteration+1));
+					final double update_v = v[i] / (1-Math.pow(betas[1], iteration+1));
 					final double stepDirection = update_m / (Math.sqrt(update_v)+eps);
 
 					parameters[i] = ((RandomVariableDifferentiable) parameters[i].sub(learningRate[i]*stepDirection)).getCloneIndependent();
 				}
 
-				if (k % 10 == 0) {
+				if(iteration % 10 == 0) {
 					final double valueForPrinting = (gradientMethod == GradientMethod.AVERAGE) ? value.getAverage() :
 						-RandomOperators.expectedShortFall(value.mult(-1.0),0.05).doubleValue();
-					if (k % 100 == 0) {
-						System.out.printf("iteration %8d \t\t value %8.4f %n", k, -valueForPrinting);
+					if (iteration % 100 == 0) {
+						System.out.printf("iteration %8d \t\t value %8.4f %n", iteration, -valueForPrinting);
 					} else {
 						//						System.out.printf("iteration %8d \t\t value %8.4f \r", k, -valueForPrinting);
 					}
@@ -140,7 +142,7 @@ public abstract class AdamOptimizerUsingFiniteDifferences {
 				v[i] = randomVariableFactory.createRandomVariable(0);
 			}
 
-			for(int k=0; k<iterations && runnning; k++) {
+			for(iteration=0; iteration<iterations && runnning; iteration++) {
 				final RandomVariable value = setValue(parameters);
 				if (value.getAverage() < bestValue || bestFitParameters == null) {
 					bestValue = value.getAverage();
@@ -160,16 +162,16 @@ public abstract class AdamOptimizerUsingFiniteDifferences {
 					m[i] = m[i].mult(betas[0]).add(gradient.mult(1-betas[0]));
 					v[i] = v[i].mult(betas[1]).add(gradient.squared().mult(1-betas[1]));
 
-					final RandomVariable update_m = m[i].div(1-Math.pow(betas[0],k+1));
-					final RandomVariable update_v = v[i].div(1-Math.pow(betas[1],k+1));
+					final RandomVariable update_m = m[i].div(1-Math.pow(betas[0], iteration+1));
+					final RandomVariable update_v = v[i].div(1-Math.pow(betas[1], iteration+1));
 					final RandomVariable stepDirection = update_m.div(update_v.sqrt().add(eps));
 
 					parameters[i] =
 							((RandomVariableDifferentiable) parameters[i].sub(stepDirection.mult(learningRate[i]))).getCloneIndependent();
 				}
 
-				if (k % 100 == 0) {
-					System.out.printf("iteration %8.4f \t\t value %8.4f %n", (double) k,value.getAverage());
+				if (iteration % 100 == 0) {
+					System.out.printf("iteration %8.4f \t\t value %8.4f %n", (double)iteration,value.getAverage());
 				}
 			}
 		}
@@ -208,5 +210,9 @@ public abstract class AdamOptimizerUsingFiniteDifferences {
 		}
 
 		return gradient;
+	}
+
+	public double getIteration() {
+		return iteration;
 	}
 }

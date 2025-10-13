@@ -142,6 +142,13 @@ public class ExperimentsTree extends Application {
 			"Interest Rates", mapOf(
 					"Simulation of Hull White Paths", new ExperimentApplication(() -> new InterestRatesHullWhiteSimulationPathOfShortRate(), 1),
 					"(tba)", (Runnable) () -> System.out.println("Will be added soon.")
+					),
+			"DICE Model (Climate School)", mapOf(
+					"One Parametric Abatement Model", new ExperimentApplication(() -> new DICEAbatementTimeExperimentUI(), 1),
+					"One Parametric Abatement Model, Calibrated", new ExperimentApplication(() -> new DICECalibrationOneParameterExperimentUI(), 1),
+					"Full Abatement Model, Calibrated", new ExperimentApplication(() -> new DICECalibrationExperimentUI(), 1)
+					//,
+					//					"One Parametric Abatement Model (new Window)", DICEAbatementTimeExperimentUI.class
 					)
 			);
 

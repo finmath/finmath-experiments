@@ -24,7 +24,7 @@
 		<finmath-opencl.classifier>opencl-1.0</finmath-opencl.classifier>
 
 		<apache-commons-math3.version>3.6.1</apache-commons-math3.version>
-		<apache.commons-commons-lang3.version>3.10</apache.commons-commons-lang3.version>
+		<apache.commons-commons-lang3.version>3.18.0</apache.commons-commons-lang3.version>
 		<apache.commons-commons-csv.version>1.4</apache.commons-commons-csv.version>
 		
 		<!-- JavaFX -->

@@ -5,7 +5,8 @@ import net.finmath.functions.NormalDistribution;
 /**
  * CIR Simulation.
  *
- * @author Gnoatto, Fries
+ * @author Alessandro Gnoatto
+ * @author Christian Fries
  */
 public class CIRSimulation {
 

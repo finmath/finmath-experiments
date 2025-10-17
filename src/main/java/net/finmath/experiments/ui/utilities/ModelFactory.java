@@ -1,4 +1,4 @@
-package net.finmath.experiments.ui.utilitites;
+package net.finmath.experiments.ui.utilities;
 
 import java.time.LocalDate;
 import java.util.HashMap;

@@ -11,11 +11,11 @@ import java.util.stream.Collectors;
 
 import net.finmath.climate.models.ClimateModel;
 import net.finmath.climate.models.dice.DICEModel;
-import net.finmath.climateschool.utilities.AdamOptimizerUsingFiniteDifferences;
-import net.finmath.climateschool.utilities.AdamOptimizerUsingFiniteDifferences.GradientMethod;
-import net.finmath.climateschool.utilities.DICEModelPlots;
 import net.finmath.experiments.ui.parameter.BooleanParameter;
 import net.finmath.experiments.ui.parameter.DoubleParameter;
+import net.finmath.experiments.ui.utilities.AdamOptimizerUsingFiniteDifferences;
+import net.finmath.experiments.ui.utilities.DICEModelPlots;
+import net.finmath.experiments.ui.utilities.AdamOptimizerUsingFiniteDifferences.GradientMethod;
 import net.finmath.stochastic.RandomVariable;
 import net.finmath.stochastic.Scalar;
 import net.finmath.time.TimeDiscretization;

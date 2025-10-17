@@ -1,4 +1,4 @@
-package net.finmath.experiments.ui.utilitites;
+package net.finmath.experiments.ui.utilities;
 
 import net.finmath.stochastic.RandomOperator;
 import net.finmath.stochastic.RandomVariable;

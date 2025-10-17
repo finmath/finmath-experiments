@@ -1,4 +1,4 @@
-package net.finmath.climateschool.utilities;
+package net.finmath.experiments.ui.utilities;
 
 /**
  * Application to check if JavaFX works.

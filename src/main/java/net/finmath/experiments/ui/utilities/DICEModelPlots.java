@@ -1,4 +1,4 @@
-package net.finmath.climateschool.utilities;
+package net.finmath.experiments.ui.utilities;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -200,7 +200,7 @@ public class MonteCarloLIBORMarketModelValuation {
 		System.out.println("__________________________________________________________________________________________\n");
 
 		// jUnit assertion: condition under which we consider this test successful
-		Assert.assertTrue(maxAbsDeviation < 8E-03);
+		Assertions.assertTrue(maxAbsDeviation < 8E-03);
 	}
 
 	@Test
@@ -257,7 +257,7 @@ public class MonteCarloLIBORMarketModelValuation {
 		 * jUnit assertion: condition under which we consider this test successful
 		 * The swap should be at par (close to zero)
 		 */
-		Assert.assertTrue(maxAbsDeviation < 2E-3);
+		Assertions.assertTrue(maxAbsDeviation < 2E-3);
 	}
 
 	@Test
@@ -314,7 +314,7 @@ public class MonteCarloLIBORMarketModelValuation {
 		 * jUnit assertion: condition under which we consider this test successful
 		 * The swap should be at par (close to zero)
 		 */
-		Assert.assertTrue(maxAbsDeviation < 2E-3);
+		Assertions.assertTrue(maxAbsDeviation < 2E-3);
 	}
 
 	@Test
@@ -363,7 +363,7 @@ public class MonteCarloLIBORMarketModelValuation {
 		/*
 		 * jUnit assertion: condition under which we consider this test successful
 		 */
-		Assert.assertTrue(Math.abs(maxAbsDeviation) < 5E-2);
+		Assertions.assertTrue(Math.abs(maxAbsDeviation) < 5E-2);
 	}
 
 	@Test
@@ -428,7 +428,7 @@ public class MonteCarloLIBORMarketModelValuation {
 		/*
 		 * jUnit assertion: condition under which we consider this test successful
 		 */
-		Assert.assertTrue(Math.abs(maxAbsDeviation) < 8E-3);
+		Assertions.assertTrue(Math.abs(maxAbsDeviation) < 8E-3);
 	}
 
 	@Test
@@ -493,7 +493,7 @@ public class MonteCarloLIBORMarketModelValuation {
 		/*
 		 * jUnit assertion: condition under which we consider this test successful
 		 */
-		Assert.assertTrue(Math.abs(maxAbsDeviation) < 8E-3);
+		Assertions.assertTrue(Math.abs(maxAbsDeviation) < 8E-3);
 	}
 
 	@Test
@@ -569,7 +569,7 @@ public class MonteCarloLIBORMarketModelValuation {
 		/*
 		 * jUnit assertion: condition under which we consider this test successful
 		 */
-		Assert.assertTrue(Math.abs(maxAbsDeviation) < 5E-4);
+		Assertions.assertTrue(Math.abs(maxAbsDeviation) < 5E-4);
 	}
 
 	@Test
@@ -642,7 +642,7 @@ public class MonteCarloLIBORMarketModelValuation {
 		/*
 		 * jUnit assertion: condition under which we consider this test successful
 		 */
-		Assert.assertTrue(Math.abs(maxAbsDeviation) < 1E-1);
+		Assertions.assertTrue(Math.abs(maxAbsDeviation) < 1E-1);
 	}
 
 	@Test
@@ -672,10 +672,10 @@ public class MonteCarloLIBORMarketModelValuation {
 			System.out.println(payment + "       \t" + formatterValue.format(rate));
 
 			if(payment < periodEnd) {
-				Assert.assertTrue("LIBOR payment convexity adjustment: rate > forward", rate > forward);
+				Assertions.assertTrue(rate > forward, "LIBOR payment convexity adjustment: rate > forward");
 			}
 			if(payment > periodEnd) {
-				Assert.assertTrue("LIBOR payment convexity adjustment: rate < forward", rate < forward);
+				Assertions.assertTrue(rate < forward, "LIBOR payment convexity adjustment: rate < forward");
 			}
 		}
 		System.out.println("__________________________________________________________________________________________\n");
@@ -806,7 +806,7 @@ public class MonteCarloLIBORMarketModelValuation {
 		System.out.println("Root Mean Squared Deviation..:" + formatterValue.format(diviationRMS));
 		System.out.println("__________________________________________________________________________________________\n");
 
-		Assert.assertEquals("RMS Deviation", 0.0, diviationRMS, 0.025);
+		Assertions.assertEquals(0.0, diviationRMS, 0.025, "RMS Deviation");
 	}
 
 	private static double getParSwaprate(final LIBORModelMonteCarloSimulationModel liborMarketModel, final double[] swapTenor) {

@@ -24,8 +24,8 @@
 		<finmath-opencl.classifier>opencl-1.0</finmath-opencl.classifier>
 
 		<apache-commons-math3.version>3.6.1</apache-commons-math3.version>
-		<apache.commons-commons-lang3.version>3.18.0</apache.commons-commons-lang3.version>
-		<apache.commons-commons-csv.version>1.4</apache.commons-commons-csv.version>
+		<apache-commons-lang3.version>3.18.0</apache-commons-lang3.version>
+		<apache-commons-csv.version>1.4</apache-commons-csv.version>
 		
 		<!-- JavaFX -->
 		<javafx.version>21.0.5</javafx.version>
@@ -34,6 +34,7 @@
 
 		<!-- maven plugins -->
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+		<maven-dependency-plugin.version>3.6.1</maven-dependency-plugin.version>
 		<surefire-plugin.version>3.0.0-M4</surefire-plugin.version>
 		<surefire-report-plugin.version>3.0.0-M4</surefire-report-plugin.version>
 		<javadoc-plugin.version>3.1.1</javadoc-plugin.version>
@@ -163,12 +164,12 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>${apache.commons-commons-lang3.version}</version>
+			<version>${apache-commons-lang3.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
-			<version>${apache.commons-commons-csv.version}</version>
+			<version>${apache-commons-csv.version}</version>
 		</dependency>
 
 		<!-- Tests -->
@@ -230,7 +231,7 @@
 				</configuration>
 			</plugin>
 
-			<!-- Start via exec:java -->
+			<!-- Start from command line via `mvn exec:java` -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -283,7 +284,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>3.6.1</version>
+				<version>${maven-dependency-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>copy-runtime-deps</id>

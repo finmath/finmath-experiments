@@ -9,6 +9,7 @@ module net.finmath.experiments {
 	exports net.finmath.experiments.reproduction;
 	exports net.finmath.experiments.ui;
 	exports net.finmath.experiments.ui.parameter;
+	exports net.finmath.experiments.utilities;
 	
 	requires transitive net.finmath.lib;
 	requires transitive net.finmath.opencl;

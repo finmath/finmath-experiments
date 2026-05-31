@@ -15,13 +15,16 @@
 		<maven.compiler.source>21</maven.compiler.source>
 		<maven.compiler.target>21</maven.compiler.target>
 
+		<jpackage.app.version>1.0.16</jpackage.app.version>
+		
 		<junit.version>5.6.2</junit.version>
-		<finmath-lib.version>6.0.28</finmath-lib.version>
-		<finmath-plot.version>0.5.7</finmath-plot.version>
+		<finmath-lib.version>6.1.3-SNAPSHOT</finmath-lib.version>
+		<finmath-plot.version>0.5.8-SNAPSHOT</finmath-plot.version>
 		<finmath-opencl.version>5.1.3</finmath-opencl.version>
 		<finmath-cuda.version>5.1.3</finmath-cuda.version>
 		<finmath-cuda.classifier />
 		<finmath-opencl.classifier>opencl-1.0</finmath-opencl.classifier>
+
 
 		<apache-commons-math3.version>3.6.1</apache-commons-math3.version>
 		<apache-commons-lang3.version>3.18.0</apache-commons-lang3.version>
@@ -281,6 +284,7 @@
 			</plugin>
 
 			<!-- Dependencies for jpackage in target/ -->
+			<!--
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -299,6 +303,7 @@
 					</execution>
 				</executions>
 			</plugin>
+			-->
 
 			<!-- jpackage -->
 			<plugin>
@@ -308,7 +313,10 @@
 				<!-- top level config (if called via mvn jpackage:jpackage -->
 				<configuration>
 					<name>${project.name}</name>
+					<appVersion>${jpackage.app.version}</appVersion>
+					<!--
 					<appVersion>${project.version}</appVersion>
+					-->
 					<input>${project.build.directory}</input>
 					<mainJar>${project.build.finalName}.jar</mainJar>
 					<mainClass>net.finmath.experiments.ui.StartUI</mainClass>
@@ -331,7 +339,10 @@
 						</goals>
 						<configuration>
 							<name>${project.name}</name>
+							<appVersion>${jpackage.app.version}</appVersion>
+							<!--
 							<appVersion>${project.version}</appVersion>
+							-->
 							<input>${project.build.directory}</input>
 							<mainJar>${project.build.finalName}.jar</mainJar>
 							<mainClass>net.finmath.experiments.ui.StartUI</mainClass>
@@ -406,7 +417,7 @@
 			<properties>
 				<envClassifier>experimental</envClassifier>
 				<finmath-lib.version>4.1.7</finmath-lib.version>
-				<finmath-plot.version>0.3.8-SNAPSHOT</finmath-plot.version>
+				<finmath-plot.version>0.5.8-SNAPSHOT</finmath-plot.version>
 				<finmath-cuda.version>4.1.7</finmath-cuda.version>
 			</properties>
 		</profile>

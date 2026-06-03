@@ -28,7 +28,6 @@ import net.finmath.experiments.input.LectureProjectData;
 import net.finmath.experiments.utilities.ModelFactoryInterestRates;
 import net.finmath.marketdata.model.curves.DiscountCurve;
 import net.finmath.marketdata.model.curves.ForwardCurve;
-import net.finmath.modelling.Model;
 import net.finmath.montecarlo.BrownianMotion;
 import net.finmath.montecarlo.BrownianMotionFromMersenneRandomNumbers;
 import net.finmath.montecarlo.MonteCarloSimulationModel;
@@ -54,6 +53,7 @@ import net.finmath.plots.Plotable2D;
 import net.finmath.plots.PlotableFunction2D;
 import net.finmath.plots.PlotableFunctionWithConfidenceInterval2D;
 import net.finmath.plots.PlotablePoints2D;
+import net.finmath.plots.PlotablePointsWithConfidenceIntervall2D;
 import net.finmath.plots.Plots;
 import net.finmath.plots.Point2D;
 import net.finmath.plots.util.ColorUtils;
@@ -112,23 +112,41 @@ public class ForwardSensitivityCapletHedgingExperiment {
 	 */
 	private static final double DEFAULT_CAPLET_STRIKE = 2.00 / 100.0;
 	private static final double TENOR_PERIOD_LENGTH = 0.5;
-
+	private static final int NUMBER_OF_PATHS = 10000;
+	private static final int SEED = 3141;
+	
 	/*
 	 * Model specific parameters.
+	 * Note that the model must allow the specified rebalancingPerPeriod (part of the config below).
+	 * Below we use rebalancingPerPeriod = numberOfSimulationStepsPerTenor, but it is possible to use a coarser rebalancing on a finer model
 	 */
 	public enum ModelType {
-		HULL_WHITE(2),
-		LMM(5),
-		LMM_HW(2);
+		HULL_WHITE_FINE("HullWhite@10", 2, 10),
+		HULL_WHITE("HullWhite@1", 2, 1),
+		LMM("LMM", 5, 1),
+		LMM_HW("LMM-HW", 5, 1);
 
+		private final String name;
 		private final int numberOfFactors;
+		private final int numberOfSimulationStepsPerTenor;
 
-		ModelType(final int numberOfFactors) {
+		ModelType(final String name, final int numberOfFactors, final int numberOfSimulationStepsPerTenor) {
+			this.name = name;
 			this.numberOfFactors = numberOfFactors;
+			this.numberOfSimulationStepsPerTenor = numberOfSimulationStepsPerTenor;
 		}
 
 		public int getNumberOfFactors() {
 			return numberOfFactors;
+		}
+
+		public int getNumberOfSimulationStepsPerTenor() {
+			return numberOfSimulationStepsPerTenor;
+		}
+
+		@Override
+		public String toString() {
+			return name;
 		}
 	}
 
@@ -145,6 +163,13 @@ public class ForwardSensitivityCapletHedgingExperiment {
 		DISCRETE_ROLL_OVER_AND_PAYMENT_BOND,
 	}
 
+	/*
+	 * Where to unwind the hedge.
+	 * Important: If you use PAYMENT_TIME_CASHFLOW you need to use DISCRETE_ROLL_OVER_AND_PAYMENT_BOND
+	 * because with TWO_BONDS the first bond will be matured and the delta hedge class currently
+	 * does not do a roll over.
+	 * If you like to investigate FULL_BOND_CURVE then unwind the hedge at fixing using FIXING_TIME_MARK_TO_MARKET
+	 */
 	public enum EvaluationMode {
 		/* Compare against the actual caplet cashflow at paymentTime. */
 		PAYMENT_TIME_CASHFLOW,
@@ -165,6 +190,9 @@ public class ForwardSensitivityCapletHedgingExperiment {
 			BasisType.CAPLET_FORWARD_POLYNOMIAL,
 	};
 
+	/*
+	 * List of lambdas we try below.
+	 */
 	private static final double[] REGULARIZATION_LAMBDAS = new double[] { 1E-6, 0.0, 1E-3, 1E-12 };
 
 	public static void main(final String[] args) throws Exception {
@@ -231,12 +259,13 @@ public class ForwardSensitivityCapletHedgingExperiment {
 					.withShowScatterPlots(true));
 		}
 
-		for(ModelType modelType : new ModelType[] { ModelType.HULL_WHITE , ModelType.LMM /*, ModelType.LMM_HW */ }) {
+		for(ModelType modelType : new ModelType[] { ModelType.HULL_WHITE, ModelType.HULL_WHITE_FINE, ModelType.LMM /*, ModelType.LMM_HW */ }) {
 			for(HedgeInstrumentSet hedgeInstrumentSet : new HedgeInstrumentSet[] { HedgeInstrumentSet.TWO_BONDS, HedgeInstrumentSet.TWO_BONDS_WITH_NOISE, HedgeInstrumentSet.FULL_BOND_CURVE, /* HedgeInstrumentSet.DISCRETE_ROLL_OVER_AND_PAYMENT_BOND */ }) {
 				experiments.add(ExperimentConfig.defaultConfig()
 						.withName(modelType.name() + " dynamic K>0")
 						.withModelType(modelType)
 						.withCapletStrike(DEFAULT_CAPLET_STRIKE)
+						.withRebalancingPerPeriod(modelType.getNumberOfSimulationStepsPerTenor())
 						.withStaticHedgeOnly(false)
 						.withEvaluationMode(EvaluationMode.FIXING_TIME_MARK_TO_MARKET)
 						.withHedgeInstrumentSet(hedgeInstrumentSet)
@@ -295,7 +324,7 @@ public class ForwardSensitivityCapletHedgingExperiment {
 		 * Simulation TimeDiscretization.
 		 */
 		final double simulationLastTime = tenorHorizon;
-		final double simulationTimeStep = TENOR_PERIOD_LENGTH / config.rebalancingPerPeriod;
+		final double simulationTimeStep = TENOR_PERIOD_LENGTH / config.modelType.getNumberOfSimulationStepsPerTenor();
 
 		/*
 		 * Hull-White short-rate parameters.
@@ -307,7 +336,6 @@ public class ForwardSensitivityCapletHedgingExperiment {
 		 * BrownianMotion.
 		 */
 		final int numberOfFactors = config.modelType.getNumberOfFactors();
-		final int seed = 321;
 
 		final String tenorInterpolationMethod = "linear";
 		final String simulationTimeInterpolationMethod = "round_down";
@@ -325,9 +353,7 @@ public class ForwardSensitivityCapletHedgingExperiment {
 
 		final double fixingTime = tenorHorizon - 10*TENOR_PERIOD_LENGTH;
 		final double paymentTime = fixingTime + TENOR_PERIOD_LENGTH;
-		final double evaluationTime = config.evaluationMode == EvaluationMode.PAYMENT_TIME_CASHFLOW
-				? paymentTime
-						: fixingTime;
+		final double evaluationTime = config.evaluationMode == EvaluationMode.PAYMENT_TIME_CASHFLOW ? paymentTime : fixingTime;
 
 		final Caplet capletPlain = new Caplet(fixingTime, TENOR_PERIOD_LENGTH, config.capletStrike);
 		AbstractTermStructureMonteCarloProduct capletProduct = new AbstractTermStructureMonteCarloProduct() {
@@ -339,26 +365,26 @@ public class ForwardSensitivityCapletHedgingExperiment {
 
 			capletProduct = capletPlain;
 
-			final double hedgeTimeStep = simulationTimeStep;
+			final double hedgeTimeStep = tenorHorizon/numberOfTenorPeriods/config.rebalancingPerPeriod;
 			final TimeDiscretization rebalancingTimes = config.staticHedgeOnly ? new TimeDiscretizationFromArray(new double[] { 0.0 }) : new TimeDiscretizationFromArray(0.0, (int)Math.round(fixingTime/hedgeTimeStep), hedgeTimeStep);
 
 			/*
 			 * Build TermStructureMonteCarloSimulationModel.
 			 */
 			final TermStructureMonteCarloSimulationModel liborSimulationPlain = switch(config.modelType) {
-			case HULL_WHITE -> ModelFactoryInterestRates.createHullWhiteSimulation(
+			case HULL_WHITE, HULL_WHITE_FINE -> ModelFactoryInterestRates.createHullWhiteSimulation(
 					forwardCurve,
 					config.useDiscountCurve ? discountCurve : null,
-							tenorHorizon,
-							TENOR_PERIOD_LENGTH,
-							simulationLastTime,
-							simulationTimeStep,
-							shortRateVolatility,
-							shortRateMeanReversion,
-							numberOfFactors*5,		// Run HW on 5 time the LMM path
-							config.numberOfPaths,
-							config.seed,
-							randomVariableFactory);
+					tenorHorizon,
+					TENOR_PERIOD_LENGTH,
+					simulationLastTime,
+					simulationTimeStep,
+					shortRateVolatility,
+					shortRateMeanReversion,
+					numberOfFactors*5,		// Run HW on 5 time the LMM path
+					config.numberOfPaths,
+					config.seed,
+					randomVariableFactory);
 			case LMM -> ModelFactoryInterestRates.createSimulationOriginal(
 					forwardCurve,
 					config.useDiscountCurve,
@@ -381,18 +407,19 @@ public class ForwardSensitivityCapletHedgingExperiment {
 			case LMM_HW -> ModelFactoryInterestRates.createSimulationHWasLMM(
 					forwardCurve,
 					config.useDiscountCurve ? discountCurve : null,
-							tenorHorizon,
-							TENOR_PERIOD_LENGTH,
-							simulationLastTime,
-							simulationTimeStep,
-							shortRateVolatility,
-							shortRateMeanReversion,
-							tenorInterpolationMethod,
-							simulationTimeInterpolationMethod,
-							numberOfFactors,
-							config.numberOfPaths,
-							config.seed,
-							randomVariableFactory);
+					tenorHorizon,
+					TENOR_PERIOD_LENGTH,
+					simulationLastTime,
+					simulationTimeStep,
+					shortRateVolatility,
+					shortRateMeanReversion,
+					tenorInterpolationMethod,
+					simulationTimeInterpolationMethod,
+					numberOfFactors,
+					config.numberOfPaths,
+					config.seed,
+					randomVariableFactory);
+			default -> throw new IllegalArgumentException("Unexpected value: " + config.modelType);
 			};
 
 			// liborSimulation
@@ -505,7 +532,8 @@ public class ForwardSensitivityCapletHedgingExperiment {
 
 			case TWO_BONDS:
 			default:
-				hedgeInstruments.add(new Bond(fixingTime));
+				hedgeInstruments.add(new DiscreteTenorRollOver(fixingTime, paymentTime, TENOR_PERIOD_LENGTH));
+//				hedgeInstruments.add(new Bond(fixingTime));
 				hedgeInstruments.add(new Bond(paymentTime));
 				break;
 			}
@@ -551,7 +579,7 @@ public class ForwardSensitivityCapletHedgingExperiment {
 					+ ", evaluationMode=" + config.evaluationMode
 					+ ", useAnalyticBondValuation=" + config.useAnalyticBondValuation);
 			System.out.println("basisTypes=" + Arrays.toString(BASIS_TYPES)
-					+ ", regularizationLambdas=" + Arrays.toString(REGULARIZATION_LAMBDAS));
+			+ ", regularizationLambdas=" + Arrays.toString(REGULARIZATION_LAMBDAS));
 			System.out.println("hedge instruments=" + describeHedgeInstruments(hedgeInstruments));
 			System.out.println("rebalancing times=" + rebalancingTimes.getNumberOfTimes() + " from "
 					+ rebalancingTimes.getFirstTime() + " to " + rebalancingTimes.getLastTime());
@@ -568,7 +596,7 @@ public class ForwardSensitivityCapletHedgingExperiment {
 				if(!config.staticHedgeOnly && rebalancingTimes.size() > 2) {
 					printAnalyticBondValuationDiagnostics(
 							"middle rebalance",
-							rebalancingTimes.getTimeIndex(rebalancingTimes.size() / 2),
+							rebalancingTimes.getTime(rebalancingTimes.size() / 2),
 							bondDiagnosticsSubset(hedgeInstruments),
 							TENOR_PERIOD_LENGTH,
 							liborSimulation);
@@ -675,7 +703,7 @@ public class ForwardSensitivityCapletHedgingExperiment {
 								paymentTime,
 								evaluationTime,
 								config.saveToFile,
-								"" + config.modelType + "," + config.hedgeInstrumentSet + "@" + config.rebalancingPerPeriod + "," + basisType + "," + regularizationLambda + ",Caplet@" + config.capletStrike + "," + "," + config.evaluationMode);
+								"" + config.modelType + "," + config.hedgeInstrumentSet + "@" + config.rebalancingPerPeriod + "," + basisType + "," + regularizationLambda + ",Caplet@" + config.capletStrike + "," + config.evaluationMode);
 					}
 				}
 			}
@@ -768,8 +796,8 @@ public class ForwardSensitivityCapletHedgingExperiment {
 				addLocalizedForwardBasisFunctions(basis, forward, one, zero, 0, maxPower+1, -1.0);
 			}
 
-//			final RandomVariable numeraire = model.getNumeraire(evaluationTime);
-//			basis.addAll(new Monomials(1, maxPower + 1).of(numeraire));
+			//			final RandomVariable numeraire = model.getNumeraire(evaluationTime);
+			//			basis.addAll(new Monomials(1, maxPower + 1).of(numeraire));
 
 			return basis.toArray(new RandomVariable[basis.size()]);
 		};
@@ -853,19 +881,6 @@ public class ForwardSensitivityCapletHedgingExperiment {
 				model);
 
 		return capletCashflowAmount.mult(paymentBondAtFixing);
-	}
-
-	private static double[] createRebalancingTimes(
-			final double firstTime,
-			final double lastTime,
-			final double timeStep) {
-
-		final int numberOfTimes = (int)Math.round((lastTime - firstTime) / timeStep) + 1;
-		final double[] times = new double[numberOfTimes];
-		for(int timeIndex = 0; timeIndex < numberOfTimes; timeIndex++) {
-			times[timeIndex] = firstTime + timeIndex * timeStep;
-		}
-		return times;
 	}
 
 	private static void printRollOverDiagnostic(
@@ -1122,32 +1137,52 @@ public class ForwardSensitivityCapletHedgingExperiment {
 			final boolean saveToFile,
 			final String configSpec) throws CalculationException {
 
-		final double xMin = forwardRateAtFixing.getQuantile(0.01);
-		final double xMax = forwardRateAtFixing.getQuantile(0.99);
-
 		final NumberFormat percentageFormat = DecimalFormat.getPercentInstance();
 		percentageFormat.setMinimumFractionDigits(2);
 
+		// For plots: weight of the stroke
+		Stroke dotted = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0f, new float[] {5,5}, 0);
+		Stroke stroke = new BasicStroke(3.0f);
+		double r = 0.5;
+		java.awt.Shape point = new Ellipse2D.Double(-r, -r, 2*r, 2*r);
+
 		for(final HedgeRunResult result : results) {
 
-			boolean isPlotValue = false;
+			boolean isPlotValue = true;
 			if(isPlotValue) {
-				final Plot2D plotValue = Plots.createScatter(Arrays.stream(forwardRateAtFixing.getRealizations()).boxed().toList(), Collections.orderedMapOf(
-						"hedge", Arrays.stream(result.hedgeValue.getRealizations()).boxed().toList(),
-						"target", Arrays.stream(targetValue.getRealizations()).boxed().toList()
-						), xMin, xMax, 1)
-						.setTitle("Hedge of Caplet using " + result.name)
-						.setSubtitle("(" + configSpec + ")")
-						.setXAxisLabel("Forrward Rate L(" + fixingTime + ", " + paymentTime + ") at Fixing")
-						.setYAxisLabel("value at t=" + evaluationTime)
-						.setXAxisNumberFormat(percentageFormat)
-						.setYAxisNumberFormat(percentageFormat)
-						.setXRange(-0.02, 0.07)
-						.setYRange(-0.02, 0.07);
-				plotValue.show();
+				List<Point2D> target = new ArrayList<>();
+				List<Point2D> hedge = new ArrayList<>();
+				for(int pathIndex = 0; pathIndex < result.hedgeError.size(); pathIndex++) {
+					target.add(new Point2D(forwardRateAtFixing.get(pathIndex), targetValue.get(pathIndex)));
+					hedge.add(new Point2D(forwardRateAtFixing.get(pathIndex), result.hedgeValue.get(pathIndex)));
+				}
+
+				final List<Plotable2D> plotables = List.of(
+						new PlotablePoints2D("hedge", hedge,
+								new GraphStyle(point, null, Color.RED)),
+						new PlotablePointsWithConfidenceIntervall2D("hedge", target,
+								new Named<DoubleUnaryOperator>("target - 2 stdDev", (DoubleUnaryOperator)
+										x -> -2*result.hedgeError.getStandardDeviation()
+										),
+								new Named<DoubleUnaryOperator>("target + 2 stdDev", (DoubleUnaryOperator)
+										x -> +2*result.hedgeError.getStandardDeviation()
+										),
+								new GraphStyle(null, dotted, Color.GREEN, ColorUtils.colorWithAlpha(Color.CYAN, 0.4)))
+						);
+				final Plot2D plotValue = new Plot2D(plotables);
+				plotValue
+				.setTitle("Hedge of Caplet using " + result.name)
+				.setSubtitle("(" + configSpec + ")")
+				.setXAxisLabel("Forrward Rate L(" + fixingTime + ", " + paymentTime + ") at Fixing")
+				.setYAxisLabel("value at t=" + evaluationTime)
+				.setXAxisNumberFormat(percentageFormat)
+				.setYAxisNumberFormat(percentageFormat)
+				.setXRange(-0.01, 0.05)
+				.setYRange(-0.01, 0.03)
+				.show();
 				if(saveToFile) {
 					try {
-						plotValue.saveAsPDF(new File("Hedge-Value-" + result.name + "(" + configSpec + ").pdf"), 800, 400);
+						plotValue.saveAsPDF(new File("Hedge-Value-(" + configSpec + ")-" + result.name + ").pdf"), 800, 400);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -1155,12 +1190,7 @@ public class ForwardSensitivityCapletHedgingExperiment {
 				}
 			}
 
-			// For plots: weight of the stroke
-			Stroke dotted = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0f, new float[] {5,5}, 0);
-			Stroke stroke = new BasicStroke(3.0f);
-			double r = 0.5;
-			java.awt.Shape point = new Ellipse2D.Double(-r, -r, 2*r, 2*r);
-			
+
 			List<Point2D> errors = new ArrayList<>();
 			for(int pathIndex = 0; pathIndex < result.hedgeError.size(); pathIndex++) {
 				errors.add(new Point2D(forwardRateAtFixing.get(pathIndex), result.hedgeError.get(pathIndex)));
@@ -1198,7 +1228,7 @@ public class ForwardSensitivityCapletHedgingExperiment {
 			.show();
 			if(saveToFile) {
 				try {
-					plot.saveAsPDF(new File("Hedge-Error-(" + configSpec + ")-"+ result.name + ".pdf"), 800, 400);
+					plot.saveAsPDF(new File("Hedge-Error-(" + configSpec + ")-" + result.name + ".pdf"), 800, 400);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -1313,13 +1343,13 @@ public class ForwardSensitivityCapletHedgingExperiment {
 					false, /* staticHedgeOnly */
 					true, /* printStaticDiagnostics */
 					true, /* useAnalyticBondValuation */
-					false, /* printBondValuationDiagnostics */
+					true, /* printBondValuationDiagnostics */
 					false, /* saveToFile */
 					ModelType.LMM_HW,
 					HedgeInstrumentSet.TWO_BONDS,
 					EvaluationMode.PAYMENT_TIME_CASHFLOW,
-					10000,
-					3141, /* seed */
+					NUMBER_OF_PATHS,
+					SEED, /* seed */
 					1,
 					DEFAULT_CAPLET_STRIKE);
 		}
@@ -1370,6 +1400,12 @@ public class ForwardSensitivityCapletHedgingExperiment {
 			return copy(name, useDiscountCurve, showScatterPlots, staticHedgeOnly, printStaticDiagnostics,
 					useAnalyticBondValuation, printBondValuationDiagnostics, saveToFile, modelType, hedgeInstrumentSet,
 					value, numberOfPaths, seed, rebalancingPerPeriod, capletStrike);
+		}
+
+		public ExperimentConfig withRebalancingPerPeriod(final int value) {
+			return copy(name, useDiscountCurve, showScatterPlots, staticHedgeOnly, printStaticDiagnostics,
+					useAnalyticBondValuation, printBondValuationDiagnostics, saveToFile, modelType, hedgeInstrumentSet,
+					evaluationMode, numberOfPaths, seed, value, capletStrike);
 		}
 
 		public ExperimentConfig withCapletStrike(final double value) {

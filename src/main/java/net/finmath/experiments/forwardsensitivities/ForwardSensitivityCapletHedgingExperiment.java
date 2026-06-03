@@ -9,6 +9,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.Stroke;
+import java.awt.geom.Ellipse2D;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputFilter.Config;
@@ -160,8 +161,8 @@ public class ForwardSensitivityCapletHedgingExperiment {
 
 	private static final BasisType[] BASIS_TYPES = new BasisType[] {
 			BasisType.PROCESS_STATE_POLYNOMIAL,
+			BasisType.CAPLET_FORWARD_ONLY,
 			BasisType.CAPLET_FORWARD_POLYNOMIAL,
-			BasisType.CAPLET_FORWARD_ONLY
 	};
 
 	private static final double[] REGULARIZATION_LAMBDAS = new double[] { 1E-6, 0.0, 1E-3, 1E-12 };
@@ -230,8 +231,8 @@ public class ForwardSensitivityCapletHedgingExperiment {
 					.withShowScatterPlots(true));
 		}
 
-		for(ModelType modelType : new ModelType[] { ModelType.LMM, ModelType.HULL_WHITE, ModelType.LMM_HW }) {
-			for(HedgeInstrumentSet hedgeInstrumentSet : new HedgeInstrumentSet[] { HedgeInstrumentSet.TWO_BONDS, /* HedgeInstrumentSet.TWO_BONDS_WITH_NOISE, */ HedgeInstrumentSet.FULL_BOND_CURVE, HedgeInstrumentSet.DISCRETE_ROLL_OVER_AND_PAYMENT_BOND }) {
+		for(ModelType modelType : new ModelType[] { ModelType.HULL_WHITE , ModelType.LMM /*, ModelType.LMM_HW */ }) {
+			for(HedgeInstrumentSet hedgeInstrumentSet : new HedgeInstrumentSet[] { HedgeInstrumentSet.TWO_BONDS, HedgeInstrumentSet.TWO_BONDS_WITH_NOISE, HedgeInstrumentSet.FULL_BOND_CURVE, /* HedgeInstrumentSet.DISCRETE_ROLL_OVER_AND_PAYMENT_BOND */ }) {
 				experiments.add(ExperimentConfig.defaultConfig()
 						.withName(modelType.name() + " dynamic K>0")
 						.withModelType(modelType)
@@ -765,11 +766,10 @@ public class ForwardSensitivityCapletHedgingExperiment {
 				addLocalizedForwardBasisFunctions(basis, forward, one, zero, 0, maxPower+1, 0.0);
 				addLocalizedForwardBasisFunctions(basis, forward, one, zero, 0, maxPower+1, 1.0);
 				addLocalizedForwardBasisFunctions(basis, forward, one, zero, 0, maxPower+1, -1.0);
-				addLocalizedForwardBasisFunctions(basis, forward, one, zero, 0, maxPower+1, -0.5);
 			}
 
-			final RandomVariable numeraire = model.getNumeraire(evaluationTime);
-			//			addLocalizedForwardBasisFunctions(basis, numeraire, one, zero, maxPower, 0.0);
+//			final RandomVariable numeraire = model.getNumeraire(evaluationTime);
+//			basis.addAll(new Monomials(1, maxPower + 1).of(numeraire));
 
 			return basis.toArray(new RandomVariable[basis.size()]);
 		};
@@ -1052,12 +1052,14 @@ public class ForwardSensitivityCapletHedgingExperiment {
 				100.0 * varianceReduction);
 
 		System.out.printf(Locale.US,
-				"%-16s timings: total=%6.2fs, valuation=%6.2fs, trade-values=%6.2fs, hedge-ratios=%6.2fs, rebalances=%d%n",
+				"%-16s timings: total=%6.2fs, valuation=%6.2fs, trade-values=%6.2fs, hedge-ratios=%6.2fs, project=%6.2fs, solve=%6.2fs, rebalances=%d%n",
 				name,
 				hedge.getLastOperationTimingTotal(),
 				hedge.getLastOperationTimingValuation(),
 				hedge.getLastOperationTimingTradeValues(),
 				hedge.getLastOperationTimingHedgeRatios(),
+				hedge.getLastOperationTimingHedgeRatioProject(),
+				hedge.getLastOperationTimingHedgeRatioSolve(),
 				hedge.getLastRebalancingTimes().size());
 
 		printFirstRebalanceHedgeRatios(name, hedge);
@@ -1156,8 +1158,9 @@ public class ForwardSensitivityCapletHedgingExperiment {
 			// For plots: weight of the stroke
 			Stroke dotted = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0f, new float[] {5,5}, 0);
 			Stroke stroke = new BasicStroke(3.0f);
-			Rectangle point = new Rectangle(1, 1);
-
+			double r = 0.5;
+			java.awt.Shape point = new Ellipse2D.Double(-r, -r, 2*r, 2*r);
+			
 			List<Point2D> errors = new ArrayList<>();
 			for(int pathIndex = 0; pathIndex < result.hedgeError.size(); pathIndex++) {
 				errors.add(new Point2D(forwardRateAtFixing.get(pathIndex), result.hedgeError.get(pathIndex)));

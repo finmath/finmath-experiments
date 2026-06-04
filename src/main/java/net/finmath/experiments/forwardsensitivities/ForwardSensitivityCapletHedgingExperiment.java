@@ -13,6 +13,8 @@ import java.awt.geom.Ellipse2D;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputFilter.Config;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -21,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.DoubleUnaryOperator;
 
 import net.finmath.exception.CalculationException;
@@ -58,6 +61,7 @@ import net.finmath.plots.Plots;
 import net.finmath.plots.Point2D;
 import net.finmath.plots.util.ColorUtils;
 import net.finmath.stochastic.RandomVariable;
+import net.finmath.stochastic.Scalar;
 import net.finmath.stochastic.operators.Monomials;
 import net.finmath.time.TimeDiscretization;
 import net.finmath.time.TimeDiscretizationFromArray;
@@ -259,8 +263,10 @@ public class ForwardSensitivityCapletHedgingExperiment {
 					.withShowScatterPlots(true));
 		}
 
-		for(ModelType modelType : new ModelType[] { ModelType.HULL_WHITE, ModelType.HULL_WHITE_FINE, ModelType.LMM /*, ModelType.LMM_HW */ }) {
-			for(HedgeInstrumentSet hedgeInstrumentSet : new HedgeInstrumentSet[] { HedgeInstrumentSet.TWO_BONDS, HedgeInstrumentSet.TWO_BONDS_WITH_NOISE, HedgeInstrumentSet.FULL_BOND_CURVE, /* HedgeInstrumentSet.DISCRETE_ROLL_OVER_AND_PAYMENT_BOND */ }) {
+		for(ModelType modelType : new ModelType[] { ModelType.HULL_WHITE_FINE, ModelType.HULL_WHITE, ModelType.LMM /*, ModelType.LMM_HW */ }) {
+			for(HedgeInstrumentSet hedgeInstrumentSet : new HedgeInstrumentSet[] {
+					HedgeInstrumentSet.TWO_BONDS, HedgeInstrumentSet.TWO_BONDS_WITH_NOISE,
+					HedgeInstrumentSet.FULL_BOND_CURVE, /* HedgeInstrumentSet.DISCRETE_ROLL_OVER_AND_PAYMENT_BOND */ }) {
 				experiments.add(ExperimentConfig.defaultConfig()
 						.withName(modelType.name() + " dynamic K>0")
 						.withModelType(modelType)
@@ -695,15 +701,21 @@ public class ForwardSensitivityCapletHedgingExperiment {
 							targetValueAtEvaluationTime));
 
 					if(config.showScatterPlots) {
-						showScatterPlots(
-								forwardRateAtFixing,
-								targetValueAtEvaluationTime,
-								results,
-								fixingTime,
-								paymentTime,
-								evaluationTime,
-								config.saveToFile,
-								"" + config.modelType + "," + config.hedgeInstrumentSet + "@" + config.rebalancingPerPeriod + "," + basisType + "," + regularizationLambda + ",Caplet@" + config.capletStrike + "," + config.evaluationMode);
+						CompletableFuture.runAsync(() -> {
+							try {
+								showScatterPlots(
+										forwardRateAtFixing,
+										targetValueAtEvaluationTime,
+										results,
+										fixingTime,
+										paymentTime,
+										evaluationTime,
+										config.saveToFile,
+										"" + config.modelType + "," + config.hedgeInstrumentSet + "@" + config.rebalancingPerPeriod + "," + basisType + "," + regularizationLambda + ",Caplet@" + config.capletStrike + "," + config.evaluationMode);
+							} catch (CalculationException e) {
+								e.printStackTrace();
+							}
+						});
 					}
 				}
 			}
@@ -851,7 +863,7 @@ public class ForwardSensitivityCapletHedgingExperiment {
 			final RandomVariable[] processState = model.getProcess().getProcessValue(processTimeIndex);
 			for(final RandomVariable stateComponent : processState) {
 				/* Skip exponent 0 here, because the constant was already added. */
-				basis.addAll(new Monomials(1, maxPower + 1).of(stateComponent));
+				basis.addAll(new Monomials(1, maxPower + 1).of(stateComponent.getValues()));
 			}
 
 			return basis.toArray(new RandomVariable[basis.size()]);
@@ -1182,7 +1194,8 @@ public class ForwardSensitivityCapletHedgingExperiment {
 				.show();
 				if(saveToFile) {
 					try {
-						plotValue.saveAsPDF(new File("Hedge-Value-(" + configSpec + ")-" + result.name + ").pdf"), 800, 400);
+						final Path path = Files.createDirectories(Path.of("images",ForwardSensitivityCapletHedgingExperiment.class.getName()));
+						plotValue.saveAsPDF(new File(path + File.separator + "Hedge-Value-(" + configSpec + ")-" + result.name + ").pdf"), 800, 400);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -1228,7 +1241,8 @@ public class ForwardSensitivityCapletHedgingExperiment {
 			.show();
 			if(saveToFile) {
 				try {
-					plot.saveAsPDF(new File("Hedge-Error-(" + configSpec + ")-" + result.name + ".pdf"), 800, 400);
+					final Path path = Files.createDirectories(Path.of("images",ForwardSensitivityCapletHedgingExperiment.class.getName()));
+					plot.saveAsPDF(new File(path + File.separator + "Hedge-Error-(" + configSpec + ")-" + result.name + ".pdf"), 800, 400);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

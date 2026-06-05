@@ -263,7 +263,9 @@ public class ForwardSensitivityCapletHedgingExperiment {
 					.withShowScatterPlots(true));
 		}
 
-		for(ModelType modelType : new ModelType[] { ModelType.HULL_WHITE_FINE, ModelType.HULL_WHITE, ModelType.LMM /*, ModelType.LMM_HW */ }) {
+		for(ModelType modelType : new ModelType[] {
+//				ModelType.HULL_WHITE_FINE, ModelType.HULL_WHITE,
+				ModelType.LMM /*, ModelType.LMM_HW */ }) {
 			for(HedgeInstrumentSet hedgeInstrumentSet : new HedgeInstrumentSet[] {
 					HedgeInstrumentSet.TWO_BONDS, HedgeInstrumentSet.TWO_BONDS_WITH_NOISE,
 					HedgeInstrumentSet.FULL_BOND_CURVE, /* HedgeInstrumentSet.DISCRETE_ROLL_OVER_AND_PAYMENT_BOND */ }) {
@@ -538,8 +540,8 @@ public class ForwardSensitivityCapletHedgingExperiment {
 
 			case TWO_BONDS:
 			default:
-				hedgeInstruments.add(new DiscreteTenorRollOver(fixingTime, paymentTime, TENOR_PERIOD_LENGTH));
-//				hedgeInstruments.add(new Bond(fixingTime));
+//				hedgeInstruments.add(new DiscreteTenorRollOver(fixingTime, paymentTime, TENOR_PERIOD_LENGTH));
+				hedgeInstruments.add(new Bond(fixingTime));
 				hedgeInstruments.add(new Bond(paymentTime));
 				break;
 			}
@@ -701,7 +703,7 @@ public class ForwardSensitivityCapletHedgingExperiment {
 							targetValueAtEvaluationTime));
 
 					if(config.showScatterPlots) {
-						CompletableFuture.runAsync(() -> {
+//						CompletableFuture.runAsync(() -> {
 							try {
 								showScatterPlots(
 										forwardRateAtFixing,
@@ -715,7 +717,7 @@ public class ForwardSensitivityCapletHedgingExperiment {
 							} catch (CalculationException e) {
 								e.printStackTrace();
 							}
-						});
+//						});
 					}
 				}
 			}

@@ -264,8 +264,10 @@ public class ForwardSensitivityCapletHedgingExperiment {
 		}
 
 		for(ModelType modelType : new ModelType[] {
-//				ModelType.HULL_WHITE_FINE, ModelType.HULL_WHITE,
-				ModelType.LMM /*, ModelType.LMM_HW */ }) {
+				ModelType.HULL_WHITE_FINE,
+				ModelType.HULL_WHITE,
+				ModelType.LMM, ModelType.LMM_HW
+				}) {
 			for(HedgeInstrumentSet hedgeInstrumentSet : new HedgeInstrumentSet[] {
 					HedgeInstrumentSet.TWO_BONDS, HedgeInstrumentSet.TWO_BONDS_WITH_NOISE,
 					HedgeInstrumentSet.FULL_BOND_CURVE, /* HedgeInstrumentSet.DISCRETE_ROLL_OVER_AND_PAYMENT_BOND */ }) {

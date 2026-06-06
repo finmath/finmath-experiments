@@ -18,7 +18,7 @@
 		<jpackage.app.version>1.0.16</jpackage.app.version>
 		
 		<junit.version>5.6.2</junit.version>
-		<finmath-lib.version>6.1.7</finmath-lib.version>
+		<finmath-lib.version>6.1.8</finmath-lib.version>
 		<finmath-plot.version>0.5.8</finmath-plot.version>
 		<finmath-opencl.version>5.1.3</finmath-opencl.version>
 		<finmath-cuda.version>5.1.3</finmath-cuda.version>

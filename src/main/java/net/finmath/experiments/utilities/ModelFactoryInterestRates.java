@@ -615,8 +615,7 @@ public class ModelFactoryInterestRates {
 				calibrationItems,
 				properties);
 		
-		final BrownianMotion brownianMotion = 
-				new BrownianMotionFromMersenneRandomNumbers(simulationTimeDiscretization, numberOfFactors, numberOfPaths, seed);
+		final BrownianMotion brownianMotion = new BrownianMotionFromMersenneRandomNumbers(simulationTimeDiscretization, numberOfFactors, numberOfPaths, seed, randomVariableFactory);
 	
 		final MonteCarloProcess process = new EulerSchemeFromProcessModel(liborMarketModel, brownianMotion);
 	

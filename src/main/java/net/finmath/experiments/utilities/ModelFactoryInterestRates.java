@@ -135,7 +135,8 @@ public class ModelFactoryInterestRates {
 				timeDiscretization,
 				numberOfFactors,
 				numberOfPaths,
-				seed);
+				seed,
+				randomVariableFactory);
 
 		final EulerSchemeFromProcessModel process = new EulerSchemeFromProcessModel(
 				hullWhiteModel,
@@ -699,8 +700,12 @@ public class ModelFactoryInterestRates {
 				calibrationItems,
 				properties);
 		
-		final BrownianMotion brownianMotion = 
-				new BrownianMotionFromMersenneRandomNumbers(simulationTimeDiscretization, numberOfFactors, numberOfPaths, seed);
+		final BrownianMotion brownianMotion = new BrownianMotionFromMersenneRandomNumbers(
+				simulationTimeDiscretization,
+				numberOfFactors,
+				numberOfPaths,
+				seed,
+				randomVariableFactory);
 	
 		final MonteCarloProcess process = new EulerSchemeFromProcessModel(liborMarketModel, brownianMotion);
 	

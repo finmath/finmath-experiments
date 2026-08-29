@@ -679,7 +679,7 @@ public class ForwardSensitivityCapletHedgingExperiment {
 		switch(config.hedgeInstrumentSet) {
 		case FULL_BOND_CURVE:
 			for(final double maturity : tenorTimeDiscretization) {
-				if(maturity > 0.0) {
+				if(maturity >= evaluationTime) {
 					hedgeInstruments.add(new Bond(maturity));
 				}
 			}

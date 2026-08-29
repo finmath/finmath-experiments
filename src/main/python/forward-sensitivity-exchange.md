@@ -86,7 +86,7 @@ recomputes the Java AAD system for this validation and for the unchanged raw
 comparison; it is a reproducible projection replay rather than a model-free
 hedge replay.
 
-Full-curve datasets are large. For example, 20,000 paths, 40 risk factors, 40
-hedges, and 31 rebalancing dates require roughly 8 GB for the raw sensitivity
+Full-curve datasets are large. For example, 20,000 paths, 40 risk factors, 11
+hedges, and 31 rebalancing dates require roughly 2.4 GB for the raw sensitivity
 payload alone. Sharding by rebalancing date permits streaming or incremental
 processing without loading the full dataset at once.
